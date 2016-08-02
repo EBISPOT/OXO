@@ -1,0 +1,81 @@
+CREATE CONSTRAINT ON (i:Identifier) ASSERT i.identifier IS UNIQUE
+CREATE CONSTRAINT ON (i:Uri) ASSERT i.identifier IS UNIQUE
+CREATE CONSTRAINT ON (i:Cui) ASSERT i.identifier IS UNIQUE
+CREATE CONSTRAINT ON (i:PrefixedCui) ASSERT i.identifier IS UNIQUE
+CREATE CONSTRAINT ON (i:Datasource) ASSERT i.prefix IS UNIQUE
+
+CREATE INDEX ON :Datasource(source)
+CREATE INDEX ON :MAPPING(sourceName)
+CREATE INDEX ON :MAPPING(scope)
+
+
+Queries
+
+Get direct xrefs for a term (show sources)
+
+
+Match (u:Uri)-[r1:XREF]->(x:PrefixedCui)<-[r2:XREF]-(u1:Uri)
+Where u.identifier = 'http://www.ebi.ac.uk/efo/EFO_0000349'
+Return u1.identifier, collect (distinct r1.sourcePrefix) + collect(distinct r2.sourcePrefix)
+
+
+Get derived xrefs (1 hop) - high score
+
+term -> xref -> term -> xref
+
+Get derived xrefs (4 hops) - low score
+
+Get lexical mappings
+	- search zooma, get best hits, get high score mappings for those
+
+
+Mapping project
+
+1. Take HP, hit Zooma with each label, get ORDO hits. 
+2. Take HP, hit Zooma, with each id hit, get mappings to ordo. 
+
+
+MATCH (c:Identifier)-[*1..5]-(m:Uri) 
+WHERE c.identifier = 'HP:0000819'
+WITH m as mappedUri
+MATCH (mappedUri)-[:DATASOURCE]->(d:Datasource { prefix : 'ordo'})
+WITH mappedUri as ordoUri
+MATCH (ordoUri)-[ATLID]->(ordoP:PrefixedCui)
+RETURN distinct ordoP.identifier 
+
+
+MATCH (source:Uri)-[DATASOURCE]->(d:Datasource { prefix : 'efo'})
+WITH source
+MATCH path = allShortestPaths ( (c:Identifier)-[:ALTID|:XREF*..10]-(source) )
+WHERE c.identifier = 'DOID_4467'
+RETURN distinct source.identifier , length(path) as dist
+ORDER BY dist
+
+
+// find a Uri 
+
+MATCH (i:Identifier)-[*0..1]-(u:Uri)
+WHERE i.identifier = 'EFO_0000001'
+RETURN u.identifier 
+
+
+
+// Use case
+
+Given set of identifiers
+
+1. Get all mappings (don't map to own datasource)
+
+x1 mapped to y1 (1 sources)
+x1 mapped to y2 (2 sources)
+x1 mapped to z3 (2 sources) (inferred) (show)
+
+2. Get mappings to ontology (e..g HP)
+
+x1 mapped to y1 (1 sources)
+x1 mapped to y2 (2 sources)
+x1 mapped to z3 (2 sources) (inferred) (show)
+
+3. Need ability to validate
+
+4. Ability to add new mapping
