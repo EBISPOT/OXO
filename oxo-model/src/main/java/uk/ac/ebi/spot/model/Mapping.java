@@ -24,14 +24,20 @@ public class Mapping {
     @Property
     private String sourcePrefix;
 
-    @StartNode
-    private Identifier fromIdentifier;
-
-    @EndNode
-    private Identifier toIdentifier;
+    @Property
+    private SourceType sourceType = SourceType.MANUAL;
 
     @Property
-    private Scope scope;
+    private SourceType predicate;
+
+    @StartNode
+    private Term fromTerm;
+
+    @EndNode
+    private Term toTerm;
+
+    @Property
+    private Scope scope = Scope.RELATED;
 
     @DateString("yy-MM-dd")
     private Date date;
@@ -40,24 +46,48 @@ public class Mapping {
     public Mapping() {
     }
 
-    public Identifier getFromIdentifier() {
-        return fromIdentifier;
+    public Long getMappingId() {
+        return mappingId;
     }
 
-    public void setFromIdentifier(Identifier fromIdentifier) {
-        this.fromIdentifier = fromIdentifier;
+    public void setMappingId(Long mappingId) {
+        this.mappingId = mappingId;
     }
 
-    public Identifier getToIdentifier() {
-        return toIdentifier;
+    public Term getFromTerm() {
+            return fromTerm;
+        }
+
+    public SourceType getSourceType() {
+        return sourceType;
     }
 
-    public void setToIdentifier(Identifier toIdentifier) {
-        this.toIdentifier = toIdentifier;
+    public void setSourceType(SourceType sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public void setFromTerm(Term fromTerm) {
+        this.fromTerm = fromTerm;
+    }
+
+    public Term getToTerm() {
+        return toTerm;
+    }
+
+    public void setToTerm(Term toTerm) {
+        this.toTerm = toTerm;
     }
 
     public void setScope(Scope scope) {
         this.scope = scope;
+    }
+
+    public SourceType getPredicate() {
+        return predicate;
+    }
+
+    public void setPredicate(SourceType predicate) {
+        this.predicate = predicate;
     }
 
     public void setDate(Date date) {

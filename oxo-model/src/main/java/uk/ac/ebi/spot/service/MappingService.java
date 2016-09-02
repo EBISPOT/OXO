@@ -1,15 +1,16 @@
 package uk.ac.ebi.spot.service;
 
-import org.neo4j.ogm.model.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.template.Neo4jOperations;
-import org.springframework.data.neo4j.template.Neo4jTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.spot.model.Datasource;
-import uk.ac.ebi.spot.model.Identifier;
-import uk.ac.ebi.spot.model.Mapping;
-import uk.ac.ebi.spot.model.MappingSource;
+import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.spot.exception.*;
+import uk.ac.ebi.spot.model.*;
 import uk.ac.ebi.spot.repository.MappingRepository;
+import uk.ac.ebi.spot.repository.TermGraphRepository;
 
 import java.util.*;
 
@@ -21,10 +22,10 @@ import java.util.*;
 @Service
 public class MappingService {
 
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private IdentifierService identifierService;
-
+    private TermGraphRepository termGraphRepository;
 
     @Autowired
     private MappingRepository mappingRepository;
@@ -33,68 +34,72 @@ public class MappingService {
     private DatasourceService datasourceService;
 
     @Autowired
-    Neo4jOperations neo4jOperations;
+    MappingQueryService mappingQueryService;
 
     @Autowired
-    Neo4jTemplate neo4jTemplate;
-//    @Autowired
-//    CypherMappingQueryBuilder cypherMappingQueryBuilder;
+    TermService termService;
 
     public MappingService() {
     }
 
-    public void getOrCreateMappings(Collection<MappingSource> mappingSources) {
+    /**
+     * Save a mapping between two terms. Terms must have a prefix that is from a known datasource
+     * @param fromId
+     * @param toId
+     * @param datasourcePrefix
+     * @param sourceType
+     * @param scope
+     * @return
+     * @throws UnknownTermException
+     * @throws UnknownDatasourceException
+     */
+    @Transactional
+    public Mapping save(String fromId, String toId, String datasourcePrefix, SourceType sourceType, Scope scope) throws MappingException, UnknownTermException, UnknownDatasourceException, InvalidCurieException {
 
-        for (MappingSource mappingSource : mappingSources) {
 
-            List<Mapping> mappingCollection = new ArrayList<>();
-            Collection<Mapping> mappings = mappingSource.getMappings();
+        Term fromT = termService.getOrCreateTerm(fromId, null, null);
+        Term toT = termService.getOrCreateTerm(toId, null, null);
 
-            Datasource datasource = mappingSource.getDatasource();
-            datasource = datasourceService.getOrCreateDatasource(datasource);
 
-            System.out.println("About to process " + mappings.size() + " mappings for " + datasource.getPrefix());
-            int counter = 0;
-            try {
-                for (Mapping mapping : mappings) {
+        Mapping mapping = mappingRepository.findOneByMappingBySourceAndId(fromT.getCurie(), toT.getCurie(), datasourcePrefix, scope.toString());
 
-                    Identifier fromId = identifierService.getOrCreateIdentifier(mapping.getFromIdentifier());
-                    Identifier toId = identifierService.getOrCreateIdentifier(mapping.getToIdentifier());
-
-                    mapping.setFromIdentifier(fromId);
-                    mapping.setToIdentifier(toId);
-
-                    mapping.setDatasource(datasource);
-                    mappingCollection.add(mapping);
-
-                    if (counter == 1000) {
-                        System.out.print(".");
-                        counter=0;
-                    }
-                    counter++;
-                }
-
-                mappingRepository.save(mappingCollection);
-             } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (mapping != null) {
+            throw new MappingException("Mapping between these identifiers already exists from this source");
         }
+        mapping = new Mapping();
 
+
+        Datasource datasource = datasourceService.getDatasource(datasourcePrefix);
+        if (datasource == null) {
+            throw new UnknownDatasourceException("You can only create mappings for an existing datasource");
+        }
+        mapping.setFromTerm(fromT);
+        mapping.setToTerm(toT);
+        mapping.setDatasource(datasource);
+        mapping.setSourcePrefix(datasource.getPrefix());
+        mapping.setSourceType(sourceType);
+        mapping.setScope(scope);
+        mapping.setDate(new Date());
+        return mappingRepository.save(mapping);
     }
 
-    public List<CypherMappingQueryBuilder.MappingResponse> getMappingsSearch(String id, int distance, String sourcePrefix) {
-        Result results = neo4jOperations.query(CypherMappingQueryBuilder.getMappingQuery(id, distance, sourcePrefix), new HashMap());
-        List<CypherMappingQueryBuilder.MappingResponse> target = new ArrayList<>();
-        for (Map<String, Object> row : results)  {
-            CypherMappingQueryBuilder.MappingResponse response = new CypherMappingQueryBuilder.MappingResponse();
-            response.setIri((String) row.get("iri"));
-            response.setCurie((String) row.get("curie"));
-            response.setCurie((String) row.get("curie"));
+    public Page<Mapping> getMappingBySource(String sourcePrefix, Pageable pageable) {
+        Datasource datasource = datasourceService.getDatasource(sourcePrefix);
+        return mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable);
+    }
 
-//            neo4jTemplate.getDefaultConverter().
+    public LinkedHashMap<String, List<MappingResponse>> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
+
+        LinkedHashMap<String, List<MappingResponse>> mappingResponses = new LinkedHashMap<>();
+
+        for (String id : identifiers) {
+            Term fromTerm = termService.getTerm(id);
+            // could check that source prefix and target prefixes are valid...
+
+            mappingResponses.put(fromTerm.getCurie(), mappingQueryService.getMappingResponseSearch(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix));
         }
-//        results.forEach(target::add);
-        return target;
+
+        return mappingResponses;
     }
 
 
@@ -104,6 +109,15 @@ public class MappingService {
     }
 
 
+    public Page<Mapping> getMappings(Pageable pageable) {
+        return mappingRepository.findAll(pageable);
+    }
 
+    public Mapping getMapping(String id) {
+        return mappingRepository.findOne(Long.getLong(id));
+    }
 
+    public Object getSummaryJson() {
+        return mappingQueryService.getMappingSummary();
+    }
 }

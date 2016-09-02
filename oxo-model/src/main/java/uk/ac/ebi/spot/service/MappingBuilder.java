@@ -1,8 +1,6 @@
 package uk.ac.ebi.spot.service;
 
 import uk.ac.ebi.spot.model.*;
-import uk.ac.ebi.spot.util.IdentifierType;
-import uk.ac.ebi.spot.util.MappingType;
 
 import java.util.Date;
 
@@ -13,15 +11,10 @@ import java.util.Date;
  */
 public class MappingBuilder {
 
-    private String fromId;
-    private IdentifierType fromType;
-    private Datasource fromDatasource;
+    private Term fromTerm;
 
-    private String toId;
-    private IdentifierType toType;
-    private Datasource toDatasource;
+    private Term toTerm;
 
-    private MappingType mappingType;
     private Scope scope;
     private SourceType source;
     private Date date;
@@ -30,53 +23,31 @@ public class MappingBuilder {
 
     public MappingBuilder(
 
-            String fromId,
-            IdentifierType fromType,
-            Datasource fromDatasoure,
-            String toId,
-            IdentifierType toType,
-            Datasource toDatasoure,
-            MappingType mappingType,
+            Term fromTerm,
+            Term toTerm,
             Datasource mappingSource) {
         this.date = new Date();
         this.scope = Scope.RELATED;
         this.source = SourceType.MANUAL;
-        this.mappingType = mappingType;
-        this.fromDatasource = fromDatasoure;
-        this.toDatasource = toDatasoure;
-        this.toDatasource = toDatasoure;
         this.mappingSource = mappingSource;
-        this.fromId = fromId;
-        this.fromType = fromType;
-        this.toId = toId;
-        this.toType = toType;
+        this.fromTerm = fromTerm;
+        this.toTerm = toTerm;
 
     }
 
-    public MappingBuilder setFromId(String fromId) {
-        this.fromId = fromId;
+    public MappingBuilder setFromId(Term fromTerm) {
+        this.fromTerm = fromTerm;
         return this;
     }
 
-    public MappingBuilder setFromType(IdentifierType fromType) {
-        this.fromType = fromType;
+
+    public MappingBuilder setToId(Term toTerm) {
+        this.toTerm = toTerm;
         return this;
     }
 
-    public MappingBuilder setToId(String toId) {
-        this.toId = toId;
-        return this;
-    }
 
-    public MappingBuilder setToType(IdentifierType toType) {
-        this.toType = toType;
-        return this;
-    }
 
-    public MappingBuilder setMappingType(MappingType mappingType) {
-        this.mappingType = mappingType;
-        return this;
-    }
 
     public MappingBuilder setScope(Scope scope) {
         this.scope = scope;
@@ -102,46 +73,16 @@ public class MappingBuilder {
 
         Mapping mapping;
 
-        Identifier fromId;
+        mapping = new Mapping();
 
-        if (this.fromType.equals(IdentifierType.URI)) {
-            fromId = new URINode(this.fromId, this.fromDatasource);
-        }
-        else if (this.fromType.equals(IdentifierType.PREFIXED)) {
-            fromId = new PrefixedCurie(this.fromId);
-        }
-        else {
-            fromId = new CurieNode(this.fromId);
-        }
-
-        Identifier toId;
-
-        if (this.toType.equals(IdentifierType.URI)){
-            toId = new URINode(this.toId, this.fromDatasource);
-        }
-        else if (this.toType.equals(IdentifierType.PREFIXED)) {
-            toId = new PrefixedCurie(this.toId);
-        }
-        else {
-            toId = new CurieNode(this.toId);
-        }
-
-        if (mappingType.equals(MappingType.XREF)) {
-            mapping = new XrefMapping();
-            mapping.setScope(Scope.RELATED);
-        }
-        else {
-            mapping = new AlternateIdMapping();
-            mapping.setScope(Scope.EXACT);
-
-            mapping.setScope(this.scope);
-        }
 
         mapping.setDatasource(this.mappingSource);
         mapping.setSourcePrefix(this.mappingSource.getPrefix());
-        mapping.setFromIdentifier(fromId);
-        mapping.setToIdentifier(toId);
+        mapping.setFromTerm(fromTerm);
+        mapping.setToTerm(toTerm);
         mapping.setDate(this.date);
+        mapping.setScope(this.scope);
+        mapping.setSourceType(this.source);
 
 
         return mapping;

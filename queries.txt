@@ -1,7 +1,21 @@
-CREATE CONSTRAINT ON (i:Identifier) ASSERT i.identifier IS UNIQUE
-CREATE CONSTRAINT ON (i:Uri) ASSERT i.identifier IS UNIQUE
-CREATE CONSTRAINT ON (i:Cui) ASSERT i.identifier IS UNIQUE
-CREATE CONSTRAINT ON (i:PrefixedCui) ASSERT i.identifier IS UNIQUE
+
+# Get mappings distance 2 filtering by either source or datsource target
+MATCH path= shortestPath( (ft:Term)-[m:MAPPING*1..2]-(tt:Term))
+WHERE ft.curie = 'EFO:0004230'
+WITH tt,path, extract ( r in m |  r.sourcePrefix) as source
+MATCH (tt)-[HAS_SOURCE]-(td)
+WHERE 'KEGG' in td.prefix and 'efo' in source
+UNWIND source as source1
+RETURN tt.curie, tt.label,collect (distinct td.prefix), collect (distinct source1), length(path) as dist
+ORDER BY dist
+
+
+# old experimental stuff below
+
+CREATE CONSTRAINT ON (i:Identifier) ASSERT i.term IS UNIQUE
+CREATE CONSTRAINT ON (i:Uri) ASSERT i.term IS UNIQUE
+CREATE CONSTRAINT ON (i:Cui) ASSERT i.term IS UNIQUE
+CREATE CONSTRAINT ON (i:PrefixedCui) ASSERT i.term IS UNIQUE
 CREATE CONSTRAINT ON (i:Datasource) ASSERT i.prefix IS UNIQUE
 
 CREATE INDEX ON :Datasource(source)
@@ -15,8 +29,8 @@ Get direct xrefs for a term (show sources)
 
 
 Match (u:Uri)-[r1:XREF]->(x:PrefixedCui)<-[r2:XREF]-(u1:Uri)
-Where u.identifier = 'http://www.ebi.ac.uk/efo/EFO_0000349'
-Return u1.identifier, collect (distinct r1.sourcePrefix) + collect(distinct r2.sourcePrefix)
+Where u.term = 'http://www.ebi.ac.uk/efo/EFO_0000349'
+Return u1.term, collect (distinct r1.sourcePrefix) + collect(distinct r2.sourcePrefix)
 
 
 Get derived xrefs (1 hop) - high score
@@ -36,27 +50,27 @@ Mapping project
 
 
 MATCH (c:Identifier)-[*1..5]-(m:Uri) 
-WHERE c.identifier = 'HP:0000819'
+WHERE c.term = 'HP:0000819'
 WITH m as mappedUri
 MATCH (mappedUri)-[:DATASOURCE]->(d:Datasource { prefix : 'ordo'})
 WITH mappedUri as ordoUri
 MATCH (ordoUri)-[ATLID]->(ordoP:PrefixedCui)
-RETURN distinct ordoP.identifier 
+RETURN distinct ordoP.term
 
 
 MATCH (source:Uri)-[DATASOURCE]->(d:Datasource { prefix : 'efo'})
 WITH source
 MATCH path = allShortestPaths ( (c:Identifier)-[:ALTID|:XREF*..10]-(source) )
-WHERE c.identifier = 'DOID_4467'
-RETURN distinct source.identifier , length(path) as dist
+WHERE c.term = 'DOID_4467'
+RETURN distinct source.term , length(path) as dist
 ORDER BY dist
 
 
 // find a Uri 
 
 MATCH (i:Identifier)-[*0..1]-(u:Uri)
-WHERE i.identifier = 'EFO_0000001'
-RETURN u.identifier 
+WHERE i.term = 'EFO_0000001'
+RETURN u.term
 
 
 

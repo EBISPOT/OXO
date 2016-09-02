@@ -12,8 +12,6 @@ import uk.ac.ebi.spot.ols.loader.OntologyLoader;
 import uk.ac.ebi.spot.ols.loader.OntologyLoaderFactory;
 import uk.ac.ebi.spot.ols.util.OBOXref;
 import uk.ac.ebi.spot.service.MappingBuilder;
-import uk.ac.ebi.spot.util.IdentifierType;
-import uk.ac.ebi.spot.util.MappingType;
 
 import java.net.URI;
 import java.net.URL;
@@ -60,33 +58,42 @@ public class OBOLoader implements Loader {
 //                .setBaseUris(Collections.singleton("http://purl.obolibrary.org/obo/UBERON_")).build());
 
 
-        Map<String, MappingType> properties = new HashMap<>();
-        properties.put("database_cross_reference", MappingType.XREF);
-        properties.put("definition_citation", MappingType.XREF);
-        properties.put("has_alternative_id", MappingType.ALTID);
-        properties.put("hasDbXref", MappingType.XREF);
+        Set<String> properties = new HashSet<>();
+        properties.add("database_cross_reference");
+        properties.add("definition_citation");
+        properties.add("has_alternative_id");
+        properties.add("hasDbXref");
 
 
         for (OntologyResourceConfig config : configs) {
             Collection<Mapping> mappings = new HashSet<>();
 
-            Datasource datasource = new Datasource(config.getNamespace(), config.getTitle(), "", SourceType.ONTOLOGY);
+            Datasource datasource = new Datasource(config.getNamespace(), null, Collections.emptySet(), config.getTitle(), config.getDescription(), SourceType.ONTOLOGY);
 
             try {
                 OntologyLoader loader = OntologyLoaderFactory.getLoader(config);
 
                 Collection<IRI> classIrirs = loader.getAllClasses();
                 for (IRI iri: classIrirs) {
-                    String shortForm = loader.getShortForm(iri);
+                    String fromCurie = loader.getOboId(iri);
+
+                    if (fromCurie == null) {
+                       fromCurie = loader.getShortForm(iri);
+                    }
 
                     Datasource localSource = null;
                     if (loader.isLocalTerm(iri)) {
                         localSource = datasource;
-                        mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource, shortForm, IdentifierType.CUI, null, MappingType.ALTID, datasource ).setScope(Scope.EXACT).setSource(SourceType.ONTOLOGY).build());
-
-                        String oboId = loader.getOboId(iri);
-                        mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource, oboId, IdentifierType.PREFIXED, null, MappingType.ALTID,datasource ).setScope(Scope.EXACT).setSource(SourceType.ONTOLOGY).build());
                     }
+
+                    String id = fromCurie;
+
+                    if (id.split(":").length == 2) {
+                        id = id.split(":")[1];
+                    }
+
+                    Term fromTerm = new Term(fromCurie, id, iri.toString(), loader.getTermLabels().get(iri), datasource);
+
 
                     Map<IRI, Collection<String>> annotations = loader.getAnnotations(iri);
 
@@ -95,9 +102,9 @@ public class OBOLoader implements Loader {
                             if (xrefs.getDatabase() != null && xrefs.getId() != null) {
                                 String s = xrefs.getDatabase() + ":" + xrefs.getId();
                                 s = cleanupHack(s);
-                                IdentifierType type = IdentifierType.PREFIXED;
-                                mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource,  s, type, null, MappingType.XREF, datasource ).setScope(Scope.RELATED).setSource(SourceType.ONTOLOGY).build());
-
+//                                IdentifierType type = IdentifierType.PREFIXED;
+//                                mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource,  s, type, null, MappingType.XREF, datasource ).setScope(Scope.RELATED).setSource(SourceType.ONTOLOGY).build());
+//
                             }
                         }
                     }
@@ -107,26 +114,23 @@ public class OBOLoader implements Loader {
                             if (loader.getTermLabels().containsKey(annotationPropertyIri)) {
                                 String propertyLabel =  loader.getTermLabels().get(annotationPropertyIri);
 
-                                for (String lookupProps : properties.keySet()) {
+                                for (String lookupProps : properties) {
                                     if (propertyLabel.contains(lookupProps))   {
 
                                         for (String s : annotations.get(annotationPropertyIri)) {
 
-                                            IdentifierType type = IdentifierType.CUI;
 
                                             s = cleanupHack(s);
 
                                             try {
                                                 new URL(s);
-                                                type = IdentifierType.URI;
                                             } catch (Exception e) {
                                                 if (s.split(":").length == 2) {
-                                                    type = IdentifierType.PREFIXED;
 
                                                 }
                                                 // its not a URI
                                             }
-                                            mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource,  s, type, null, properties.get(lookupProps), datasource ).setScope(Scope.RELATED).setSource(SourceType.ONTOLOGY).build());
+//                                            mappings.add(new MappingBuilder(iri.toString(), IdentifierType.URI, localSource,  s, type, null, properties.get(lookupProps), datasource ).setScope(Scope.RELATED).setSource(SourceType.ONTOLOGY).build());
                                         }
                                     }
 
