@@ -6,6 +6,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import uk.ac.ebi.spot.model.Datasource;
 
+import java.util.List;
+
 /**
  * @author Simon Jupp
  * @date 11/05/2016
@@ -17,4 +19,14 @@ public interface DatasourceRepository  extends GraphRepository<Datasource> {
 
     @Query("match (n:Datasource) WHERE n.prefix = {0} OR {0} IN n.alternatePrefix return n")
     Datasource findByPrefix(String prefix);
+
+    @Query("match (n:Datasource)<-[:HAS_SOURCE]-(:Term)-[MAPPING]-() RETURN distinct n")
+    List<Datasource> getDatasourcesWithMappings();
+
+    @Query("MATCH ()-[r:MAPPING]->()\n" +
+            "WITH collect (distinct r.sourcePrefix) as prefixes\n" +
+            "UNWIND prefixes as p1\n" +
+            "MATCH (d:Datasource) WHERE p1 in d.alternatePrefix\n" +
+            "return  d")
+    List<Datasource> getMappingDatasources();
 }

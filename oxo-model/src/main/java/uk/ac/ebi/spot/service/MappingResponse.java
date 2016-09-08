@@ -1,7 +1,5 @@
 package uk.ac.ebi.spot.service;
 
-import uk.ac.ebi.spot.model.Mapping;
-
 import java.util.Collection;
 
 /**

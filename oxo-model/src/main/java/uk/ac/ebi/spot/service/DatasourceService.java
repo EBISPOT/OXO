@@ -55,6 +55,15 @@ public class DatasourceService {
         return datasourceRepository.findAll(pageable);
     }
 
+    public List<Datasource> getDatasurceWithMappings () {
+        return datasourceRepository.getDatasourcesWithMappings();
+    }
+
+    public List<Datasource> getMappingSources() {
+
+        return datasourceRepository.getMappingDatasources();
+    }
+
     public Datasource save (Datasource datasource) throws DuplicateKeyException {
         try {
 

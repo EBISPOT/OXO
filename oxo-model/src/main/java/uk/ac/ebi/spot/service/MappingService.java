@@ -88,19 +88,33 @@ public class MappingService {
         return mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable);
     }
 
-    public LinkedHashMap<String, List<MappingResponse>> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
+    public List<SearchResult> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
 
+        List<SearchResult> searchResults = new ArrayList<>();
         LinkedHashMap<String, List<MappingResponse>> mappingResponses = new LinkedHashMap<>();
 
         for (String id : identifiers) {
             Term fromTerm = termService.getTerm(id);
+
             // could check that source prefix and target prefixes are valid...
 
-            mappingResponses.put(fromTerm.getCurie(), mappingQueryService.getMappingResponseSearch(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix));
+            List<MappingResponse> mappingResponse = new ArrayList<>();
+
+            String fromCurie = id;
+            String fromLabel = null;
+            if (fromTerm != null) {
+                mappingResponse = mappingQueryService.getMappingResponseSearch(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix);
+                fromCurie = fromTerm.getCurie();
+                fromLabel = fromTerm.getLabel();
+            }
+
+            searchResults.add(new SearchResult(fromCurie, fromLabel, mappingResponse));
         }
 
-        return mappingResponses;
+        return searchResults;
     }
+
+
 
 
     public void dropMappingsBySource(String sourcePrefix) {

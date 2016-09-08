@@ -151,7 +151,7 @@
                         <!--<h1>Welcome to the OLS</h1>-->
                         <!--<p>Use OLS to search and visualise biomedical ontologies</p>-->
                         <h4>Welcome to the EMBL-EBI Ontology Mapping Service.</h4>
-                        <p>Use this service to look for existing mappings (or cross-references) between terms from different ontologies, vocabularies and databases.</p>
+                        <p style="font-size: 16px;">Use this service to look for existing mappings (or cross-references) between terms from different ontologies, vocabularies and databases.</p>
 
                     </div>
 
@@ -168,9 +168,10 @@
                                 <div style="float:right; font-size: 0.7em">
                                     <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
                                 </div>
-                                <label>
-                                    <textarea id="identifiers" name="identifiers" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
+                                <label for="identifiers">
                                 </label>
+                                <textarea id="identifiers" name="identifiers" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
+                                <input type="hidden" name="distance" value="3"/>
 
                                 <div style="float: right; padding-right: 4px">
                                     <input type="button" name="submit" value="Clear" class="submit" style="float: right" onclick="clearAll();"/>

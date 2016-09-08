@@ -37,7 +37,9 @@
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
-    <link  rel="stylesheet" th:href="@{webjars/bootstrap-select/1.9.4/css/bootstrap-select.css}" href="/webjars/bootstrap-select/1.9.4/css/bootstrap-select.css"  type="text/css" media="screen"></link>
+    <!--<link  rel="stylesheet" th:href="@{webjars/bootstrap-select/1.9.4/css/bootstrap-select.css}" href="/webjars/bootstrap-select/1.9.4/css/bootstrap-select.css"  type="text/css" media="screen"></link>-->
+    <link  rel="stylesheet" th:href="@{webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
+    <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -49,6 +51,12 @@
     <style type="text/css">
         /* You have the option of setting a maximum width for your page, and making sure everything is centered */
         /* body { max-width: 1600px; margin: 0 auto; } */
+
+        #ex1Slider .slider-selection {
+            background: #BABABA;
+        }
+
+
     </style>
 
 
@@ -142,61 +150,87 @@
 
                 <h2>Mapping results</h2>
 
-                <div class="row">
+                <section class="grid_6 alpha" id="search-extras">
+                    <div class="row">
 
-                    <div class="col-xs-3">
-                        <select class="sourcepicker" title="Filter by source...">
-                            <option value="volvo">EFO</option>
-                            <option value="saab">UBERON</option>
-                            <option value="mercedes">DOID</option>
-                            <option value="audi">MeSH</option>
-                        </select>
+                        <form id="filter-form" method="post" action="search">
+                            <fieldset>
+                                <legend><span class="glyphicon glyphicon-filter">Filters</span></legend>
+
+                                <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
+
+                                <input type="hidden" name="identifiers" th:value="${request.getIdentifiers()}"/>
+                                <h3>Distance</h3>
+
+
+                                <div style="margin-left: 20px;">
+                                    <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${request.getDistance()}" th:value="${request.getDistance()}  " type="text"/>
+                                </div>
+
+                                <h3>Datasources</h3>
+
+                                <div>
+                                    <select id="datasource-select" name="mappingTarget" class="datasource-select" multiple="multiple" style="width:100%">
+                                        <!--th:with="types=${searchOptions.getTypes()}"-->
+                                        <!--&gt;-->
+                                        <option
+                                                th:each="source : ${all_datasources}"
+                                                th:value="${source.getPrefix().toLowerCase()}"
+                                                th:text="${{source.getPrefix()}}"
+                                                th:with="targetSources=${request.getMappingTarget()}"
+                                                th:selected="${#sets.contains(targetSources , source.getPrefix().toLowerCase() )}"  >
+                                            <!--&gt;-->
+                                        </option>
+                                    </select>
+                                    <div id="datasource-summary">
+
+                                    </div>
+                                </div>
+
+
+
+                                <h3>Mapping sources</h3>
+
+                                <div>
+                                    <!--@thymesVar id="onto" type="OntologyDocument"-->
+                                    <select id="mapping-source-select" name="mappingSource" class="mapping-source-select" multiple="multiple" style="width:100%">
+                                        <option
+                                                th:each="source : ${mapping_datasources}"
+                                                th:value="${source.getPrefix().toLowerCase()}"
+                                                th:text="${{source.getPrefix()}}"
+                                                th:with="mappingSources=${request.getMappingSource()}"
+                                                th:selected="${#sets.contains(mappingSources , source.getPrefix().toLowerCase())}"  >
+                                            <!--&gt;-->
+                                        </option>
+                                    </select>
+                                    <div id="mapping-summary">
+
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-default" onclick="clearFilter()">Clear filters</button>
+
+                            </fieldset>
+                        </form>
+
                     </div>
+                </section>
 
-                    <div class="col-xs-3">
-                        <select class="distancepicker" title="Filter by distance...">
-                            <option value="volvo">1</option>
-                            <option value="saab">2</option>
-                            <option value="mercedes">3</option>
-                            <option value="audi">4</option>
-                            <option value="audi">5</option>
-                        </select>
+
+                <section class="grid_18 beta" style="margin-top: 12px;">
+                    <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
+
+                    <div th:each="id : ${ids}"
+                         th:attr="data-mapping-ids=${id},
+                                  data-mapping-sources=${#strings.setJoin(request.getMappingSource(), ',')},
+                                  data-mapping-targets=${#strings.setJoin(request.getMappingTarget(), ',')},
+                                  data-mapping-distance=${request.getDistance()}"
+                    >
                     </div>
+                    <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="img/infinity.gif"/></div>
 
-                </div>
-
-
-                <hr/>
-
-                <div th:each="id : ${ids}" class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Mappings for <a th:href="@{/terms/{id}(id=${id})}" th:text="${id}"></a></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div  th:attr="data-get-mapping=${id}">
-
-                        </div>
-                    </div>
-                </div>
-
-                <!--<table>-->
-                <!--<tr>-->
-                <!--<th>Id</th>-->
-                <!--<th>Mappings</th>-->
-                <!--</tr>-->
-                <!--<tr th:each="id : ${ids}">-->
-                <!--<td>-->
-                <!--<a th:href="@{/terms/{id}(id=${id})}" th:text="${id}"></a>-->
-                <!--</td>-->
-                <!--<td>-->
-                <!--<div  th:attr="data-get-mapping=${id}">-->
-
-                <!--</div>-->
-                <!--</td>-->
-                <!--</tr>-->
+                </section>
 
 
-                <!--</table>-->
 
 
             </div>
@@ -254,9 +288,9 @@
 
 
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
+<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-<script type="text/javascript" th:src="@{webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js}" src="/webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js"></script>
 
 <script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
 
@@ -264,10 +298,50 @@
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
 
 <script>
-    $('.sourcepicker').selectpicker();
-    $('.distancepicker').selectpicker();
+
+
+    $(document).ready(function() {
+
+        $('#distance-slider').slider({
+            //        ticks: [1, 2, 3, 4, 5, 6],
+            //        ticks_positions: [1, 2, 3, 4, 5, 6],
+            //        ticks_labels: ['1', '2', '3', '4', '5', '6'],
+            //        ticks_snap_bounds: 20,
+            step: 1, min: 1, max: 6,
+            ticks: [1, 2, 3, 4, 5, 6],
+            ticks_labels: ['1', '2', '3', '4', '5', '6'],
+            ticks_snap_bounds: 50
+
+            //    	formatter: function(value) {
+            //    		return 'Current value: ' + value;
+            //    	}
+        }).on('change', function () {
+            $("#filter-form").submit();
+        });
+
+        $('.datasource-select').select2({placeholder: "Filter by datasource"})
+                .on('select2:select', function (e) {
+                    $("#filter-form").submit();
+                })
+                .on('select2:unselect', function (e) {
+                    $("#filter-form").submit();
+                });
+
+        $('.mapping-source-select').select2({placeholder: "Filter by mapping source"})
+                .on('select2:select', function (e) {
+                    $("#filter-form").submit();
+                })
+                .on('select2:unselect', function (e) {
+                    $("#filter-form").submit();
+                });
+
+
+
+
+
+    });
+
 
 </script>
-
 </body>
 </html>

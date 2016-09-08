@@ -167,11 +167,12 @@
                         <h3 class="panel-title">Term info</h3>
                     </div>
                     <div class="panel-body">
-                        <div>
-                            <span>Id: </span><span class="term-source" th:text="${term.getCurie()}">id...</span>
-                        </div>
-                        <div th:if="${term.getLabel()}">
-                            <span>Label: </span><span th:text="${term.getLabel()}">id...</span>
+                        <div style="font-size: large">
+                            <span class="term-source" th:text="${term.getCurie()}">id...</span>
+                            <span th:if="${term.getLabel()}">
+                                 (<span th:text="${term.getLabel()}">id...</span>)
+                            </span>
+
                         </div>
                         <div th:if="${term.getUri()}">
                             <span>URI: </span><a target="_blank" th:href="${term.getUri()}" th:text="${term.getUri()}">id...</a>
@@ -181,7 +182,7 @@
                         </div>
 
                         <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
-                            <a th:href="@{//www.ebi.ac.uk/ols/ontologies/{ontology}/terms(ontology=${term.getDatasource().getPrefix()},iri=${term.getUri()})}" class="btn btn-default">View in OLS</a>
+                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}/terms(ontology=${term.getDatasource().getPrefix()},iri=${term.getUri()})} + '\''"  class="btn btn-default">View in OLS</button>
                         </div>
                     </div>
                 </div>
@@ -192,11 +193,11 @@
                         <h3 class="panel-title">Datasource</h3>
                     </div>
                     <div class="panel-body">
-                        <div>
-                            <span>Name: </span><a th:href="@{../datasource/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
+                        <div  style="font-size: large">
+                            <a th:href="@{../datasources/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
                         </div>
                         <div th:if="${term.getDatasource().getDescription()}">
-                            <span>Description: </span><span th:text="${term.getDatasource().getDescription()}">id...</span>
+                            <span th:text="${term.getDatasource().getDescription()}">id...</span>
                         </div>
                         <div>
                             <span>Prefix: </span><span class="ontology-source" th:text="${term.getDatasource().getPrefix()}">id...</span>
@@ -220,7 +221,18 @@
 
                         <br/>
                         <section>
-                            <div  class="grid_10 alpha">
+
+                            <div style="width: 580px;" class="grid_10 alpha">
+
+                                <div th:attr="data-mapping-ids=${id}">
+
+                                </div>
+                                <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>
+
+                            </div>
+
+
+                            <div  class="grid_10 omega">
 
                                 <div id="mynetwork" th:attr="data-get-mapping-vis=${id}"></div>
 
@@ -236,12 +248,6 @@
                                 <!--</div>-->
                             </div>
 
-                            <div  class="grid_10 omega">
-
-                                <div th:attr="data-get-mapping=${id}">
-
-                                </div>
-                            </div>
 
                         </section>
 

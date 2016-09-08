@@ -4,10 +4,8 @@ import org.neo4j.ogm.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.spot.model.Mapping;
 
 import java.util.*;
 import java.util.function.Function;
@@ -28,15 +26,15 @@ public class CypherQueryService implements MappingQueryService {
 
 
     private static String MATCH_MAPPING =
-            "MATCH path= allShortestPaths( (ft:Term)-[m:MAPPING*1..%s]-(tt:Term))\n";
+            " MATCH path= allShortestPaths( (ft:Term)-[m:MAPPING*1..%s]-(tt:Term))\n";
 
     private static String WHERE_MAPPING =
-            "WHERE ft.curie = '%s' " +
+            " WHERE ft.curie = '%s' " +
                     "WITH tt,path, extract ( r in m |  r.sourcePrefix) as source\n" +
                     "MATCH (tt)-[HAS_SOURCE]-(td)\n";
 
     private static String RETURN  =
-            "UNWIND source as source1\n" +
+            " UNWIND source as source1\n" +
                     "RETURN tt.curie as curie, tt.label as label, collect (distinct td.prefix) as datasources, collect (distinct source1) as mappingSources, length(path) as dist\n" +
                     "ORDER BY dist";
 
@@ -57,18 +55,26 @@ public class CypherQueryService implements MappingQueryService {
         if (sourcePrefix.size() + targetPrefix.size() > 0) {
             query += "WHERE ";
 
+            String sourceFilter = "";
             if (!sourcePrefix.isEmpty()) {
-                String result = sourcePrefix.stream()
+                sourceFilter = sourcePrefix.stream()
                         .map(sourcePrefixWrap)
                         .collect(Collectors.joining(" OR "));
-                query += result;
             }
 
+            String targetFilter = "";
             if (!targetPrefix.isEmpty()) {
-                String result = targetPrefix.stream()
+                targetFilter = targetPrefix.stream()
                         .map(targetPrefixWrap)
                         .collect(Collectors.joining(" OR "));
-                query += result;
+            }
+
+            if (!sourcePrefix.isEmpty() && !targetPrefix.isEmpty())  {
+                String unionQuery = String.format("( %s ) AND ( %s) ", sourceFilter, targetFilter);
+                query += unionQuery;
+            }
+            else  {
+                query += sourceFilter  + " " + targetFilter;
             }
         }
 
@@ -87,7 +93,7 @@ public class CypherQueryService implements MappingQueryService {
 
     private static Function<String,String> targetPrefixWrap = new Function<String,String>() {
         @Override public String apply(String s) {
-            return new StringBuilder().append("'").append(s).append("'").append(" in td.prefix").toString();
+            return new StringBuilder().append("'").append(s).append("'").append(" in td.alternatePrefix").toString();
         }
     };
 

@@ -146,11 +146,11 @@
                         <h3 class="panel-title">Datasource</h3>
                     </div>
                     <div class="panel-body">
-                        <div>
-                            <span>Name: </span><span th:text="${datasource.getName()}">id...</span>
+                        <div  style="font-size: large">
+                            <span th:text="${datasource.getName()}">id...</span>
                         </div>
                         <div th:if="${datasource.getDescription()}">
-                            <span>Description: </span><span th:text="${datasource.getDescription()}">id...</span>
+                            <span th:text="${datasource.getDescription()}">id...</span>
                         </div>
                         <div>
                             <span>Prefix: </span><span class="ontology-source" th:text="${datasource.getPrefix()}">id...</span>
@@ -181,16 +181,9 @@
                   </ul>
                 </nav>
 
-                <div th:each="id : ${ids}" class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Mappings for <a th:href="@{/terms/{id}(id=${id})}" th:text="${id}"></a></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div  th:attr="data-get-mapping=${id}">
-
-                        </div>
-                    </div>
+                <div th:each="id : ${ids}" th:attr="data-mapping-ids=${id}">
                 </div>
+                <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>
             </div>
 
 

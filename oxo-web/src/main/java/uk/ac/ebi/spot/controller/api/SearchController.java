@@ -5,17 +5,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
 import uk.ac.ebi.spot.exception.MappingException;
 import uk.ac.ebi.spot.exception.UnknownDatasourceException;
 import uk.ac.ebi.spot.model.MappingSearchRequest;
+import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.MappingService;
+import uk.ac.ebi.spot.service.SearchResult;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -33,9 +40,12 @@ public class SearchController {
     @Autowired
     MappingService mappingService;
 
-    @PostMapping
-    public HttpEntity<String> search(
-            MappingSearchRequest request
+    @Autowired SearchResultAssembler searchResultAssembler;
+
+    @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+    public HttpEntity<PagedResources<SearchResult>> search(
+            @RequestBody MappingSearchRequest request,
+            PagedResourcesAssembler resourceAssembler
 
     ) {
 
@@ -47,14 +57,14 @@ public class SearchController {
 
         Set<String> ids = new HashSet<>(Arrays.asList(identfiers.split("\n")));
 
-        LinkedHashMap map = mappingService.getMappingsSearch(ids, request.getDistance(), Collections.emptySet(), Collections.emptySet());
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        List<SearchResult> map = mappingService.getMappingsSearch(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget());
 
-        try {
-            return new HttpEntity<String>(ow.writeValueAsString(map));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Can't get summary view");
-        }    }
+        Page<SearchResult> resultsPage = new PageImpl<SearchResult>(map);
+
+        return new ResponseEntity<>(resourceAssembler.toResource(resultsPage, searchResultAssembler), HttpStatus.OK);
+
+
+    }
 
     @ExceptionHandler({Exception.class})
     public void handleError(HttpServletResponse response, Exception exception) throws IOException {

@@ -58,7 +58,9 @@ public class TermController  implements
 
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
     HttpEntity<Term> saveTerm(@RequestBody Term term) throws ResourceNotFoundException, InvalidCurieException {
+
         return new ResponseEntity<Term>(termService.save(term), HttpStatus.OK);
+
     }
 
 

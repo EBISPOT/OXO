@@ -6,7 +6,10 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
+import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
+
+import java.util.List;
 
 /**
  * @author Simon Jupp
@@ -26,6 +29,8 @@ public interface MappingRepository  extends GraphRepository<Mapping> {
 
     @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} AND t.curie = {1} and r.sourcePrefix = {2} and r.scope = {3} return r")
     Mapping findOneByMappingBySourceAndId(String fromId, String toId, String source, String scope);
+
+
 
 
 }

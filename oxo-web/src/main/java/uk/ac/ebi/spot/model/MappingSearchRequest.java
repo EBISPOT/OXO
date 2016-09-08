@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,9 +11,9 @@ import java.util.Set;
 public class MappingSearchRequest {
 
     private String identifiers;
-    private Set<String> mappingSource;
-    private Set<String> mappingTarget;
-    private int distance = 5;
+    private Set<String> mappingTarget = new HashSet<>();
+    private Set<String> mappingSource = new HashSet<>();
+    private int distance = 3;
 
     public MappingSearchRequest(String identifiers, Set<String> mappingSource, Set<String> mappingTarget) {
         this.identifiers = identifiers;
