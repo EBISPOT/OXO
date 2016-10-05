@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.controller.ui;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -12,9 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("")
 public class IndexController {
 
-    @RequestMapping(path = "")
+    @RequestMapping(path = {"", "index"})
     public String home() {
         return "index";
     }
 
+    @Secured("ROLE_USER")
+    @RequestMapping(path = "myaccount")
+    public String myAccount() {
+        return "myaccount";
+    }
 }

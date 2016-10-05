@@ -11,6 +11,7 @@ import java.util.Set;
 public class MappingSearchRequest {
 
     private String identifiers;
+    private Set<String> inputSource = new HashSet<>();
     private Set<String> mappingTarget = new HashSet<>();
     private Set<String> mappingSource = new HashSet<>();
     private int distance = 3;
@@ -19,6 +20,21 @@ public class MappingSearchRequest {
         this.identifiers = identifiers;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
+    }
+
+    public MappingSearchRequest(String identifiers, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
+        this.identifiers = identifiers;
+        this.inputSource = inputSource;
+        this.mappingSource = mappingSource;
+        this.mappingTarget = mappingTarget;
+    }
+
+    public Set<String> getInputSource() {
+        return inputSource;
+    }
+
+    public void setInputSource(Set<String> inputSource) {
+        this.inputSource = inputSource;
     }
 
     public int getDistance() {

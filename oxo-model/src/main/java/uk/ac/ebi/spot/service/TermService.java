@@ -144,7 +144,7 @@ public class TermService {
      * @throws UnknownDatasourceException
      * @throws InvalidCurieException
      */
-    @Transactional
+    @Transactional("transactionManager")
     public Term getOrCreateTerm(String id, String label, String uri) throws UnknownDatasourceException, InvalidCurieException {
 
         Document document = documentRepository.findOneByIdentifier(id);

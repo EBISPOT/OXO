@@ -53,7 +53,7 @@ public class MappingService {
      * @throws UnknownTermException
      * @throws UnknownDatasourceException
      */
-    @Transactional
+    @Transactional("transactionManager")
     public Mapping save(String fromId, String toId, String datasourcePrefix, SourceType sourceType, Scope scope) throws MappingException, UnknownTermException, UnknownDatasourceException, InvalidCurieException {
 
 

@@ -12,7 +12,7 @@
          More info: h5bp.com/b/378 -->
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
 
-    <title>Search &lt; Ontology Xref Service &lt; EMBL-EBI</title>
+    <title>Home &lt; Ontology Xref Service &lt; EMBL-EBI</title>
     <meta name="description" content="EMBL-EBI Ontology Lookup Service is a repository of bio-medical ontologies and provides a powerful REST API for searching and accessing ontology term information"/><!-- Describe what this page is about -->
     <meta name="keywords" content="ontology, ontologies, bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
     <meta name="author" content="Samples Phenotypes and Ontologies Team, EMBL-EBI"/><!-- Your [project-name] here -->
@@ -37,9 +37,8 @@
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
-    <!--<link  rel="stylesheet" th:href="@{webjars/bootstrap-select/1.9.4/css/bootstrap-select.css}" href="/webjars/bootstrap-select/1.9.4/css/bootstrap-select.css"  type="text/css" media="screen"></link>-->
-    <link  rel="stylesheet" th:href="@{webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
-    <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
+
+    <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{css/oxo-d3.css}" type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -51,12 +50,6 @@
     <style type="text/css">
         /* You have the option of setting a maximum width for your page, and making sure everything is centered */
         /* body { max-width: 1600px; margin: 0 auto; } */
-
-        #ex1Slider .slider-selection {
-            background: #BABABA;
-        }
-
-
     </style>
 
 
@@ -132,7 +125,7 @@
                 <ul class="grid_24" id="local-nav">
                     <li class="first"><a href="../index">Home</a></li>
                     <li><a href="../ontologies">Ontologies</a></li>
-                    <li class="active"><a href="../">Mappings</a></li>
+                    <li class=""><a href="index">Mappings</a></li>
                     <li><a href="../docs">Documentation</a></li>
                     <li class="last" ><a href="../about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
@@ -141,13 +134,12 @@
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
                           </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username}" class="active functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
                     </li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
-                </ul>
+                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>                </ul>
             </nav>
         </div>
 
@@ -155,123 +147,36 @@
     </header>
 
     <div id="content" role="main" class="grid_24 clearfix">
-        <div class="container">
 
-            <div class="grid_24 alpha">
+		<div th:if="${username}">
 
-                <h2>Mapping results</h2>
-                <div>
-                    <div style="float:right;">
-                        <!-- Single button -->
-                        <div class="btn-group">
-                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Download <span class="caret"></span>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a href="#">CSV</a></li>
-                            <li><a href="#">TSV</a></li>
-                            <li><a href="#">JSON</a></li>
-                          </ul>
-                        </div>
+		  <h1>Hello <span th:text="${username}">you</span></h1>
+			<p>
+				<a href="http://orcid.org"><img alt="ORCID logo" src="http://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
+				<a th:text="'http://orcid.org/'+${orcid}" th:href="'http://orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
+			</p>
+			<p>ApiKey: <span th:text="${apikey}">you</span></p>
+			<p>Role: <span th:text="${role}">you</span></p>
 
-                    </div>
+			<form method="post" action="logout">
+				<!--<input type="hidden"-->
+		           <!--th:name="${_csrf.parameterName}"-->
+		           <!--th:value="${_csrf.token}" />-->
+				<button type="submit">Logout</button>
+			</form>
 
 
-                </div>
-                <div th:if="${ids.size() &gt; 100} " style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    You can only view a maximum of 100 results in the search interface. Choose download to get all the mappings
-                </div>
+		</div>
 
-                <section class="grid_6 alpha" id="search-extras">
-                    <div class="row">
-
-                        <form id="filter-form" method="GET" action="search">
-                            <fieldset>
-                                <legend><span class="glyphicon glyphicon-filter">Filters</span></legend>
-
-                                <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
-
-                                <input type="hidden" name="identifiers" th:value="${request.getIdentifiers()}"/>
-                                <h3>Distance</h3>
+		<div th:unless="${username}">
+		    <p>You must have a ORCID iD to login and add mappings.</p>
+			<a id="connect-orcid-button" href="/user">
+				<img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
+				Login with your ORCID iD or create an account
+			</a>
+		</div>
 
 
-                                <div style="margin-left: 20px;">
-                                    <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${request.getDistance()}" th:value="${request.getDistance()}  " type="text"/>
-                                </div>
-
-                                <h3>Datasources</h3>
-
-                                <div>
-                                    <select id="datasource-select" name="mappingTarget" class="datasource-select" multiple="multiple" style="width:100%">
-                                        <!--th:with="types=${searchOptions.getTypes()}"-->
-                                        <!--&gt;-->
-                                        <option
-                                                th:each="source : ${all_datasources}"
-                                                th:value="${source.getPrefix().toLowerCase()}"
-                                                th:text="${{source.getPrefix()}}"
-                                                th:with="targetSources=${request.getMappingTarget()}"
-                                                th:selected="${#sets.contains(targetSources , source.getPrefix().toLowerCase() )}"  >
-                                            <!--&gt;-->
-                                        </option>
-                                    </select>
-                                    <div id="datasource-summary">
-
-                                    </div>
-                                </div>
-
-
-
-                                <h3>Mapping sources</h3>
-
-                                <div>
-                                    <!--@thymesVar id="onto" type="OntologyDocument"-->
-                                    <select id="mapping-source-select" name="mappingSource" class="mapping-source-select" multiple="multiple" style="width:100%">
-                                        <option
-                                                th:each="source : ${mapping_datasources}"
-                                                th:value="${source.getPrefix().toLowerCase()}"
-                                                th:text="${{source.getPrefix()}}"
-                                                th:with="mappingSources=${request.getMappingSource()}"
-                                                th:selected="${#sets.contains(mappingSources , source.getPrefix().toLowerCase())}"  >
-                                            <!--&gt;-->
-                                        </option>
-                                    </select>
-                                    <div id="mapping-summary">
-
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-default" onclick="clearFilter()">Clear filters</button>
-
-                            </fieldset>
-                        </form>
-
-                    </div>
-                </section>
-
-
-                <section class="grid_18 beta" style="margin-top: 12px;">
-
-
-                    <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
-
-                    <div th:each="id : ${ids}"
-                         th:attr="data-mapping-ids=${id},
-                                  data-mapping-sources=${#strings.setJoin(request.getMappingSource(), ',')},
-                                  data-mapping-targets=${#strings.setJoin(request.getMappingTarget(), ',')},
-                                  data-mapping-distance=${request.getDistance()}"
-                    >
-                    </div>
-                    <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="img/infinity.gif"/></div>
-
-                </section>
-
-
-
-
-            </div>
-
-
-
-        </div>
     </div>
 
     <footer>
@@ -321,53 +226,16 @@
 </div>
 
 
+<script type="text/javascript" th:src="@{webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
-<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
 <script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
+<script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{js/oxo-flare.js}"></script>
+
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
 
-<script>
-
-
-    $(document).ready(function() {
-
-        $('#distance-slider').slider({
-            step: 1, min: 1, max: 6,
-            ticks: [1, 2, 3, 4, 5, 6],
-            ticks_labels: ['1', '2', '3', '4', '5', '6'],
-            ticks_snap_bounds: 50
-        }).on('change', function () {
-            $("#filter-form").submit();
-        });
-
-        $('.datasource-select').select2({placeholder: "Filter by datasource"})
-                .on('select2:select', function (e) {
-                    $("#filter-form").submit();
-                })
-                .on('select2:unselect', function (e) {
-                    $("#filter-form").submit();
-                });
-
-        $('.mapping-source-select').select2({placeholder: "Filter by mapping source"})
-                .on('select2:select', function (e) {
-                    $("#filter-form").submit();
-                })
-                .on('select2:unselect', function (e) {
-                    $("#filter-form").submit();
-                });
-
-
-
-
-
-    });
-
-
-</script>
 </body>
 </html>
+
+

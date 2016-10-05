@@ -4,10 +4,13 @@ $(document).ready(function() {
 
 /**
  * Find all elements on page with attribute data-get-mapping and append a div showing the mappings for that value
- * todo add additional filter opetions like data-source, data-target and data-distance to prodide additional filters
+ * todo add additional filter options like data-source, data-target and data-distance to prodide additional filters
  *
  */
 function renderSearchResults() {
+
+    if ($( "div[data-mapping-ids]" ).length)
+
     $( "div[data-mapping-ids]" ).each(function() {
 
         var id = $(this).data("mapping-ids");
@@ -18,7 +21,7 @@ function renderSearchResults() {
         var requestData = {
 
             identifiers : id,
-            mappingTarget : targets,
+            mappingTarget: targets,
             mappingSource :  sources,
             distance: distance
         };
@@ -26,9 +29,10 @@ function renderSearchResults() {
         $.ajax({
             url:"/api/search",
             dataType: 'json',
-            method: 'POST',
+            method: 'GET',
             contentType: "application/json; charset=utf-8",
-            data : JSON.stringify(requestData),
+            data : requestData,
+            traditional: true,
             context: this,
             success:function(data) {
 

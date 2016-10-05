@@ -2,11 +2,15 @@ package uk.ac.ebi.spot.controller.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import uk.ac.ebi.spot.model.MappingRequest;
+import uk.ac.ebi.spot.model.Scope;
+import uk.ac.ebi.spot.model.SourceType;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.MappingResponse;
 import uk.ac.ebi.spot.service.MappingService;
@@ -41,12 +45,16 @@ public class TermControllerUI {
         }  else {
             model.addAttribute("id", t.getCurie());
             model.addAttribute("term", t);
-
         }
 
-        return "term";
+        MappingRequest mappingRequest = new MappingRequest();
+        mappingRequest.setFromId(curie);
+        mappingRequest.setSourceType(SourceType.USER);
+        mappingRequest.setScope(Scope.EXACT);
+        model.addAttribute("mappingRequest", mappingRequest);
 
-
+        return "terms";
     }
+
 
 }

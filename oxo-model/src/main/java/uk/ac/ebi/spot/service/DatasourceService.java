@@ -75,7 +75,7 @@ public class DatasourceService {
             if (e.getCode().contains("ConstraintValidationFailed")) {
                 throw new DuplicateKeyException("Duplicate key exception, datasource already exists: " + datasource.getPrefix());
             }
-            throw new RuntimeException("Erro saving datasource", e);
+            throw new RuntimeException("Error saving datasource", e);
         }
     }
 

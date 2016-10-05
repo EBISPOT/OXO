@@ -56,7 +56,8 @@ $(document).ready(function() {
             .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
             .text(function(d) { return d.key; })
             .on("mouseover", mouseovered)
-            .on("mouseout", mouseouted);
+            .on("mouseout", mouseouted)
+            .on("click", function(d) {window.location =  "http://localhost:8080/datasources/" + d.key});
 
         $("#mapping-vis-spinner").hide();
 
@@ -64,6 +65,7 @@ $(document).ready(function() {
     d3.select('#mapping-vis').style("height", diameter + "px");
 
 });
+
 
 function mouseovered(d) {
     node
@@ -93,10 +95,12 @@ function mouseouted(d) {
 
 // Lazily construct the package hierarchy from class names.
 function packageHierarchy(classes) {
+
     var map = {};
 
     function find(name, data) {
-        var node = map[name], i;
+        var node = map[name];
+        var i;
         if (!node) {
             node = map[name] = data || {name: name, children: []};
             if (!node.name) {
@@ -117,6 +121,7 @@ function packageHierarchy(classes) {
     classes.forEach(function(d) {
         find(d.source, d);
     });
+
 
     return map[""];
 }

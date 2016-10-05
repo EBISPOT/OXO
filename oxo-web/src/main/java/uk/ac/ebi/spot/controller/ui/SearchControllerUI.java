@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ public class SearchControllerUI {
 //        return Collections.emptyList();
     }
 
-    @PostMapping
+    @GetMapping
     public String search(
             MappingSearchRequest request,
             Model model
@@ -61,7 +62,12 @@ public class SearchControllerUI {
         Set<String> ids = new HashSet<>(Arrays.asList(identfiers.split("\n")));
 
         ids = ids.stream().map(trim).collect(Collectors.toSet());
-        model.addAttribute("ids", ids);
+        // only get first 100 in UI
+        int limit = ids.size();
+        if (limit > 100) {
+            limit = 99;
+        }
+        model.addAttribute("ids", new ArrayList<String>(ids).subList(0, limit));
 //        model.addAttribute("results", results);
         model.addAttribute("request", request);
 

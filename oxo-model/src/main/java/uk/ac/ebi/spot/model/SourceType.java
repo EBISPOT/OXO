@@ -8,8 +8,6 @@ package uk.ac.ebi.spot.model;
 public enum SourceType {
     ONTOLOGY,
     DATABASE,
-    CURTAOR,
-    MANUAL,
-    COMPUTED
-
+    USER,
+    MANUAL
 }

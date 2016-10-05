@@ -142,12 +142,23 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../index">Home</a></li>
-                    <li><a href="../ontologies">Ontologies</a></li>
+                    <li class="first"><a href="../../index">Home</a></li>
+                    <li><a href="../../ontologies">Ontologies</a></li>
                     <li class="active"><a href="../">Mappings</a></li>
-                    <li><a href="../docs">Documentation</a></li>
-                    <li class="last" ><a href="../about">About</a></li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li><a href="../../docs">Documentation</a></li>
+                    <li class="last" ><a href="../../about">About</a></li>
+                    <li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                        Logout <span th:text="${username}">user</span>
+                        <form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
+                        </form>
+                    </a></li>
+                    <li th:if="${username}" class="functional">
+                        <a href="myaccount" class="icon icon-functional" data-icon="5">
+                            My mappings
+                        </a>
+                    </li>
+                    <li class="functional last"><a href="../../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -216,7 +227,23 @@
                     <div class="panel-body">
 
                         <div>
-                            <a href="templates/new" style="color: white;" class="btn btn-primary">Add new mappings</a>
+
+                            <h4>Add a new mappping</h4>
+                            <!--@thymesVar id="mappingRequest" type="uk.ac.ebi.spot.model.MappingRequest"-->
+
+                            <form method="post" action="../mapping" th:object="${mappingRequest}">
+
+                                <div class="form-group">
+                                    <label for="toId" class="col-lg-2 control-label">Mapped id</label>
+                                    <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
+                                        <input type="text" class="form-control" id="toId" name="toId" th:field="*{toId}"/>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
+                                <input type="hidden" name="scope" th:field="*{scope}"/>
+                                <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
+                                <button type="submit">Add mapping</button>
+                            </form>
                         </div>
 
                         <br/>
