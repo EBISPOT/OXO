@@ -52,10 +52,9 @@ public class SearchController {
     @Autowired
     SearchResultsCsvBuilder csvBuilder;
 
-    @RequestMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = "text/csv", method = RequestMethod.GET)
+    @RequestMapping(path = "", produces = "text/csv", method = RequestMethod.GET)
     public void getSearchAsCSV(
             MappingSearchRequest request,
-            PagedResourcesAssembler resourceAssembler,
             HttpServletResponse response
 
     ) {
@@ -72,15 +71,14 @@ public class SearchController {
         }
     }
 
-    @RequestMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = "text/tsv", method = RequestMethod.GET)
+    @RequestMapping(path = "", produces = "text/tsv", method = RequestMethod.GET)
     public void getSearchAsTsv(
             MappingSearchRequest request,
-            PagedResourcesAssembler resourceAssembler,
             HttpServletResponse response
 
     ) {
 
-        response.setContentType("text/tsc");
+        response.setContentType("text/tsv");
         response.setHeader( "Content-Disposition", "filename=mappings.tsv" );
 
         List<SearchResult> map = getSearchResults(request);
@@ -92,7 +90,16 @@ public class SearchController {
         }
     }
 
-    @RequestMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path = "",  produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+    public HttpEntity<PagedResources<SearchResult>> postSearch(
+                @RequestBody MappingSearchRequest request,
+                PagedResourcesAssembler resourceAssembler
+
+        ) {
+        return search(request, resourceAssembler);
+    }
+
+    @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     public HttpEntity<PagedResources<SearchResult>> search(
             MappingSearchRequest request,
             PagedResourcesAssembler resourceAssembler
@@ -108,15 +115,17 @@ public class SearchController {
     }
 
     private List<SearchResult> getSearchResults(MappingSearchRequest request) {
-        String identfiers = request.getIdentifiers();
+        Set<String> identfiers = request.getIds();
         if (identfiers == null && request.getInputSource().isEmpty()) {
             // handle error
             throw new RuntimeException("Must supply an id or inputDatasource to search");
         }
 
         Set<String> ids = new HashSet<>();
-        if (identfiers != null) {
-            ids = new HashSet<>(Arrays.asList(identfiers.split("\n")));
+        if (!identfiers.isEmpty()) {
+            for (String id : identfiers) {
+                ids.addAll(new HashSet<>(Arrays.asList(id.split("\n"))));
+            }
         } else if (!request.getInputSource().isEmpty()) {
             for (String inputSource : request.getInputSource()) {
 

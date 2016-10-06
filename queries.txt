@@ -76,7 +76,7 @@ RETURN u.term
 
 // Use case
 
-Given set of identifiers
+Given set of ids
 
 1. Get all mappings (don't map to own datasource)
 

@@ -21,6 +21,7 @@ import java.util.List;
 public class SearchResultsCsvBuilder {
 
 
+    static String [] HEADERS = {"curie_id", "label", "mapped_curie", "mapped_label", "mapping_source_prefix", "mapping_target_prefix", "distance" };
     public void writeResultsAsCsv(List<SearchResult> searchResultList, char seperator, OutputStream outputStream) {
 
         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
@@ -28,6 +29,9 @@ public class SearchResultsCsvBuilder {
 
         try {
             Iterator r = searchResultList.iterator();
+            csvWriter.writeNext(
+                    HEADERS
+            );
             while (r.hasNext()) {
 
                 SearchResult result = (SearchResult) r.next();
@@ -36,9 +40,12 @@ public class SearchResultsCsvBuilder {
                 for (MappingResponse response : result.getMappingResponseList()) {
                     List<String> row = new ArrayList<>();
                     row.add(result.getCurie());
+                    row.add(result.getLabel());
 
                     row.add(response.getCurie());
+                    row.add(response.getLabel());
                     row.add(StringUtils.join(response.getSourcePrefixes(), ','));
+                    row.add(StringUtils.join(response.getTargetPrefixes(), ','));
                     row.add(String.valueOf(response.getDistance()));
 
                     csvWriter.writeNext(row.toArray(new String [row.size()]));

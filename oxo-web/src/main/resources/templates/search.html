@@ -115,7 +115,7 @@
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
             <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Mapping Service</h1></span>
+                <span><h1>Ontology Xref Service</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -158,26 +158,29 @@
         <div class="container">
 
             <div class="grid_24 alpha">
+                <div class="row">
+                    <section class="grid_18 alpha">
+                        <h2>Mapping results</h2>
+                    </section>
 
-                <h2>Mapping results</h2>
-                <div>
-                    <div style="float:right;">
-                        <!-- Single button -->
-                        <div class="btn-group">
-                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Download <span class="caret"></span>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a href="#">CSV</a></li>
-                            <li><a href="#">TSV</a></li>
-                            <li><a href="#">JSON</a></li>
-                          </ul>
+                    <section class="grid_6 alpha">
+                        <div style="float:right;">
+                            <!-- Single button -->
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Download <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
+                                <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
+                                <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
+                              </ul>
+                            </div>
+
                         </div>
+                    </section>
+                 </div>
 
-                    </div>
-
-
-                </div>
                 <div th:if="${ids.size() &gt; 100} " style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
                     You can only view a maximum of 100 results in the search interface. Choose download to get all the mappings
                 </div>
@@ -191,7 +194,9 @@
 
                                 <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
 
-                                <input type="hidden" name="identifiers" th:value="${request.getIdentifiers()}"/>
+
+
+                                <input th:each="id : ${request.getIds()}" type="hidden" name="ids" th:value="${id}"/>
                                 <h3>Distance</h3>
 
 
@@ -360,11 +365,6 @@
                 .on('select2:unselect', function (e) {
                     $("#filter-form").submit();
                 });
-
-
-
-
-
     });
 
 

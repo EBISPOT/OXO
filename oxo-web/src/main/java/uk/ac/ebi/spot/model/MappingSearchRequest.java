@@ -10,20 +10,20 @@ import java.util.Set;
  */
 public class MappingSearchRequest {
 
-    private String identifiers;
+    private Set<String> ids = new HashSet<>();;
     private Set<String> inputSource = new HashSet<>();
     private Set<String> mappingTarget = new HashSet<>();
     private Set<String> mappingSource = new HashSet<>();
     private int distance = 3;
 
-    public MappingSearchRequest(String identifiers, Set<String> mappingSource, Set<String> mappingTarget) {
-        this.identifiers = identifiers;
+    public MappingSearchRequest(Set<String> ids, Set<String> mappingSource, Set<String> mappingTarget) {
+        this.ids = ids;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
     }
 
-    public MappingSearchRequest(String identifiers, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
-        this.identifiers = identifiers;
+    public MappingSearchRequest(Set<String> ids, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
+        this.ids = ids;
         this.inputSource = inputSource;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
@@ -45,12 +45,12 @@ public class MappingSearchRequest {
         this.distance = distance;
     }
 
-    public String getIdentifiers() {
-        return identifiers;
+    public Set<String> getIds() {
+        return ids;
     }
 
-    public void setIdentifiers(String identifiers) {
-        this.identifiers = identifiers;
+    public void setIds(Set<String> ids) {
+        this.ids = ids;
     }
 
     public Set<String> getMappingSource() {

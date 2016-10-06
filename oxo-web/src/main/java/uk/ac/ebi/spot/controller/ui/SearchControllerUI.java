@@ -53,13 +53,18 @@ public class SearchControllerUI {
 
     ) {
 
-        String identfiers = request.getIdentifiers();
-        if (identfiers == null) {
+        Set<String> identfiers = request.getIds();
+        if (identfiers.isEmpty()) {
             // handle error
             return "error";
         }
 
-        Set<String> ids = new HashSet<>(Arrays.asList(identfiers.split("\n")));
+
+        Set<String> ids = new HashSet<>();
+        for (String id : identfiers) {
+
+            ids.addAll(new HashSet<>(Arrays.asList(id.split("\n"))));
+        }
 
         ids = ids.stream().map(trim).collect(Collectors.toSet());
         // only get first 100 in UI

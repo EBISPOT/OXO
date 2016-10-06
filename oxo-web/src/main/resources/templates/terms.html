@@ -127,7 +127,7 @@
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
             <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Mapping Service</h1></span>
+                <span><h1>Ontology Xref Service</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -189,7 +189,7 @@
                             <span>URI: </span><a target="_blank" th:href="${term.getUri()}" th:text="${term.getUri()}">id...</a>
                         </div>
                         <div th:if="${term.getDatasource().getIdorgNamespace()}">
-                            <span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://identifiers.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>
+                            <span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>
                         </div>
 
                         <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">

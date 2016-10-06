@@ -108,7 +108,7 @@
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
             <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Mapping Service</h1></span>
+                <span><h1>Ontology Xref Service</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -161,8 +161,9 @@
                     <div class="jumbotron">
                         <!--<h1>Welcome to the OLS</h1>-->
                         <!--<p>Use OLS to search and visualise biomedical ontologies</p>-->
-                        <h4>Welcome to the EMBL-EBI Ontology Mapping Service.</h4>
-                        <p style="font-size: 16px;">Use this service to look for existing mappings (or cross-references) between terms from different ontologies, vocabularies and databases.</p>
+                        <h4>Welcome to the EMBL-EBI Ontology Xref Service (OxO).</h4>
+                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mapping from a variety of sources
+                            and allows you to upload and edit your own mappings by logging in with your ORCiD ID.</p>
 
                     </div>
 
@@ -174,14 +175,14 @@
 
 
                         <form method="GET" action="search">
-                            <legend>Enter a list of identifiers</legend>
+                            <legend>Enter a list of ids</legend>
                             <fieldset>
                                 <div style="float:right; font-size: 0.7em">
                                     <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
                                 </div>
                                 <label for="identifiers">
                                 </label>
-                                <textarea id="identifiers" name="identifiers" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
+                                <textarea id="identifiers" name="ids" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
                                 <input type="hidden" name="distance" value="3"/>
 
                                 <div style="float: right; padding-right: 4px">

@@ -20,7 +20,7 @@ function renderSearchResults() {
 
         var requestData = {
 
-            identifiers : id,
+            ids : id,
             mappingTarget: targets,
             mappingSource :  sources,
             distance: distance
@@ -231,4 +231,23 @@ function clearAll() {
 
 function populateExamples() {
     $('#identifiers').val("EFO:0001360\nDOID:162\nOMIM:180200\nMESH:D009202\nUBERON_0002107\nHP_0005978");
+}
+
+function exportData(format) {
+
+    if ($('#filter-form')) {
+
+        var params = $('#filter-form').serialize()
+
+        if (format == 'csv') {
+            params += "&format=csv"
+        }
+        if (format == 'tsv') {
+            params += "&format=tsv"
+        }
+
+        window.location = '../api/search?' + params
+
+    }
+
 }
