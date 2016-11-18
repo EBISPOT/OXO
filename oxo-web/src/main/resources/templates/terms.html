@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
     <link rel="stylesheet" href="../static/css/vis.css" th:href="@{../css/vis.css}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" th:href="@{../webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css}" type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -154,7 +155,7 @@
                         </form>
                     </a></li>
                     <li th:if="${username}" class="functional">
-                        <a href="myaccount" class="icon icon-functional" data-icon="5">
+                        <a href="../myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
                     </li>
@@ -188,6 +189,14 @@
                         <div th:if="${term.getUri()}">
                             <span>URI: </span><a target="_blank" th:href="${term.getUri()}" th:text="${term.getUri()}">id...</a>
                         </div>
+                        <div>
+                            <span>Datasource: </span>
+                            <a th:href="@{../datasources/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
+                            <span class="ontology-source" th:text="${term.getDatasource().getPrefix()}">id...</span>
+                        </div>
+                        <div>
+                            <span>Type: </span><span th:text="${term.getDatasource().getSource()}">id...</span>
+                        </div>
                         <div th:if="${term.getDatasource().getIdorgNamespace()}">
                             <span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>
                         </div>
@@ -198,27 +207,35 @@
                     </div>
                 </div>
 
-
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Datasource</h3>
+                        <h3 class="panel-title">Add new Mapping</h3>
                     </div>
                     <div class="panel-body">
-                        <div  style="font-size: large">
-                            <a th:href="@{../datasources/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
-                        </div>
-                        <div th:if="${term.getDatasource().getDescription()}">
-                            <span th:text="${term.getDatasource().getDescription()}">id...</span>
-                        </div>
+
                         <div>
-                            <span>Prefix: </span><span class="ontology-source" th:text="${term.getDatasource().getPrefix()}">id...</span>
-                        </div>
-                        <div>
-                            <span>Type: </span><span th:text="${term.getDatasource().getSource()}">id...</span>
+
+                            <!--@thymesVar id="mappingRequest" type="uk.ac.ebi.spot.model.MappingRequest"-->
+
+                            <form method="post" action="../mappings" th:object="${mappingRequest}">
+
+                                <div class="form-group">
+                                    <label for="toId" class="col-lg-2 control-label">Mapped id</label>
+                                    <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
+                                        <!--<input type="text" class="" id="toId" name="toId" th:field="*{toId}"/>-->
+                                        <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control"/>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
+                                <input type="hidden" name="scope" th:field="*{scope}"/>
+                                <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
+
+
+                                <button class="btn btn-default" type="submit">Add</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -226,27 +243,6 @@
                     </div>
                     <div class="panel-body">
 
-                        <div>
-
-                            <h4>Add a new mappping</h4>
-                            <!--@thymesVar id="mappingRequest" type="uk.ac.ebi.spot.model.MappingRequest"-->
-
-                            <form method="post" action="../mapping" th:object="${mappingRequest}">
-
-                                <div class="form-group">
-                                    <label for="toId" class="col-lg-2 control-label">Mapped id</label>
-                                    <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
-                                        <input type="text" class="form-control" id="toId" name="toId" th:field="*{toId}"/>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
-                                <input type="hidden" name="scope" th:field="*{scope}"/>
-                                <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
-                                <button type="submit">Add mapping</button>
-                            </form>
-                        </div>
-
-                        <br/>
                         <section>
 
                             <div style="width: 580px;" class="grid_10 alpha">
@@ -263,33 +259,13 @@
 
                                 <div id="mynetwork" th:attr="data-get-mapping-vis=${id}"></div>
 
-                                <!--<div id="graph-vis" th:attr="data-get-mapping-vis=${id}">-->
-                                <!--<div style="   position:absolute;-->
-                                <!--top:50%;-->
-                                <!--left:50%;-->
-                                <!--margin-top:-25px;-->
-                                <!--margin-left:-25px;"  id="mapping-vis-spinner">-->
-                                <!--<img src="../img/infinity.gif"/>-->
-                                <!--</div>-->
-                                <!--<svg width="200" height="200"></svg>-->
-                                <!--</div>-->
                             </div>
-
 
                         </section>
 
-
-
                     </div>
                 </div>
-
-
-
-
             </div>
-
-
-
         </div>
     </div>
 
@@ -348,8 +324,28 @@
 
 <script type="text/javascript" src="../static/js/oxo-graph.js" th:src="@{../js/oxo-graph.js}"></script>
 
+<script type="text/javascript" src="/webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js" th:src="@{../webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js}"></script>
+<script type="text/javascript" src="/webjars/handlebars/4.0.5/handlebars.min.js" th:src="@{../webjars/handlebars/4.0.5/handlebars.min.js}"></script>
+<script type="text/javascript" src="/webjars/ols-autocomplete/0.0.2/build/ols-autocomplete.js" th:src="@{../webjars/ols-autocomplete/0.0.2/build/ols-autocomplete.js}"></script>
+
+
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var app = require("ols-autocomplete");
+        var instance = new app();
+        options={action : function(relativePath, suggestion_ontology, type, iri){
+            var id = iri.substr(iri.lastIndexOf('/') + 1);
+            console.log("selected " + id)
+            $('#toId').val(id);
+            $('#toId').text(id);
+        }};
+
+        instance.start(options)
+    });
+</script>
 
 </body>
 </html>

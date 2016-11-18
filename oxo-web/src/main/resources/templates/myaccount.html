@@ -132,7 +132,7 @@
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
-                          </form>
+                        </form>
                     </a></li>
                     <li th:if="${username}" class="active functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
@@ -148,34 +148,93 @@
 
     <div id="content" role="main" class="grid_24 clearfix">
 
-		<div th:if="${username}">
+        <!--@thymesVar id="message" type="String"-->
+        <div class="alert alert-dismissible alert-success" th:if="${message}">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong th:text="${message}">Success message goes here</strong>.
+        </div>
 
-		  <h1>Hello <span th:text="${username}">you</span></h1>
-			<p>
-				<a href="http://orcid.org"><img alt="ORCID logo" src="http://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
-				<a th:text="'http://orcid.org/'+${orcid}" th:href="'http://orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
-			</p>
-			<p>ApiKey: <span th:text="${apikey}">you</span></p>
-			<p>Role: <span th:text="${role}">you</span></p>
+        <!--@thymesVar id="error" type="String"-->
+        <div class="alert alert-dismissible alert-warn" th:if="${error}">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong th:text="${error}">Success message goes here</strong>.
+        </div>
 
-			<form method="post" action="logout">
-				<!--<input type="hidden"-->
-		           <!--th:name="${_csrf.parameterName}"-->
-		           <!--th:value="${_csrf.token}" />-->
-				<button type="submit">Logout</button>
-			</form>
+        <div th:if="${username}">
 
+            <h1>Hello <span th:text="${username}">you</span></h1>
+            <p>
+                <a href="http://orcid.org"><img alt="ORCID logo" src="http://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
+                <a th:text="'http://orcid.org/'+${orcid}" th:href="'http://orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
+            </p>
+            <p>ApiKey: <span th:text="${apikey}">you</span></p>
+            <p>Role: <span th:text="${role}">you</span></p>
+        </div>
 
-		</div>
+        <div th:unless="${username}">
+            <p>You must have a ORCID iD to login and add mappings.</p>
+            <a id="connect-orcid-button" href="/user">
+                <img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
+                Login with your ORCID iD or create an account
+            </a>
+        </div>
 
-		<div th:unless="${username}">
-		    <p>You must have a ORCID iD to login and add mappings.</p>
-			<a id="connect-orcid-button" href="/user">
-				<img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
-				Login with your ORCID iD or create an account
-			</a>
-		</div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">My Mappings</h3>
+            </div>
+            <div class="panel-body">
 
+                <section>
+
+                    <div style="width: 700px;" class="alpha">
+                        <!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
+
+                        <table>
+                            <tr>
+                                <th>
+                                    From id
+                                </th>
+                                <th>
+                                    To id
+                                </th>
+                                <th>
+                                    Created date
+                                </th>
+                                <th>
+                                    View
+                                </th>
+                            </tr>
+                            <tr th:each="mapping : ${mappings}">
+                                <td>
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+                                        <span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
+                             									<span th:if="${mapping.getFromTerm().getLabel()}">
+                                 						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
+                                     							</span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+                                        <span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
+                             									<span th:if="${mapping.getToTerm().getLabel()}">
+                                 						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
+                                     							</span>
+                                    </a>
+                                </td>
+                                <td th:text="${mapping.getDate()}"></td>
+                                <td>
+                                    <a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </div>
+        </div>
 
     </div>
 

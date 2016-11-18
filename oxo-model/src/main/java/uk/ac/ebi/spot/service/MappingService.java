@@ -83,11 +83,22 @@ public class MappingService {
         return mappingRepository.save(mapping);
     }
 
-    public Page<Mapping> getMappingBySource(String sourcePrefix, Pageable pageable) {
+    public List<Mapping> getMappingBySource(String sourcePrefix) {
         Datasource datasource = datasourceService.getDatasource(sourcePrefix);
-        return mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable);
+        return mappingRepository.findAllByAnySource(datasource.getPrefix());
     }
 
+    public Mapping findOneByMappingBySourceAndId(String fromCurie, String toCurie, String sourcePrefix, String scope) {
+        return mappingRepository.findOneByMappingBySourceAndId(fromCurie, toCurie, sourcePrefix, scope);
+    }
+
+    public List<Mapping> findMappingsById(String fromCurie, String toCurie) {
+        return mappingRepository.findMappingsById(fromCurie, toCurie);
+    }
+
+    public List<Mapping> findInferredMappingsById(String fromCurie, String toCurie) {
+        return mappingRepository.findInferredMappingsById(fromCurie, toCurie);
+    }
     public List<SearchResult> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
 
         List<SearchResult> searchResults = new ArrayList<>();
@@ -122,13 +133,17 @@ public class MappingService {
         mappingRepository.delete(mappings);
     }
 
+    public void remove(Long id) {
+        mappingRepository.delete(id);
+    }
+
 
     public Page<Mapping> getMappings(Pageable pageable) {
         return mappingRepository.findAll(pageable);
     }
 
     public Mapping getMapping(String id) {
-        return mappingRepository.findOne(Long.getLong(id));
+        return mappingRepository.findOne(Long.parseLong(id));
     }
 
     public Object getSummaryJson() {

@@ -188,7 +188,7 @@
                 <section class="grid_6 alpha" id="search-extras">
                     <div class="row">
 
-                        <form id="filter-form" method="GET" action="search">
+                        <form id="filter-form" method="post" action="search">
                             <fieldset>
                                 <legend><span class="glyphicon glyphicon-filter">Filters</span></legend>
 
@@ -204,7 +204,7 @@
                                     <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${request.getDistance()}" th:value="${request.getDistance()}  " type="text"/>
                                 </div>
 
-                                <h3>Datasources</h3>
+                                <h3>Term sources</h3>
 
                                 <div>
                                     <select id="datasource-select" name="mappingTarget" class="datasource-select" multiple="multiple" style="width:100%">
@@ -331,7 +331,7 @@
 <script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
+<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>

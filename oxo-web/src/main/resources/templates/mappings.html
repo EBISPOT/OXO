@@ -181,56 +181,135 @@
 				<!--@thymesVar id="error" type="String"-->
 				<div class="alert alert-dismissible alert-error" th:if="${error}">
 					<button type="button" class="close" data-dismiss="alert">×</button>
-					<strong th:text="${error}">Success message goes here</strong>.
+					<strong th:text="${error}">Error message goes here</strong>.
 				</div>
 
-				<!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
+
+				<p>
+					Mappings from <span class="term-source" th:text="${from}">from</span> to <span class="term-source" th:text="${to}"></span>
+				</p>
+
+				<!--@thymesVar id="mappings" type="uk.ac.ebi.spot.model.Mapping"-->
 
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Mapping info</h3>
+						<h3 class="panel-title">Direct mappings</h3>
 					</div>
 					<div class="panel-body">
-						<div>
-							<span>From term: </span>
-							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
-								<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
-									<span th:if="${mapping.getFromTerm().getLabel()}">
-    						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
-        							</span>
-							</a>
-						</div>
-						<div>
-							<span>To term: </span>
-							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
-								<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
-									<span th:if="${mapping.getToTerm().getLabel()}">
-    						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
-        							</span>
-							</a>
-						</div>
-						<div>
-							<span>Scope: </span><span th:text="${mapping.getScope()}">id...</span>
-						</div>
-						<div>
-							<span>Created date: </span><span th:text="${mapping.getDate()}">id...</span>
-						</div>
-						<div>
-							<span>Mapping source: </span>
-							<a th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
-							<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
-						</div>
 
-						<div>
-							<span>Source type: </span><span th:text="${mapping.getSourceType()}">id...</span>
+						<div class="alpha">
+							<!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
+
+							<table>
+								<tr>
+									<th>
+										From id
+									</th>
+									<th>
+										To id
+									</th>
+									<th>
+										Source
+									</th>
+									<th>
+										Created date
+									</th>
+									<th>
+										View
+									</th>
+								</tr>
+								<tr th:each="mapping : ${mappings}">
+									<td>
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+											<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
+               									<span th:if="${mapping.getFromTerm().getLabel()}">
+                   						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
+                       							</span>
+										</a>
+									</td>
+									<td>
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+											<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
+               									<span th:if="${mapping.getToTerm().getLabel()}">
+                   						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
+                       							</span>
+										</a>
+									</td>
+									<td>
+										<a th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
+										<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
+									</td>
+									<td th:text="${mapping.getDate()}"></td>
+									<td>
+										<a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+									</td>
+								</tr>
+							</table>
+
 						</div>
-
-						<form method="post" class="form-horizontal" th:if="${username}" th:object="${mapping}">
-							<button name="delete" style="margin-left:1px;" onclick="return confirm('Are you sure you want to delete this mapping?')" class="btn btn-danger"  th:if="${orcid} eq ${mapping.getDatasource().getPrefix()}">Delete</button>
-						</form>
-
 					</div>
 				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Derived mapping provenance</h3>
+					</div>
+					<div class="panel-body">
+
+						<div class="alpha">
+							<!--@thymesVar id="derivedmapping" type="uk.ac.ebi.spot.model.Mapping"-->
+
+							<table>
+								<tr>
+									<th>
+										From id
+									</th>
+									<th>
+										To id
+									</th>
+									<th>
+										Source
+									</th>
+									<th>
+										Created date
+									</th>
+									<th>
+										View
+									</th>
+								</tr>
+								<tr th:each="mapping : ${derivedMappings}">
+									<td>
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+											<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
+               									<span th:if="${mapping.getFromTerm().getLabel()}">
+                   						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
+                       							</span>
+										</a>
+									</td>
+									<td>
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+											<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
+               									<span th:if="${mapping.getToTerm().getLabel()}">
+                   						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
+                       							</span>
+										</a>
+									</td>
+									<td>
+										<a th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
+										<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
+									</td>
+									<td th:text="${mapping.getDate()}"></td>
+									<td>
+										<a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+									</td>
+								</tr>
+							</table>
+
+						</div>
+					</div>
+				</div>
+
+
 			</div>
 		</div>
 	</div>

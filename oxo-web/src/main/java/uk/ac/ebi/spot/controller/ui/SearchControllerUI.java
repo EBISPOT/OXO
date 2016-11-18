@@ -46,7 +46,7 @@ public class SearchControllerUI {
 //        return Collections.emptyList();
     }
 
-    @GetMapping
+    @PostMapping
     public String search(
             MappingSearchRequest request,
             Model model

@@ -7,7 +7,7 @@ $(document).ready(function() {
  * todo add additional filter options like data-source, data-target and data-distance to prodide additional filters
  *
  */
-function renderSearchResults() {
+function renderSearchResults(withHeader) {
 
     if ($( "div[data-mapping-ids]" ).length)
 
@@ -20,19 +20,19 @@ function renderSearchResults() {
 
         var requestData = {
 
-            ids : id,
+            ids : [id],
             mappingTarget: targets,
             mappingSource :  sources,
             distance: distance
         };
 
+        console.log(JSON.stringify(requestData))
         $.ajax({
             url:"/api/search",
             dataType: 'json',
-            method: 'GET',
+            method: 'POST',
             contentType: "application/json; charset=utf-8",
-            data : requestData,
-            traditional: true,
+            data : JSON.stringify(requestData),
             context: this,
             success:function(data) {
 
@@ -43,7 +43,7 @@ function renderSearchResults() {
 
                 var table = $("<table style='width:100%;margin: 0;border: none;'/>");
                 var headerRow = $("<tr/>")
-                headerRow.append($("<th style='width:120px;'>Datasource</th><th style='width:250px;'>Id</th><th style='width:150px;'>Mapping source</th><th style='width:150px;'>Distance</th>"))
+                headerRow.append($("<th style='width:250px;'>Term id</th><th style='width:120px;'>Term source</th><th style='width:150px;'>No. of mappings</th><th style='width:150px;'>Distance</th>"))
                 table.append(headerRow);
 
 
@@ -60,12 +60,6 @@ function renderSearchResults() {
                     var targetSpan =  $('<span class="ontology-source"></span>').text(targetSource)
                     var curie =  $('<span class="term-source"></span>').text(mapping.curie)
 
-                    var datasourceCell  =  $("<td/>");
-                    targetLink.append(targetSpan);
-                    datasourceCell.append(targetLink);
-                    tableRow.append(datasourceCell);
-
-
                     var term =  $("<td/>");
                     termLink.append(curie);
                     term.append(termLink);
@@ -75,13 +69,21 @@ function renderSearchResults() {
                     }
 
                     tableRow.append(term);
-                    var sourceName =    $("<td/>");
+
+                    var datasourceCell  =  $("<td/>");
+                    targetLink.append(targetSpan);
+                    datasourceCell.append(targetLink);
+                    tableRow.append(datasourceCell);
+
+                    var sourceLink = $('<a></a>').attr('href', '/mappings?fromId=' + requestId + '&' + 'toId=' + mapping.curie);
+                    sourceLink.append($('<span></span>').text(mapping.sourcePrefixes.length));
+
+                    var sourceName =    $("<td/>").append(sourceLink);
                     $.each(mapping.sourcePrefixes, function (index, value){
-                        var sourceLink = $('<a class="nounderline" style="border-bottom-width: 0px;"></a>').attr('href', '/datasources/' + value);
 
                         _mappingSourceFound(value)
-                        sourceLink.append($('<span class=\"ontology-source\"></span>').text(value.toUpperCase()));
-                        sourceName.append(sourceLink);
+                        // sourceLink.append($('<span class=\"ontology-source\"></span>').text(value.toUpperCase()));
+                        // sourceName.append(sourceLink);
 
                     });
                     tableRow.append(sourceName);
@@ -96,7 +98,7 @@ function renderSearchResults() {
                 if (requestLabel) {
                     requestDisplay= requestId + " (" +requestLabel + ")"
                 }
-                var panelTitle = $('<h3 class="panel-title">Mappings to <a href="/terms/'+requestId+'">'+requestDisplay+'</a></h3> ');
+                var panelTitle = $('<h3 class="panel-title text-center"><a style="font-size: larger;" href="/terms/'+requestId+'">'+requestDisplay+'</a></h3> ');
                 // var divPanelBody= $('<div class="panel-body"/>');
 
 
