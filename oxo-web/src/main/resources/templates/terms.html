@@ -172,9 +172,19 @@
 
             <div class="grid_24 alpha">
 
+                <!--@thymesVar id="message" type="String"-->
+                <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
+                    <strong th:text="${message}">Success message goes here</strong>.
+                </div>
+
+                <!--@thymesVar id="error" type="String"-->
+                <div style="border-left: 1px solid #ebccd1;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-danger" th:if="${error}">
+                    <strong th:text="${error}">Error message goes here</strong>.
+                </div>
+
                 <!--@thymesVar id="term" type="uk.ac.ebi.spot.model.Term"-->
 
-                <div class="panel panel-default">
+                <div th:if="${term}" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Term info</h3>
                     </div>
@@ -207,7 +217,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div th:if="${term}" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Add new Mapping</h3>
                     </div>
@@ -223,7 +233,7 @@
                                     <label for="toId" class="col-lg-2 control-label">Mapped id</label>
                                     <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
                                         <!--<input type="text" class="" id="toId" name="toId" th:field="*{toId}"/>-->
-                                        <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control"/>
+                                        <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-suggest-header="Select term" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control toId"/>
                                     </div>
                                 </div>
                                 <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
@@ -231,13 +241,13 @@
                                 <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
 
 
-                                <button class="btn btn-default" type="submit">Add</button>
+                                <button onclick="return confirm('Are you sure you want to add this mapping?')" class="btn btn-default" type="submit">Add</button>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div th:if="${term}" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Mappings</h3>
                     </div>
@@ -247,7 +257,7 @@
 
                             <div style="width: 580px;" class="grid_10 alpha">
 
-                                <div th:attr="data-mapping-ids=${id}">
+                                <div th:attr="data-mapping-ids=${id},data-api-path='../'">
 
                                 </div>
                                 <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>
@@ -257,7 +267,7 @@
 
                             <div  class="grid_10 omega">
 
-                                <div id="mynetwork" th:attr="data-get-mapping-vis=${id}"></div>
+                                <div id="mynetwork" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
 
                             </div>
 
@@ -326,7 +336,7 @@
 
 <script type="text/javascript" src="/webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js" th:src="@{../webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js}"></script>
 <script type="text/javascript" src="/webjars/handlebars/4.0.5/handlebars.min.js" th:src="@{../webjars/handlebars/4.0.5/handlebars.min.js}"></script>
-<script type="text/javascript" src="/webjars/ols-autocomplete/0.0.2/build/ols-autocomplete.js" th:src="@{../webjars/ols-autocomplete/0.0.2/build/ols-autocomplete.js}"></script>
+<script type="text/javascript" src="/webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js" th:src="@{../webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js}"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
@@ -336,11 +346,10 @@
     $(document).ready(function() {
         var app = require("ols-autocomplete");
         var instance = new app();
-        options={action : function(relativePath, suggestion_ontology, type, iri){
-            var id = iri.substr(iri.lastIndexOf('/') + 1);
-            console.log("selected " + id)
-            $('#toId').val(id);
-            $('#toId').text(id);
+        options={action : function(relativePath, suggestion_ontology, type, iri, data){
+            console.log(JSON.stringify(data))
+//            var id = iri.substr(iri.lastIndexOf('/') + 1);
+            $('#toId').typeahead('val', data.shortForm);
         }};
 
         instance.start(options)

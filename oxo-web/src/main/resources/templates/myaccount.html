@@ -207,7 +207,7 @@
                             </tr>
                             <tr th:each="mapping : ${mappings}">
                                 <td>
-                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
                                         <span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
                              									<span th:if="${mapping.getFromTerm().getLabel()}">
                                  						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
@@ -215,7 +215,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getToTerm().getCurie()})}">
                                         <span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
                              									<span th:if="${mapping.getToTerm().getLabel()}">
                                  						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
@@ -224,7 +224,7 @@
                                 </td>
                                 <td th:text="${mapping.getDate()}"></td>
                                 <td>
-                                    <a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+                                    <a th:href="@{mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
                                 </td>
                             </tr>
                         </table>

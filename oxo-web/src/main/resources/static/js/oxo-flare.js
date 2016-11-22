@@ -33,7 +33,7 @@ $(document).ready(function() {
     link = svg.append("g").selectAll(".link"),
     node = svg.append("g").selectAll(".node");
 
-    d3.json("http://localhost:8080/api/mappings/summary", function (error, classes) {
+    d3.json("api/mappings/summary", function (error, classes) {
 
         if (error) throw error;
 
@@ -57,7 +57,7 @@ $(document).ready(function() {
             .text(function(d) { return d.key; })
             .on("mouseover", mouseovered)
             .on("mouseout", mouseouted)
-            .on("click", function(d) {window.location =  "http://localhost:8080/datasources/" + d.key});
+            .on("click", function(d) {window.location =  "datasources/" + d.key});
 
         $("#mapping-vis-spinner").hide();
 

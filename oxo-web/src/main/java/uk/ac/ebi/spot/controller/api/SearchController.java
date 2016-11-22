@@ -29,7 +29,9 @@ import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,53 +51,73 @@ public class SearchController {
 
     @Autowired SearchResultAssembler searchResultAssembler;
 
-    @Autowired
-    SearchResultsCsvBuilder csvBuilder;
+//    @Autowired
+//    SearchResultsCsvBuilder csvBuilder;
 
-    @RequestMapping(path = "", produces = "text/csv", method = RequestMethod.GET)
+    @RequestMapping(path = "", produces = "text/csv", method = RequestMethod.POST)
     public void getSearchAsCSV(
             MappingSearchRequest request,
-            HttpServletResponse response
+            HttpServletResponse response,
+            String seperator,
+            String contentType
+
 
     ) {
+        if (seperator == null && contentType == null) {
+            contentType = "csv";
+            seperator = ",";
+        }
 
-        response.setContentType("text/csv");
-        response.setHeader( "Content-Disposition", "filename=mappings.csv" );
-
-        List<SearchResult> map = getSearchResults(request);
+        response.setContentType("text/"+contentType);
+        response.setHeader( "Content-Disposition", "filename=mappings."+contentType );
 
         try {
-            csvBuilder.writeResultsAsCsv(map, ',', response.getOutputStream());
-        } catch (IOException e) {
+            SearchResultsCsvBuilder csvBuilder = new SearchResultsCsvBuilder(seperator.charAt(0), response.getOutputStream());
+            csvBuilder.writeHeaders();
+            for (String id: request.getIds()) {
+
+                // check if list of ids
+                Set<String> ids  = Arrays.asList(id.split("\n")).stream().map(trim).collect(Collectors.toSet());
+                for (String id2 : ids)  {
+
+                    MappingSearchRequest mpq1 = new MappingSearchRequest(
+                            Collections.singleton(id2),
+                            request.getInputSource(), request.getMappingSource(), request.getMappingTarget());
+                    mpq1.setDistance(request.getDistance());
+                    List<SearchResult> map = getSearchResults(mpq1);
+                    csvBuilder.writeResultsAsCsv(map);
+                }
+            }
+            csvBuilder.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @RequestMapping(path = "", produces = "text/tsv", method = RequestMethod.GET)
+    @RequestMapping(path = "", produces = "text/tsv", method = RequestMethod.POST)
     public void getSearchAsTsv(
             MappingSearchRequest request,
             HttpServletResponse response
 
     ) {
-
-        response.setContentType("text/tsv");
-        response.setHeader( "Content-Disposition", "filename=mappings.tsv" );
-
-        List<SearchResult> map = getSearchResults(request);
-
-        try {
-            csvBuilder.writeResultsAsCsv(map, '\t', response.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        getSearchAsCSV(request, response, "\t", "tsv");
     }
 
-    @RequestMapping(path = "",  produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
-    public HttpEntity<PagedResources<SearchResult>> postSearch(
-                @RequestBody MappingSearchRequest request,
-                PagedResourcesAssembler resourceAssembler
+    @RequestMapping(path = "",  produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = "application/x-www-form-urlencoded;charset=UTF-8", method = RequestMethod.POST)
+    public HttpEntity<PagedResources<SearchResult>> postSearchFromFrom(
+            MappingSearchRequest request,
+            PagedResourcesAssembler resourceAssembler
 
-        ) {
+    ) {
+        return search(request, resourceAssembler);
+    }
+
+    @RequestMapping(path = "",  produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+    public HttpEntity<PagedResources<SearchResult>> postSearch(
+            @RequestBody MappingSearchRequest request,
+            PagedResourcesAssembler resourceAssembler
+
+    ) {
         return search(request, resourceAssembler);
     }
 
@@ -118,7 +140,7 @@ public class SearchController {
         Set<String> identfiers = request.getIds();
         if (identfiers == null && request.getInputSource().isEmpty()) {
             // handle error
-            throw new RuntimeException("Must supply an id or inputDatasource to search");
+            throw new RuntimeException("Must supply an id or input datasource to search");
         }
 
         Set<String> ids = new HashSet<>();
@@ -126,6 +148,7 @@ public class SearchController {
             for (String id : identfiers) {
                 ids.addAll(new HashSet<>(Arrays.asList(id.split("\n"))));
             }
+            ids = ids.stream().map(trim).collect(Collectors.toSet());
         } else if (!request.getInputSource().isEmpty()) {
             for (String inputSource : request.getInputSource()) {
 
@@ -142,6 +165,12 @@ public class SearchController {
 
     }
 
+    private static Function<String,String> trim = new Function<String,String>() {
+        @Override public String apply(String s) {
+            return s.replaceAll("(\\r|\\n)*$", "").trim();
+
+        }
+    };
 
 
     @ExceptionHandler({Exception.class})

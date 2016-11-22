@@ -38,8 +38,6 @@
 	<link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
 	<link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
-	<link rel="stylesheet" href="../static/css/vis.css" th:href="@{../css/vis.css}" type="text/css" media="screen"/>
-	<link rel="stylesheet" href="webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" th:href="@{../webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css}" type="text/css" media="screen"/>
 
 	<!-- for production the above can be replaced with -->
 	<!--
@@ -173,14 +171,12 @@
 			<div class="grid_24 alpha">
 
 				<!--@thymesVar id="message" type="String"-->
-				<div class="alert alert-dismissible alert-success" th:if="${message}">
-					<button type="button" class="close" data-dismiss="alert">×</button>
+				<div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
 					<strong th:text="${message}">Success message goes here</strong>.
 				</div>
 
 				<!--@thymesVar id="error" type="String"-->
-				<div class="alert alert-dismissible alert-error" th:if="${error}">
-					<button type="button" class="close" data-dismiss="alert">×</button>
+				<div style="border-left: 1px solid #ebccd1;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-danger" th:if="${error}">
 					<strong th:text="${error}">Error message goes here</strong>.
 				</div>
 
@@ -220,7 +216,7 @@
 								</tr>
 								<tr th:each="mapping : ${mappings}">
 									<td>
-										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
 											<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
                									<span th:if="${mapping.getFromTerm().getLabel()}">
                    						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
@@ -228,7 +224,7 @@
 										</a>
 									</td>
 									<td>
-										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getToTerm().getCurie()})}">
 											<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
                									<span th:if="${mapping.getToTerm().getLabel()}">
                    						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
@@ -236,12 +232,12 @@
 										</a>
 									</td>
 									<td>
-										<a th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
+										<a th:href="@{datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
 										<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
 									</td>
 									<td th:text="${mapping.getDate()}"></td>
 									<td>
-										<a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+										<a th:href="@{mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
 									</td>
 								</tr>
 							</table>
@@ -279,7 +275,7 @@
 								</tr>
 								<tr th:each="mapping : ${derivedMappings}">
 									<td>
-										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
 											<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
                									<span th:if="${mapping.getFromTerm().getLabel()}">
                    						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
@@ -287,7 +283,7 @@
 										</a>
 									</td>
 									<td>
-										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+										<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getToTerm().getCurie()})}">
 											<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
                									<span th:if="${mapping.getToTerm().getLabel()}">
                    						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
@@ -359,12 +355,6 @@
 	</footer>
 
 </div>
-
-
-<script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
-
-<script type="text/javascript" src="../static/js/oxo.js" th:src="@{../js/oxo.js}"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>

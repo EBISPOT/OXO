@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.ac.ebi.spot.model.MappingRequest;
 import uk.ac.ebi.spot.model.Scope;
 import uk.ac.ebi.spot.model.SourceType;
@@ -35,23 +36,23 @@ public class TermControllerUI {
     @Autowired
     MappingService mappingService;
     @RequestMapping(path = "/{curie}", produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
-    public String getTerms (@PathVariable("curie") String curie, Model model) {
+    public String getTerms (@PathVariable("curie") String curie, Model model, final RedirectAttributes redirectAttributes) {
 
         Term t = termService.getTerm(curie);
 
         if (t == null) {
-            model.addAttribute("error", "Term not found");
+            model.addAttribute("error", "Term with this id not found");
 
         }  else {
             model.addAttribute("id", t.getCurie());
             model.addAttribute("term", t);
+            MappingRequest mappingRequest = new MappingRequest();
+            mappingRequest.setFromId(curie);
+            mappingRequest.setSourceType(SourceType.USER);
+            mappingRequest.setScope(Scope.EXACT);
+            model.addAttribute("mappingRequest", mappingRequest);
         }
 
-        MappingRequest mappingRequest = new MappingRequest();
-        mappingRequest.setFromId(curie);
-        mappingRequest.setSourceType(SourceType.USER);
-        mappingRequest.setScope(Scope.EXACT);
-        model.addAttribute("mappingRequest", mappingRequest);
 
         return "terms";
     }

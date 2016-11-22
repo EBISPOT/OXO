@@ -46,6 +46,11 @@ public class SearchControllerUI {
 //        return Collections.emptyList();
     }
 
+    @GetMapping
+    public String search() {
+        return "index";
+    }
+
     @PostMapping
     public String search(
             MappingSearchRequest request,
@@ -54,11 +59,6 @@ public class SearchControllerUI {
     ) {
 
         Set<String> identfiers = request.getIds();
-        if (identfiers.isEmpty()) {
-            // handle error
-            return "error";
-        }
-
 
         Set<String> ids = new HashSet<>();
         for (String id : identfiers) {
@@ -71,6 +71,8 @@ public class SearchControllerUI {
         int limit = ids.size();
         if (limit > 100) {
             limit = 99;
+            model.addAttribute("limited", true);
+
         }
         model.addAttribute("ids", new ArrayList<String>(ids).subList(0, limit));
 //        model.addAttribute("results", results);

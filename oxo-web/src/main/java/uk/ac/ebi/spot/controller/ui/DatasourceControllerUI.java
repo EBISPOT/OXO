@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.controller.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,11 @@ public class DatasourceControllerUI {
     DatasourceService datasourceService;
 
     @Autowired
+    MappingService mappingService;
+
+    @Autowired
     TermService termService;
+
     @RequestMapping(path = "/{prefix}", produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
     public String getDatasource (@PathVariable("prefix") String prefix, Model model, Pageable pageable) {
 
@@ -41,12 +46,14 @@ public class DatasourceControllerUI {
             model.addAttribute("error", "Datasource not found");
 
         }  else {
-            Page<Term> terms = termService.getTermsBySource(datasource.getPrefix(), pageable);
-            Collection<String> termsIds = terms.getContent().stream().map(Term::getCurie).collect(Collectors.toSet());
-            model.addAttribute("ids",termsIds);
 
+
+
+            Page<Mapping> mappings = mappingService.getMappingBySource(datasource.getPrefix(),pageable);
+
+            model.addAttribute("mappings",mappings);
+            model.addAttribute("datasource",datasource);
         }
-        model.addAttribute("datasource",datasource);
 
 
 

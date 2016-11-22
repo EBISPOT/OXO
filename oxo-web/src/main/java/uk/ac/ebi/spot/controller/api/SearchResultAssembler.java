@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -27,8 +28,15 @@ public class SearchResultAssembler implements ResourceAssembler<SearchResult, Re
         final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder.methodOn(TermController.class).getTerm(id));
 
+        final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(MappingController.class).mappings(null, null, searchResult.getCurie(), null));
+
+
         resource.add(lb.withSelfRel());
-//        resource.add(lb.slash("mappings").withRel("mappings"));
+        resource.add(new Link(
+                ml.toUriComponentsBuilder().build().toUriString(),
+                "mappings"
+        ));
 
 
         return resource;

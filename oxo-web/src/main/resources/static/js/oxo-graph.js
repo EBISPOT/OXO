@@ -8,20 +8,11 @@ $(document).ready(function() {
 
     // $("#mapping-vis-spinner").show();
     var curie = $("div[data-get-mapping-vis]").data('get-mapping-vis');
-    console.log("Getting vis for " + curie)
+    var relativePath = $("div[data-get-mapping-vis]").data("api-path") ? $("div[data-get-mapping-vis]").data("api-path") : '';
 
-
-    console.log("Ready!")
-
-    $.getJSON("http://localhost:8080/api/terms/"+curie+"/graph", function(json) {})
+    $.getJSON(relativePath+"api/terms/"+curie+"/graph", function(json) {})
         .success(function(json){
-            console.log("Loaded data")
-
-            console.log(json)
             var container = document.getElementById('mynetwork');
-
-
-
             for(var i=0;i<json.nodes.length;i++){
                 json.nodes[i]["label"]=json.nodes[i]["id"]
                 json.nodes[i]["color"]=colorMap[json.nodes[i]["group"]]

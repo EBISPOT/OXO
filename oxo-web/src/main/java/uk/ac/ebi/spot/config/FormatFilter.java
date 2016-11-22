@@ -43,11 +43,10 @@ public class FormatFilter implements Filter {
             String format = req.getParameter("format");
             if (format.equals("csv")) {
                 requestWrapper.addHeader("Accept", "text/csv");;
-            }
-
-            if (format.equals("tsv")) {
+            }else if (format.equals("tsv")) {
                 requestWrapper.addHeader("Accept", "text/tsv");;
             }
+
         }
         chain.doFilter(requestWrapper, response); // Goes to default servlet.
     }

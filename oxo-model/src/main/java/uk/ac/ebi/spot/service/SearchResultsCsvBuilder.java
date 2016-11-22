@@ -17,21 +17,35 @@ import java.util.List;
  * @date 05/10/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
-@Component
+//@Component
 public class SearchResultsCsvBuilder {
 
+    private CSVWriter csvWriter;
+
+    public SearchResultsCsvBuilder (char seperator, OutputStream outputStream) {
+        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+        this.csvWriter = new CSVWriter(writer, seperator);
+
+    }
 
     static String [] HEADERS = {"curie_id", "label", "mapped_curie", "mapped_label", "mapping_source_prefix", "mapping_target_prefix", "distance" };
-    public void writeResultsAsCsv(List<SearchResult> searchResultList, char seperator, OutputStream outputStream) {
 
-        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-        CSVWriter csvWriter = new CSVWriter(writer, seperator);
+    public void writeHeaders() {
+        csvWriter.writeNext(
+                HEADERS
+        );
+        try {
+            csvWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeResultsAsCsv(List<SearchResult> searchResultList ) {
+
 
         try {
             Iterator r = searchResultList.iterator();
-            csvWriter.writeNext(
-                    HEADERS
-            );
             while (r.hasNext()) {
 
                 SearchResult result = (SearchResult) r.next();
@@ -53,11 +67,19 @@ public class SearchResultsCsvBuilder {
                 csvWriter.flush();
 
             }
-            csvWriter.close();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void close() {
+        try {
+            csvWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

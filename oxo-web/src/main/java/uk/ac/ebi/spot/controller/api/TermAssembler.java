@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -26,9 +27,19 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
         final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder.methodOn(TermController.class).getTerm(id));
 
-        resource.add(lb.withSelfRel());
-//        resource.add(lb.slash("mappings").withRel("mappings"));
+        final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(MappingController.class).mappings(null, null, term.getCurie(), null));
 
+        final ControllerLinkBuilder dl = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(DatasourceController.class).getDatasource(term.getDatasource().getPrefix()));
+
+
+        resource.add(lb.withSelfRel());
+        resource.add(dl.withRel("datasource"));
+        resource.add(new Link(
+                ml.toUriComponentsBuilder().build().toUriString(),
+                "mappings"
+        ));
 
         return resource;
     }

@@ -130,8 +130,8 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../index">Home</a></li>
-                    <li><a href="../ontologies">Ontologies</a></li>
+                    <li class="first"><a th:href="@{index}">Home</a></li>
+                    <li><a href="http://www.ebi.ac.uk/ols">Ontologies</a></li>
                     <li class="active"><a href="../">Mappings</a></li>
                     <li><a href="../docs">Documentation</a></li>
                     <li class="last" ><a href="../about">About</a></li>
@@ -181,7 +181,7 @@
                     </section>
                  </div>
 
-                <div th:if="${ids.size() &gt; 100} " style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
+                <div th:if="${limited}" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
                     You can only view a maximum of 100 results in the search interface. Choose download to get all the mappings
                 </div>
 
@@ -262,7 +262,8 @@
                          th:attr="data-mapping-ids=${id},
                                   data-mapping-sources=${#strings.setJoin(request.getMappingSource(), ',')},
                                   data-mapping-targets=${#strings.setJoin(request.getMappingTarget(), ',')},
-                                  data-mapping-distance=${request.getDistance()}"
+                                  data-mapping-distance=${request.getDistance()}
+                                  "
                     >
                     </div>
                     <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="img/infinity.gif"/></div>

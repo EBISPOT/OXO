@@ -121,7 +121,7 @@ public class CypherQueryService implements MappingQueryService {
 
 
     private static String SUMMARY_MAPPING_QUERY =
-            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]-(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
+            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]->(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
                     "WITH { source : (fd.sourceType+'.'+fd.prefix), size: count(distinct m), target : (td.sourceType+'.'+td.prefix)} as row\n" +
                     "RETURN collect(row) as result";
 

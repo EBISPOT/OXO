@@ -130,7 +130,7 @@
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
-                          </form>
+                        </form>
                     </a></li>
                     <li th:if="${username}" class="functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
@@ -148,7 +148,18 @@
     <div id="content" role="main" class="grid_24 clearfix">
         <div class="container">
 
-            <div class="grid_24 alpha">
+            <!--@thymesVar id="message" type="String"-->
+            <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
+                <strong th:text="${message}">Success message goes here</strong>.
+            </div>
+
+            <!--@thymesVar id="error" type="String"-->
+            <div style="border-left: 1px solid #ebccd1;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-danger" th:if="${error}">
+                <strong th:text="${error}">Error message goes here</strong>.
+            </div>
+
+
+            <div th:if="${datasource}" class="grid_24 alpha">
 
                 <!--@thymesVar id="datasource" type="uk.ac.ebi.spot.model.Datasource"-->
 
@@ -169,35 +180,72 @@
                         <div>
                             <span>Type: </span><span th:text="${datasource.getSource()}">id...</span>
                         </div>
+
+                        <div  th:if="${datasource.getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
+                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"  class="btn btn-default">View in OLS</button>
+                        </div>
                     </div>
                 </div>
-
-                <nav aria-label="Page navigation">
-                  <ul class="pagination">
-                    <li>
-                      <a href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                      </a>
-                    </li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li>
-                      <a href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-
-                <div th:each="id : ${ids}" th:attr="data-mapping-ids=${id}">
-                </div>
-                <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>
             </div>
 
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Direct mappings</h3>
+                </div>
+                <div class="panel-body">
 
+                    <div class="alpha">
+                        <!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
+
+                        <table>
+                            <tr>
+                                <th>
+                                    From id
+                                </th>
+                                <th>
+                                    To id
+                                </th>
+                                <th>
+                                    Source
+                                </th>
+                                <th>
+                                    Created date
+                                </th>
+                                <th>
+                                    View
+                                </th>
+                            </tr>
+                            <tr th:each="mapping : ${mappings}">
+                                <td>
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
+                                        <span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
+                           									<span th:if="${mapping.getFromTerm().getLabel()}">
+                               						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
+                                   							</span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getToTerm().getCurie()})}">
+                                        <span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
+                           									<span th:if="${mapping.getToTerm().getLabel()}">
+                               						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
+                                   							</span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a th:href="@{datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
+                                    <span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
+                                </td>
+                                <td th:text="${mapping.getDate()}"></td>
+                                <td>
+                                    <a th:href="@{mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>

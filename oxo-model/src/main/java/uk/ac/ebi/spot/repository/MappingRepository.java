@@ -27,11 +27,26 @@ public interface MappingRepository  extends GraphRepository<Mapping> {
             "RETURN m")
     List<Mapping> findAllByAnySource(String sourcePrefix);
 
+    @Query("MATCH (td)-[m:MAPPING]-(ft)-[HAS_SOURCE]-(d:Datasource)\n" +
+            "WHERE d.prefix = {0} or m.sourcePrefix = {0}\n" +
+            "RETURN m")
+    Page<Mapping> findAllByAnySource(String sourcePrefix, Pageable pageable);
+
     @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} AND t.curie = {1} and r.sourcePrefix = {2} and r.scope = {3} return r")
     Mapping findOneByMappingBySourceAndId(String fromId, String toId, String source, String scope);
 
     @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} AND t.curie = {1} return r")
     List<Mapping> findMappingsById(String fromId, String toId);
+
+    @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} AND t.curie = {1} return r SKIP {2} LIMIT {3}")
+    List<Mapping> findMappingsById(String fromId, String toId, long skip, long limit);
+
+    @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} return r")
+    List<Mapping> findMappingsById(String fromId);
+
+    @Query("match (f:Term)-[r:MAPPING]-(t:Term) WHERE f.curie = {0} return r SKIP {1} LIMIT {2}")
+    List<Mapping> findMappingsById(String fromId, long skip, long limit);
+
 
     @Query("match path = allShortestPaths ( (f:Term)-[r:MAPPING*1..10]-(t:Term) ) WHERE f.curie = {0} AND t.curie = {1} with rels(path) as m, length(path) as l WHERE l> 1 return m")
     List<Mapping> findInferredMappingsById(String fromId, String toId);

@@ -19,7 +19,7 @@ public class CurieUtils {
             return curie.split(":")[0];
         }
         else {
-            throw new InvalidCurieException();
+            throw new InvalidCurieException("Id is not a valid curie, should be QNAME:<element name>");
         }
     }
 
@@ -29,7 +29,7 @@ public class CurieUtils {
                 return curie.split(":")[1];
             }
             else {
-                throw new InvalidCurieException();
+                throw new InvalidCurieException("Id is not a valid curie, should be QNAME:<element name>");
             }
      }
 

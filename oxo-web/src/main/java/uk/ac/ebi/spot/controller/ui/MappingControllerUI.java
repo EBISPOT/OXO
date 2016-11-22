@@ -122,7 +122,7 @@ public class MappingControllerUI {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public ModelAndView addNewMapping (MappingRequest mappingRequest, @AuthenticationPrincipal OrcidPrinciple principle) {
+    public ModelAndView addNewMapping (MappingRequest mappingRequest, @AuthenticationPrincipal OrcidPrinciple principle, final RedirectAttributes redirectAttributes) {
 
         try {
             OrcidUser user = userRepository.findByOrcid(principle.getOrcid());
@@ -148,19 +148,15 @@ public class MappingControllerUI {
                     mappingRequest.getScope()
             );
             // get or create datasource from user detail
-//            redirectAttributes.addAttribute("message", "Successfully created mapping to " + mappingRequest.getToId());
+            redirectAttributes.addFlashAttribute("message", "Successfully created mapping to " + mappingRequest.getToId());
 
         } catch (InvalidCurieException e) {
-            e.printStackTrace();
-//            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-
-//            redirectAttributes.addAttribute("error", e.getMessage());
-
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         String url = "terms/"+mappingRequest.getFromId();
-        return redirect(url);
+        return   redirect(url);
     }
 
     private ModelAndView redirect(String url) {

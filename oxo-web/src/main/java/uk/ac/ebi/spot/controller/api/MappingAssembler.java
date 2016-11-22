@@ -26,7 +26,14 @@ public class MappingAssembler  implements ResourceAssembler<Mapping, Resource<Ma
         final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder.methodOn(MappingController.class).getMapping(id.toString()));
 
+        final ControllerLinkBuilder fromLink = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(TermController.class).getTerm(mapping.getFromTerm().getCurie()));
+        final ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(TermController.class).getTerm(mapping.getToTerm().getCurie()));
+
         resource.add(lb.withSelfRel());
+        resource.add(fromLink.withRel("fromTerm"));
+        resource.add(linkTo.withRel("toTerm"));
 
         return resource;
     }

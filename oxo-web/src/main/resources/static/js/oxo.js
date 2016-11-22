@@ -17,6 +17,7 @@ function renderSearchResults(withHeader) {
         var targets = $(this).data("mapping-targets") ? $(this).data("mapping-targets").split(",") : undefined;
         var sources = $(this).data("mapping-sources") ? $(this).data("mapping-sources").split(",") : undefined;
         var distance = $(this).data("mapping-distance") ? $(this).data("mapping-distance") : undefined;
+        var relativePath = $(this).data("api-path") ? $(this).data("api-path") : '';
 
         var requestData = {
 
@@ -26,9 +27,8 @@ function renderSearchResults(withHeader) {
             distance: distance
         };
 
-        console.log(JSON.stringify(requestData))
         $.ajax({
-            url:"/api/search",
+            url:relativePath + "api/search",
             dataType: 'json',
             method: 'POST',
             contentType: "application/json; charset=utf-8",
@@ -54,8 +54,8 @@ function renderSearchResults(withHeader) {
 
                     _mappingTargetFound(targetSource);
 
-                    var targetLink = $('<a class="nounderline" style="border-bottom-width: 0px;"></a>').attr('href', '/datasources/' + targetSource);
-                    var termLink = $('<a class="nounderline" style="border-bottom-width: 0px;"></a>').attr('href', '/terms/' + mapping.curie);
+                    var targetLink = $('<a class="nounderline" style="border-bottom-width: 0px;"></a>').attr('href', relativePath+'datasources/' + targetSource);
+                    var termLink = $('<a class="nounderline" style="border-bottom-width: 0px;"></a>').attr('href', relativePath+'terms/' + mapping.curie);
 
                     var targetSpan =  $('<span class="ontology-source"></span>').text(targetSource)
                     var curie =  $('<span class="term-source"></span>').text(mapping.curie)
@@ -75,7 +75,7 @@ function renderSearchResults(withHeader) {
                     datasourceCell.append(targetLink);
                     tableRow.append(datasourceCell);
 
-                    var sourceLink = $('<a></a>').attr('href', '/mappings?fromId=' + requestId + '&' + 'toId=' + mapping.curie);
+                    var sourceLink = $('<a></a>').attr('href', relativePath+'mappings?fromId=' + requestId + '&' + 'toId=' + mapping.curie);
                     sourceLink.append($('<span></span>').text(mapping.sourcePrefixes.length));
 
                     var sourceName =    $("<td/>").append(sourceLink);
@@ -98,7 +98,7 @@ function renderSearchResults(withHeader) {
                 if (requestLabel) {
                     requestDisplay= requestId + " (" +requestLabel + ")"
                 }
-                var panelTitle = $('<h3 class="panel-title text-center"><a style="font-size: larger;" href="/terms/'+requestId+'">'+requestDisplay+'</a></h3> ');
+                var panelTitle = $('<h3 class="panel-title text-center"><a style="font-size: larger;" href="'+relativePath+'terms/'+requestId+'">'+requestDisplay+'</a></h3> ');
                 // var divPanelBody= $('<div class="panel-body"/>');
 
 
@@ -237,19 +237,12 @@ function populateExamples() {
 
 function exportData(format) {
 
-    if ($('#filter-form')) {
-
-        var params = $('#filter-form').serialize()
-
-        if (format == 'csv') {
-            params += "&format=csv"
-        }
-        if (format == 'tsv') {
-            params += "&format=tsv"
-        }
-
-        window.location = '../api/search?' + params
-
+    console.log("fomart " + format)
+    var filterForm = $('#filter-form');
+    if (filterForm) {
+        filterForm.attr('action', 'api/search?format='+format);
+        filterForm.submit();
+        filterForm.attr('action', 'search');
     }
 
 }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,12 +89,29 @@ public class MappingService {
         return mappingRepository.findAllByAnySource(datasource.getPrefix());
     }
 
+    public Page<Mapping> getMappingBySource(String sourcePrefix, Pageable pageable) {
+        Datasource datasource = datasourceService.getDatasource(sourcePrefix);
+        return mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable);
+    }
+
     public Mapping findOneByMappingBySourceAndId(String fromCurie, String toCurie, String sourcePrefix, String scope) {
         return mappingRepository.findOneByMappingBySourceAndId(fromCurie, toCurie, sourcePrefix, scope);
     }
 
     public List<Mapping> findMappingsById(String fromCurie, String toCurie) {
         return mappingRepository.findMappingsById(fromCurie, toCurie);
+    }
+
+    public Page<Mapping> findMappingsById(String fromCurie, Pageable pageable) {
+        return new PageImpl<Mapping>(mappingRepository.findMappingsById(fromCurie, pageable.getOffset(), pageable.getPageSize()));
+    }
+
+    public Page<Mapping> findMappingsById(String fromCurie, String toCurie, Pageable pageable) {
+        return new PageImpl<Mapping>(mappingRepository.findMappingsById(fromCurie, toCurie, pageable.getOffset(), pageable.getPageSize()));
+    }
+
+    public List<Mapping> findMappingsById(String fromCurie) {
+        return mappingRepository.findMappingsById(fromCurie);
     }
 
     public List<Mapping> findInferredMappingsById(String fromCurie, String toCurie) {

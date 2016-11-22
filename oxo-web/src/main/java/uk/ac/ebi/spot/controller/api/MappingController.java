@@ -51,9 +51,21 @@ public class MappingController implements
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Mapping>> mappings(
             Pageable pageable,
-            PagedResourcesAssembler resourceAssembler) throws ResourceNotFoundException {
+            PagedResourcesAssembler resourceAssembler,
+            @RequestParam(value = "fromId", required = false) String fromId,
+            @RequestParam(value = "toId", required = false) String toId
+    ) throws ResourceNotFoundException {
 
-        Page<Mapping> page = mappingService.getMappings(pageable);
+        Page<Mapping> page = null;
+        if (fromId != null && toId != null) {
+            page = mappingService.findMappingsById(fromId, toId, pageable);
+
+        } else if (fromId != null) {
+            page = mappingService.findMappingsById(fromId, pageable);
+        }
+        else {
+            page = mappingService.getMappings(pageable);
+        }
 
         return new ResponseEntity<>(resourceAssembler.toResource(page, mappingAssembler), HttpStatus.OK);
     }
