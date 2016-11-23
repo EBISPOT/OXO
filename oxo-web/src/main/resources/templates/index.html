@@ -123,11 +123,9 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../index">Home</a></li>
-                    <li><a href="../ontologies">Ontologies</a></li>
-                    <li class="active"><a href="#">Mappings</a></li>
-                    <li><a href="../docs">Documentation</a></li>
-                    <li class="last" ><a href="../about">About</a></li>
+                    <li class="first active"><a href="index">OxO</a></li>
+                    <li><a href="docs">Documentation</a></li>
+                    <li class="last" ><a href="about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
@@ -139,7 +137,7 @@
                             My mappings
                         </a>
                     </li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li class="functional last"><a href="contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -174,7 +172,7 @@
                     <div  style="height:800px;" class="grid_8 alpha">
 
 
-                        <form method="post" action="search">
+                        <form id="queryForm" method="post" action="search">
                             <legend>Enter a list of ids</legend>
                             <fieldset>
                                 <div style="float:right; font-size: 0.7em">
@@ -182,12 +180,11 @@
                                 </div>
                                 <label for="identifiers">
                                 </label>
-                                <textarea id="identifiers" name="ids" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
+                                <textarea id="identifiers" name="id-list" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
                                 <input type="hidden" name="distance" value="3"/>
-
                                 <div style="float: right; padding-right: 4px">
                                     <input type="button" name="submit" value="Clear" class="submit" style="float: right" onclick="clearAll();"/>
-                                    <input type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
+                                    <input onclick="submitIds()" type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
                                 </div>
                             </fieldset>
                         </form>
@@ -271,6 +268,33 @@
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
+
+<script>
+
+    function submitIds() {
+
+        var form = $('#queryForm');
+//        form.on('submit', function (e) {
+//            e.preventDefault();
+//        });
+
+        var ids = $('#identifiers').val();
+        if (ids) {
+            $.each(ids.split('\n'), function (index, id) {
+                $('<input/>').attr({
+                    type: 'hidden',
+                    name: 'ids',
+                    value: id
+                }).appendTo($('#queryForm'));
+            });
+
+            form.submit();
+        }
+
+    }
+
+
+</script>
 
 </body>
 </html>

@@ -223,4 +223,8 @@ public class TermService {
     public Object getSummaryGraphJson(String curie) {
         return mappingQueryService.getMappingSummaryGraph(curie);
     }
+
+    public int getTermCountBySource(String prefix) {
+        return termGraphRepository.getTermCountBySource(prefix);
+    }
 }

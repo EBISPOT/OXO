@@ -15,6 +15,11 @@ public interface MappingQueryService {
      */
     Object getMappingSummary();
 
+    /**
+     * Get an Object that reflects a mapping summary by datasource
+     */
+    Object getMappingSummary(String sourcePrefix);
+
 
     /**
      * Get a summary mapping results by searching mappings

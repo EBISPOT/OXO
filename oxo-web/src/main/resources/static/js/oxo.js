@@ -4,8 +4,7 @@ $(document).ready(function() {
 
 /**
  * Find all elements on page with attribute data-get-mapping and append a div showing the mappings for that value
- * todo add additional filter options like data-source, data-target and data-distance to prodide additional filters
- *
+ * Also generates facets and filters for results on the current page
  */
 function renderSearchResults(withHeader) {
 
@@ -158,8 +157,6 @@ function _mappingTargetFound (value) {
         } else {
             targetSources[value]++;
             $('.mapping-target-'+value.toLowerCase()).text(targetSources[value])
-
-
         }
 
         var $wrapper = $('#mapping-target-list');
@@ -167,9 +164,7 @@ function _mappingTargetFound (value) {
                 return +$(b).find("span").text() - +$(a).find("span").text();
             })
             .appendTo($wrapper);
-
     }
-
 }
 
 function _mappingSourceFound (value) {
@@ -195,8 +190,6 @@ function _mappingSourceFound (value) {
         } else {
             mappingSources[value]++;
             $('.mapping-source-'+value.toLowerCase()).text(mappingSources[value])
-
-
         }
 
         var $wrapper = $('#mapping-source-list');
@@ -223,12 +216,25 @@ function clearFilter() {
     $('#distance-slider').slider('setValue', 3, false, false);
     $('#mapping-source-select').val('');
     $('#datasource-select').val('');
+    $('#page').val(0);
+    
     $('#filter-form').submit();
 
 }
 
 function clearAll() {
     $('#identifiers').val("");
+}
+
+function clickPrev(previousPage) {
+    $('#page').val(previousPage);
+    $('#filter-form').submit();
+}
+
+function clickNext(nextPage) {
+
+    $('#page').val(nextPage);
+    $('#filter-form').submit();
 }
 
 function populateExamples() {

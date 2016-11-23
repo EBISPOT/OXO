@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.controller.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,10 +11,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.ac.ebi.spot.model.Datasource;
+import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.MappingSearchRequest;
+import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingResponse;
 import uk.ac.ebi.spot.service.MappingService;
+import uk.ac.ebi.spot.service.TermService;
 
 import java.util.*;
 import java.util.function.Function;
@@ -32,18 +36,19 @@ public class SearchControllerUI {
     MappingService mappingService;
 
     @Autowired
+    TermService termService;
+
+    @Autowired
     DatasourceService datasourceService;
 
     @ModelAttribute("all_datasources")
     public List<Datasource> getDatasources() {
         return datasourceService.getDatasurceWithMappings();
-//        return Collections.emptyList();
     }
 
     @ModelAttribute("mapping_datasources")
     public List<Datasource> getMappingSources() {
         return datasourceService.getMappingSources();
-//        return Collections.emptyList();
     }
 
     @GetMapping
@@ -54,39 +59,42 @@ public class SearchControllerUI {
     @PostMapping
     public String search(
             MappingSearchRequest request,
-            Model model
+            Model model,
+            Pageable pageable
 
     ) {
 
-        Set<String> identfiers = request.getIds();
+        List<String> ids = new ArrayList<>(request.getIds());
+        int totalTerms = 0;
 
-        Set<String> ids = new HashSet<>();
-        for (String id : identfiers) {
+        if (!request.getIds().isEmpty()) {
+            model.addAttribute("ids", ids);
+            totalTerms = ids.size();
 
-            ids.addAll(new HashSet<>(Arrays.asList(id.split("\n"))));
+            int size =  pageable.getOffset() + pageable.getPageSize() > ids.size() ? ids.size() : pageable.getOffset() + pageable.getPageSize();
+            ids = ids.subList(pageable.getOffset(), size);
+
+        } else if (!request.getInputSource().isEmpty()) {
+            for (String prefix : request.getInputSource()) {
+                ids.addAll(termService.getTermsBySource(prefix, pageable).getContent().stream().map(Term::getCurie).collect(Collectors.toList()));
+                totalTerms += termService.getTermCountBySource(prefix);
+            }
+
+        } else if (!request.getMappingSource().isEmpty()) {
+            for (String prefix : request.getMappingSource()) {
+                ids.addAll
+                        (mappingService.getMappingBySource(prefix, pageable).getContent()
+                        .parallelStream().map(Mapping::getFromTerm).collect(Collectors.toList())
+                        .parallelStream().map(Term::getCurie).collect(Collectors.toList()));
+                totalTerms += mappingService.getMappingsCountBySource(prefix);
+            }
         }
 
-        ids = ids.stream().map(trim).collect(Collectors.toSet());
-        // only get first 100 in UI
-        int limit = ids.size();
-        if (limit > 100) {
-            limit = 99;
-            model.addAttribute("limited", true);
-
-        }
-        model.addAttribute("ids", new ArrayList<String>(ids).subList(0, limit));
-//        model.addAttribute("results", results);
+        model.addAttribute("totalterms", totalTerms);
+        model.addAttribute("pageable", pageable);
+        model.addAttribute("pagedIds", ids);
         model.addAttribute("request", request);
-
-
         return "search";
     }
-
-    private static Function<String,String> trim = new Function<String,String>() {
-        @Override public String apply(String s) {
-            return s.replaceAll("(\\r|\\n)*$", "").trim();
-
-        }
-    };
 
 }

@@ -143,11 +143,9 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../../index">Home</a></li>
-                    <li><a href="../../ontologies">Ontologies</a></li>
-                    <li class="active"><a href="../">Mappings</a></li>
-                    <li><a href="../../docs">Documentation</a></li>
-                    <li class="last" ><a href="../../about">About</a></li>
+                    <li class="first active"><a href="../index">OxO</a></li>
+                    <li><a href="../docs">Documentation</a></li>
+                    <li class="last" ><a href="../about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
@@ -159,7 +157,7 @@
                             My mappings
                         </a>
                     </li>
-                    <li class="functional last"><a href="../../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -230,7 +228,7 @@
                             <form method="post" action="../mappings" th:object="${mappingRequest}">
 
                                 <div class="form-group">
-                                    <label for="toId" class="col-lg-2 control-label">Mapped id</label>
+                                    <!--<label for="toId" class="col-lg-2 control-label">Mapped id</label>-->
                                     <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
                                         <!--<input type="text" class="" id="toId" name="toId" th:field="*{toId}"/>-->
                                         <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-suggest-header="Select term" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control toId"/>

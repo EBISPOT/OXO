@@ -17,7 +17,9 @@ import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -48,10 +50,18 @@ public class DatasourceControllerUI {
         }  else {
 
 
+//            termService.getTermsBySource(datasource.getPrefix(), new PageRequest(0, 100000));
+//
+//            List<String> ids =mappingService.getMappingBySource(datasource.getPrefix())
+//                    .parallelStream().map(Mapping::getFromTerm).collect(Collectors.toSet())
+//                    .parallelStream().map(Term::getCurie).collect(Collectors.toList());
 
-            Page<Mapping> mappings = mappingService.getMappingBySource(datasource.getPrefix(),pageable);
+//            model.addAttribute("ids",ids);
 
-            model.addAttribute("mappings",mappings);
+            int termCount = termService.getTermCountBySource(datasource.getPrefix());
+            int mappingCount = mappingService.getMappingsCountBySource(datasource.getPrefix());
+            model.addAttribute("termCount",termCount);
+            model.addAttribute("mappingCount",mappingCount);
             model.addAttribute("datasource",datasource);
         }
 

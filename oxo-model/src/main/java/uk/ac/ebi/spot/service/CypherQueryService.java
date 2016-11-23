@@ -4,6 +4,7 @@ import org.neo4j.ogm.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Service;
 
@@ -85,9 +86,10 @@ public class CypherQueryService implements MappingQueryService {
 
     }
 
+    // todo remove fixing to lower case
     private static Function<String,String> sourcePrefixWrap = new Function<String,String>() {
         @Override public String apply(String s) {
-            return new StringBuilder().append("'").append(s).append("'").append(" in source").toString();
+            return new StringBuilder().append("'").append(s.toLowerCase()).append("'").append(" in source").toString();
         }
     };
 
@@ -120,14 +122,35 @@ public class CypherQueryService implements MappingQueryService {
     }
 
 
+//    private static String SUMMARY_MAPPING_QUERY =
+//            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]-(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
+//                    "WITH { source : (fd.sourceType+'.'+fd.prefix), size: count(distinct m), target : (td.sourceType+'.'+td.prefix)} as row\n" +
+//                    "RETURN collect(row) as result";
+
+    private static String SUMMARY_WHERE_CLAUSE = " WHERE fd.prefix = {source} or m.sourcePrefix = {source} or td.prefix = {source} ";
+
     private static String SUMMARY_MAPPING_QUERY =
-            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]->(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
-                    "WITH { source : (fd.sourceType+'.'+fd.prefix), size: count(distinct m), target : (td.sourceType+'.'+td.prefix)} as row\n" +
+            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]-(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
+                    " WHERE_CLAUSE \n"+
+                    "WITH { source : fd.prefix,  sourceType : fd.sourceType, size: count(distinct m), target : td.prefix, targetType : td.sourceType} as row\n" +
                     "RETURN collect(row) as result";
 
     @Override
+    public Object getMappingSummary(String sourcePrefix) {
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("source", sourcePrefix);
+        return getMappingSummaryQuery (SUMMARY_MAPPING_QUERY.replace("WHERE_CLAUSE", SUMMARY_WHERE_CLAUSE), params);
+
+    }
+
+    @Override
     public Object getMappingSummary() {
-        Result results = neo4jOperations.query(SUMMARY_MAPPING_QUERY, new HashMap());
+        return getMappingSummaryQuery (SUMMARY_MAPPING_QUERY.replace("WHERE_CLAUSE", ""), new HashMap());
+    }
+
+    public Object getMappingSummaryQuery(String query, Map params) {
+        Result results = neo4jOperations.query(query, params);
 
         for (Map<String, Object> row : results)  {
             return row.get("result");

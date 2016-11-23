@@ -5,6 +5,8 @@ var node;
 $(document).ready(function() {
 
     $("#mapping-vis-spinner").show();
+    var sourcePrefixParams = $("#mapping-vis").data("datasource-prefix") ?  '?datasource='+$("#mapping-vis").data("datasource-prefix") : '';
+    var apiPath = $("#mapping-vis").data("api-path") ?  $("#mapping-vis").data("api-path") : '';
 
     
     var diameter = 600,
@@ -33,7 +35,7 @@ $(document).ready(function() {
     link = svg.append("g").selectAll(".link"),
     node = svg.append("g").selectAll(".node");
 
-    d3.json("api/mappings/summary", function (error, classes) {
+    d3.json(apiPath+"api/mappings/summary"+sourcePrefixParams, function (error, classes) {
 
         if (error) throw error;
 
@@ -57,7 +59,7 @@ $(document).ready(function() {
             .text(function(d) { return d.key; })
             .on("mouseover", mouseovered)
             .on("mouseout", mouseouted)
-            .on("click", function(d) {window.location =  "datasources/" + d.key});
+            .on("click", function(d) {window.location =  apiPath+"datasources/" + d.key});
 
         $("#mapping-vis-spinner").hide();
 
@@ -73,22 +75,22 @@ function mouseovered(d) {
 
     link
         .classed("link--target", function(l) { if (l.target === d) return l.source.source = true; })
-        .classed("link--source", function(l) { if (l.source === d) return l.target.target = true; })
+        .classed("link--target", function(l) { if (l.source === d) return l.target.target = true; })
         .filter(function(l) { return l.target === d || l.source === d; })
         .each(function() { this.parentNode.appendChild(this); });
 
     node
-        .classed("node--target", function(n) { return n.target; })
+        .classed("node--source", function(n) { return n.target; })
         .classed("node--source", function(n) { return n.source; });
 }
 
 function mouseouted(d) {
     link
         .classed("link--target", false)
-        .classed("link--source", false);
+        .classed("link--target", false);
 
     node
-        .classed("node--target", false)
+        .classed("node--source", false)
         .classed("node--source", false);
 }
 
@@ -118,10 +120,40 @@ function packageHierarchy(classes) {
     }
 
 
+    var parentNode = {name: "", children: []}
+    map[""] = parentNode;
+    
+    var edgesMap = {};
+    
     classes.forEach(function(d) {
-        find(d.source, d);
-    });
 
+        if (!map[d.source]) {
+            if (!map[d.sourceType]) {
+                map[d.sourceType] = {key: d.sourceType, name: d.sourceType, children: [], parent : parentNode};
+                map[""].children.push(map[d.sourceType])
+            }
+            map[d.source] = {key: d.source, name: d.source, children: [], parent : map[d.sourceType], edge: [ {target : d.target, source : d.source }] } ;
+            map[d.sourceType].children.push(map[d.source])                                                                                                          
+        } else {
+            map[d.source].edge.push ({target : d.target, source : d.source, size : d.size })
+        }
+
+        if (!map[d.target]) {
+            if (!map[d.targetType]) {
+                map[d.targetType] = {key: d.targetType, name: d.targetType, children: [], parent : parentNode};
+                map[""].children.push(map[d.targetType])
+            }
+            map[d.target] = {key: d.target, name: d.target, children: [], parent : map[d.targetType], edge: [ {target : d.source, source : d.target  }]};
+            map[d.targetType].children.push(map[d.target])
+        } else {
+            // console.log("Adding " + d.target + " -> " + d.source)
+            map[d.target].edge.push ({target : d.source, source : d.target, size : d.size })
+        }
+
+        // find(d.source, d);
+
+        // find2(d.target, d);
+    });
 
     return map[""];
 }
@@ -138,8 +170,11 @@ function packageImports(nodes) {
 
     // For each import, construct a link from the source to target node.
     nodes.forEach(function(d) {
-        if (d.target) {
-            imports.push({source: map[d.name], target: map[d.target]});
+        if (d.edge) {
+            d.edge.forEach(function (edge) {
+                imports.push({source : map[edge.source], target : map[edge.target]  });
+                
+            });
         }
     });
 

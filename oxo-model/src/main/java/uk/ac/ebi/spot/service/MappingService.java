@@ -91,7 +91,7 @@ public class MappingService {
 
     public Page<Mapping> getMappingBySource(String sourcePrefix, Pageable pageable) {
         Datasource datasource = datasourceService.getDatasource(sourcePrefix);
-        return mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable);
+        return new PageImpl<Mapping>(mappingRepository.findAllByAnySource(datasource.getPrefix(), pageable.getOffset(), pageable.getPageSize()));
     }
 
     public Mapping findOneByMappingBySourceAndId(String fromCurie, String toCurie, String sourcePrefix, String scope) {
@@ -117,10 +117,10 @@ public class MappingService {
     public List<Mapping> findInferredMappingsById(String fromCurie, String toCurie) {
         return mappingRepository.findInferredMappingsById(fromCurie, toCurie);
     }
+
     public List<SearchResult> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
 
         List<SearchResult> searchResults = new ArrayList<>();
-        LinkedHashMap<String, List<MappingResponse>> mappingResponses = new LinkedHashMap<>();
 
         for (String id : identifiers) {
             Term fromTerm = termService.getTerm(id);
@@ -166,5 +166,12 @@ public class MappingService {
 
     public Object getSummaryJson() {
         return mappingQueryService.getMappingSummary();
+    }
+    public Object getSummaryJson(String datasource) {
+        return mappingQueryService.getMappingSummary(datasource);
+    }
+
+    public int getMappingsCountBySource(String prefix) {
+        return mappingRepository.getMappingsCountBySource(prefix.toLowerCase());
     }
 }

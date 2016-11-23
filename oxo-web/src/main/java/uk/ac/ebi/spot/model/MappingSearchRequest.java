@@ -1,6 +1,8 @@
 package uk.ac.ebi.spot.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,19 +12,19 @@ import java.util.Set;
  */
 public class MappingSearchRequest {
 
-    private Set<String> ids = new HashSet<>();;
+    private List<String> ids = new ArrayList<>();;
     private Set<String> inputSource = new HashSet<>();
     private Set<String> mappingTarget = new HashSet<>();
     private Set<String> mappingSource = new HashSet<>();
     private int distance = 3;
 
-    public MappingSearchRequest(Set<String> ids, Set<String> mappingSource, Set<String> mappingTarget) {
+    public MappingSearchRequest(List<String> ids, Set<String> mappingSource, Set<String> mappingTarget) {
         this.ids = ids;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
     }
 
-    public MappingSearchRequest(Set<String> ids, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
+    public MappingSearchRequest(List<String> ids, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
         this.ids = ids;
         this.inputSource = inputSource;
         this.mappingSource = mappingSource;
@@ -45,11 +47,11 @@ public class MappingSearchRequest {
         this.distance = distance;
     }
 
-    public Set<String> getIds() {
+    public List<String> getIds() {
         return ids;
     }
 
-    public void setIds(Set<String> ids) {
+    public void setIds(List<String> ids) {
         this.ids = ids;
     }
 

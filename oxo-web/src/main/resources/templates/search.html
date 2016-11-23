@@ -130,23 +130,21 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a th:href="@{index}">Home</a></li>
-                    <li><a href="http://www.ebi.ac.uk/ols">Ontologies</a></li>
-                    <li class="active"><a href="../">Mappings</a></li>
-                    <li><a href="../docs">Documentation</a></li>
-                    <li class="last" ><a href="../about">About</a></li>
+                    <li class="first active"><a href="index">OxO</a></li>
+                    <li><a href="docs">Documentation</a></li>
+                    <li class="last" ><a href="about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
-                          </form>
+                        </form>
                     </a></li>
                     <li th:if="${username}" class="functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
                     </li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li class="functional last"><a href="contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -159,31 +157,64 @@
 
             <div class="grid_24 alpha">
                 <div class="row">
-                    <section class="grid_18 alpha">
+                    <section class="grid_8 alpha">
                         <h2>Mapping results</h2>
                     </section>
 
-                    <section class="grid_6 alpha">
+                    <section  class="grid_10">
+                        <nav>
+                            <!--@thymesVar id="pageable" type="org.springframework.data.domain.Pageable"-->
+
+                            <ul style="text-align: left;" class="pager">
+
+                                <li th:if="${pageable.hasPrevious()}" class="btn-group" id="prev-button" >
+                                    <a rel="prev" href="#" th:onclick="'javascript:clickPrev(\'' + ${pageable.getPageNumber() - 1} + '\');'" >Previous</a>
+                                </li>
+                                <li th:unless="${pageable.hasPrevious()}" class="btn-group disabled" id="prev-button" >
+                                    <a href="#" >Previous</a>
+                                </li>
+
+                                <span class="search-results-count">Showing
+                                <span th:unless="${pageable.hasPrevious()}" id="start-display">1</span>
+                                <span th:if="${pageable.hasPrevious()}" id="start-display" th:text="${pageable.getOffset()}">1</span>
+                                    to  <span id="end-display" th:text="${totalterms} lt ${pageable.getOffset()} + ${pageable.getPageSize()} ?${totalterms}  : ${pageable.getOffset()} + ${pageable.getPageSize()}">10</span>
+                                    of <span id="total-display" th:text="${totalterms}">0</span> terms</span>
+
+                                <li th:if=" (${pageable.getOffset()} + ${pageable.getPageSize()}) gt ${totalterms}" class="btn-group disabled" id="next-button" >
+                                    <a href="#" >Next</a>
+                                </li>
+                                <li th:if=" (${pageable.getOffset()} + ${pageable.getPageSize()}) lt ${totalterms}" class="btn-group" id="next-button" >
+                                    <a rel="next" href="#" th:onclick="'javascript:clickNext(\'' + ${pageable.next().getPageNumber()} + '\');'">Next</a>
+                                </li>
+                            </ul>
+
+
+                        </nav>
+                    </section>
+
+                    <section class="grid_6">
                         <div style="float:right;">
                             <!-- Single button -->
                             <div class="btn-group">
-                              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Download <span class="caret"></span>
-                              </button>
-                              <ul class="dropdown-menu">
-                                <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
-                                <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
-                                <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
-                              </ul>
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Download <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
+                                    <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
+                                    <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
+                                </ul>
                             </div>
 
                         </div>
                     </section>
-                 </div>
+                </div>
 
                 <div th:if="${limited}" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
                     You can only view a maximum of 100 results in the search interface. Choose download to get all the mappings
                 </div>
+
+
 
                 <section class="grid_6 alpha" id="search-extras">
                     <div class="row">
@@ -194,9 +225,14 @@
 
                                 <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
 
+                                <!--@thymesVar id="pageable" type="org.springframework.data.domain.Pageable"-->
+
+                                <input type="hidden" id="page" name="page" th:value="${pageable.getPageNumber()}"/>
+                                <input type="hidden" name="size" th:value="${pageable.getPageSize()}"/>
+                                <input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>
 
 
-                                <input th:each="id : ${request.getIds()}" type="hidden" name="ids" th:value="${id}"/>
+                                <input name="inputSource"  th:each="inputSource : ${request.getInputSource()}" th:value="${inputSource}" type="hidden"/>
                                 <h3>Distance</h3>
 
 
@@ -258,7 +294,7 @@
 
                     <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
 
-                    <div th:each="id : ${ids}"
+                    <div th:each="id : ${pagedIds}"
                          th:attr="data-mapping-ids=${id},
                                   data-mapping-sources=${#strings.setJoin(request.getMappingSource(), ',')},
                                   data-mapping-targets=${#strings.setJoin(request.getMappingTarget(), ',')},

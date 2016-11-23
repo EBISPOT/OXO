@@ -36,6 +36,7 @@
 
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
+    <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{../css/oxo-d3.css}" type="text/css" media="screen"/>
 
 
     <!-- for production the above can be replaced with -->
@@ -121,11 +122,9 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../../index">Home</a></li>
-                    <li><a href="../../ontologies">Ontologies</a></li>
-                    <li class="active"><a href="../../">Mappings</a></li>
-                    <li><a href="../../docs">Documentation</a></li>
-                    <li class="last" ><a href="../../about">About</a></li>
+                    <li class="first active"><a href="../index">OxO</a></li>
+                    <li><a href="../docs">Documentation</a></li>
+                    <li class="last" ><a href="../about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
@@ -133,11 +132,11 @@
                         </form>
                     </a></li>
                     <li th:if="${username}" class="functional">
-                        <a href="myaccount" class="icon icon-functional" data-icon="5">
+                        <a href="../myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
                     </li>
-                    <li class="functional last"><a href="../../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -178,71 +177,64 @@
                             <span>Prefix: </span><span class="ontology-source" th:text="${datasource.getPrefix()}">id...</span>
                         </div>
                         <div>
-                            <span>Type: </span><span th:text="${datasource.getSource()}">id...</span>
+
+                            <span>
+
+                                <span>Type: </span><span th:text="${datasource.getSource()}">id...</span>
+
+                                 <button th:if="${datasource.getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}"
+                                         style="display: inline-block;"
+                                         th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"
+                                         class="btn btn-default">View in OLS</button>
+                            </span>
                         </div>
 
-                        <div  th:if="${datasource.getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
-                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"  class="btn btn-default">View in OLS</button>
-                        </div>
+
                     </div>
                 </div>
             </div>
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Direct mappings</h3>
+                    <h3 class="panel-title">Mappings</h3>
                 </div>
                 <div class="panel-body">
 
-                    <div class="alpha">
-                        <!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
+                    <div>
+                                            <span>
 
-                        <table>
-                            <tr>
-                                <th>
-                                    From id
-                                </th>
-                                <th>
-                                    To id
-                                </th>
-                                <th>
-                                    Source
-                                </th>
-                                <th>
-                                    Created date
-                                </th>
-                                <th>
-                                    View
-                                </th>
-                            </tr>
-                            <tr th:each="mapping : ${mappings}">
-                                <td>
-                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
-                                        <span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
-                           									<span th:if="${mapping.getFromTerm().getLabel()}">
-                               						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
-                                   							</span>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a class="nounderline" style="border-bottom-width: 0px;" th:href="@{terms/{id}(id=${mapping.getToTerm().getCurie()})}">
-                                        <span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
-                           									<span th:if="${mapping.getToTerm().getLabel()}">
-                               						         (<span th:text="${mapping.getToTerm().getLabel()}">id...</span>)
-                                   							</span>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a th:href="@{datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
-                                    <span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
-                                </td>
-                                <td th:text="${mapping.getDate()}"></td>
-                                <td>
-                                    <a th:href="@{mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
-                                </td>
-                            </tr>
-                        </table>
+                                            <span>Number of <span th:text="${datasource.getPrefix()}">prefix name</span> terms mapped: </span><span th:text="${termCount}">id...</span>
+                                            <form style="display: inline-block;" method="post" action="../search">
+                                                <!--<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>-->
+                                                <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
+                                                <input type="hidden" name="distance" value="1"/>
+                                                <button style="display: inline-block;" class="btn btn-default">View terms</button>
+                                            </form>
+                                            </span>
+                    </div>
 
+                    <div>
+                                            <span>
+
+                                            <span>Total number of mapping from this datasource: </span><span th:text="${mappingCount}">id...</span>
+                                            <form style="display: inline-block;" method="post" action="../search">
+                                                <!--<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>-->
+                                                <input type="hidden" name="mappingSource" th:value="${datasource.getPrefix()}"/>
+                                                <input type="hidden" name="distance" value="1"/>
+                                                <button  class="btn btn-default">View mappings</button>
+                                            </form>
+                                            </span>
+                    </div>
+
+
+                    <div style="height: 600px" class="grid_16 omega">
+
+                        <div id="mapping-vis" th:attr="data-datasource-prefix=${datasource.getPrefix()},data-api-path='../'">
+                            <div id="mapping-vis-spinner">
+                                <img src="../img/infinity.gif"/>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -297,9 +289,10 @@
 </div>
 
 
+<script type="text/javascript" th:src="@{../webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
 <script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-
 <script type="text/javascript" src="../static/js/oxo.js" th:src="@{../js/oxo.js}"></script>
+<script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{../js/oxo-flare.js}"></script>
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>

@@ -99,8 +99,16 @@ public class MappingController implements
     @CrossOrigin
     @RequestMapping(path = "/summary", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    HttpEntity<String> getMappingSummary() throws ResourceNotFoundException {
-        Object object=  mappingService.getSummaryJson();
+    HttpEntity<String> getMappingSummary(
+            @RequestParam(value = "datasource", required = false) String datasource
+    ) throws ResourceNotFoundException {
+        Object object = null;
+        if (datasource != null) {
+            object = mappingService.getSummaryJson(datasource);
+        }
+        else {
+           object =  mappingService.getSummaryJson();
+        }
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         try {
             return new HttpEntity<String>(ow.writeValueAsString(object));
