@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
 import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.service.DatasourceService;
+import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

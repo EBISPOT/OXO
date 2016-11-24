@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -26,8 +27,14 @@ public class DatasourceAssembler implements ResourceAssembler<Datasource, Resour
         final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder.methodOn(DatasourceController.class).getDatasource(id));
 
-        resource.add(lb.withSelfRel());
+        final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(TermController.class).terms(id, null, null));
 
+        resource.add(lb.withSelfRel());
+        resource.add(new Link(
+                ml.toUriComponentsBuilder().build().toUriString(),
+                "terms"
+        ));
         return resource;
     }
 }

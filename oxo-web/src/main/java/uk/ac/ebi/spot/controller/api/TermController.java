@@ -46,12 +46,19 @@ public class TermController  implements
     @Autowired
     private TermService termService;
 
-    @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Term>> terms(
+            @RequestParam(value = "datasource", required = false) String datasource,
             Pageable pageable,
             PagedResourcesAssembler resourceAssembler) throws ResourceNotFoundException {
 
-        Page<Term> page = termService.getTerms(pageable);
+        Page<Term> page;
+
+        if (datasource != null ) {
+            page = termService.getTermsBySource(datasource, pageable);
+        } else {
+            page = termService.getTerms(pageable);
+        }
 
         return new ResponseEntity<>(resourceAssembler.toResource(page, termAssembler), HttpStatus.OK);
     }

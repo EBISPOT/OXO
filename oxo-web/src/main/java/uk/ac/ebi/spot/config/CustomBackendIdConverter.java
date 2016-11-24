@@ -7,6 +7,7 @@ import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.repository.DatasourceRepository;
 import uk.ac.ebi.spot.repository.TermGraphRepository;
+import uk.ac.ebi.spot.security.model.OrcidUser;
 
 import java.io.Serializable;
 

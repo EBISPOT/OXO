@@ -150,6 +150,7 @@ function _mappingTargetFound (value) {
             // make button clickable
             button.on('click', function(e){
                 $(".datasource-select").val(e.target.id.toLowerCase());
+                $('#page').val(0);
                 $("#filter-form").submit();
             });
 
@@ -183,6 +184,7 @@ function _mappingSourceFound (value) {
             // make button clickable
             button.on('click', function(e){
                 $(".mapping-source-select").val(e.target.id.toLowerCase());
+                $('#page').val(0);
                 $("#filter-form").submit();
             });
 

@@ -384,24 +384,30 @@
             ticks_labels: ['1', '2', '3', '4', '5', '6'],
             ticks_snap_bounds: 50
         }).on('change', function () {
+            $('#page').val(0);
             $("#filter-form").submit();
         });
 
         $('.datasource-select').select2({placeholder: "Filter by datasource"})
                 .on('select2:select', function (e) {
+                    $('#page').val(0);
                     $("#filter-form").submit();
                 })
                 .on('select2:unselect', function (e) {
+                    $('#page').val(0);
                     $("#filter-form").submit();
                 });
 
         $('.mapping-source-select').select2({placeholder: "Filter by mapping source"})
                 .on('select2:select', function (e) {
+                    $('#page').val(0);
                     $("#filter-form").submit();
                 })
                 .on('select2:unselect', function (e) {
+                    $('#page').val(0);
                     $("#filter-form").submit();
                 });
+
     });
 
 

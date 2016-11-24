@@ -7,7 +7,9 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
+import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Term;
+import uk.ac.ebi.spot.service.TermService;
 
 /**
  * @author Simon Jupp
@@ -20,6 +22,9 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
     @Autowired
     EntityLinks entityLinks;
 
+    @Autowired
+    private TermService termService;
+
     @Override
     public Resource<Term> toResource(Term term) {
         Resource<Term> resource = new Resource<Term>(term);
@@ -30,8 +35,12 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
         final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
                 ControllerLinkBuilder.methodOn(MappingController.class).mappings(null, null, term.getCurie(), null));
 
+        Datasource datasource = term.getDatasource();
+        if (datasource == null) {
+            datasource= termService.getTerm(term.getCurie()).getDatasource();
+        }
         final ControllerLinkBuilder dl = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(DatasourceController.class).getDatasource(term.getDatasource().getPrefix()));
+                ControllerLinkBuilder.methodOn(DatasourceController.class).getDatasource(datasource.getPrefix()));
 
 
         resource.add(lb.withSelfRel());

@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-import static com.sun.javafx.tools.resource.DeployResource.Type.data;
-
 /**
  * @author Simon Jupp
  * @date 06/10/2016
