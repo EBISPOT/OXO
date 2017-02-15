@@ -52,8 +52,6 @@ public class SearchController {
             HttpServletResponse response,
             String seperator,
             String contentType
-
-
     ) {
         if (seperator == null && contentType == null) {
             contentType = "csv";
@@ -67,11 +65,15 @@ public class SearchController {
             SearchResultsCsvBuilder csvBuilder = new SearchResultsCsvBuilder(seperator.charAt(0), response.getOutputStream());
             csvBuilder.writeHeaders();
 
-            PageRequest pageRequest = new PageRequest(0, 100);
+            int page = 0;
+            PageRequest pageRequest = new PageRequest(page, 100);
             List<SearchResult> map = getSearchResults(request, pageRequest).getContent();
             csvBuilder.writeResultsAsCsv(map);
             while (!map.isEmpty()) {
-                map = getSearchResults(request, pageRequest.next()).getContent();
+                map = getSearchResults(request, pageRequest).getContent();
+                csvBuilder.writeResultsAsCsv(map);
+                page++;
+                pageRequest = new PageRequest(page, 100);
             }
 
 
@@ -91,7 +93,7 @@ public class SearchController {
     }
 
     @RequestMapping(path = "",  produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = "application/x-www-form-urlencoded;charset=UTF-8", method = RequestMethod.POST)
-    public HttpEntity<PagedResources<SearchResult>> postSearchFromFrom(
+    public HttpEntity<PagedResources<SearchResult>> postSearchFromForm(
             MappingSearchRequest request,
             Pageable pageable,
             PagedResourcesAssembler resourceAssembler
@@ -126,29 +128,17 @@ public class SearchController {
     }
 
     private Page<SearchResult> getSearchResults(MappingSearchRequest request, Pageable pageable) {
-        if (request.getIds().isEmpty() && request.getInputSource().isEmpty()) {
+        if (request.getIds().isEmpty() && request.getInputSource() == null) {
             // handle error
             throw new RuntimeException("Must supply an id or input datasources to search");
         }
-
         // if Ids are provided then we know what to lookup
         List<String> ids =request.getIds();;
         if (!ids.isEmpty()) {
-            int size =  pageable.getOffset() + pageable.getPageSize() > ids.size() ? ids.size() : pageable.getOffset() + pageable.getPageSize();
-            ids = ids.subList(pageable.getOffset(), size);
-        } else {
-
-            for (String mappingSource : request.getInputSource()) {
-                for (uk.ac.ebi.spot.model.Mapping mapping : mappingService.getMappingBySource(mappingSource, pageable)) {
-                    ids.add(
-                            mapping.getFromTerm().getCurie()
-                    );
-                }
-            }
+            return mappingService.getMappingsSearchByIds(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
         }
-
-        return new PageImpl<SearchResult>(mappingService.getMappingsSearch(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget()));
-
+        String inputSource = request.getInputSource();
+        return mappingService.getMappingsSearchByDatasource(inputSource, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
     }
 
     private static Function<String,String> trim = new Function<String,String>() {

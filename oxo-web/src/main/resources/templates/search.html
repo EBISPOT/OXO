@@ -40,6 +40,8 @@
     <!--<link  rel="stylesheet" th:href="@{webjars/bootstrap-select/1.9.4/css/bootstrap-select.css}" href="/webjars/bootstrap-select/1.9.4/css/bootstrap-select.css"  type="text/css" media="screen"></link>-->
     <link  rel="stylesheet" th:href="@{webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
     <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
+    <link  rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"  type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -56,6 +58,21 @@
             background: #BABABA;
         }
 
+        tr.group,
+        tr.group:hover {
+            background-color: #ddd !important;
+        }
+
+        .ui-progressbar {
+            position: relative;
+        }
+        .progress-label {
+            position: absolute;
+            left: 50%;
+            top: 4px;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+        }
 
     </style>
 
@@ -157,158 +174,36 @@
 
             <div class="grid_24 alpha">
                 <div class="row">
-                    <section class="grid_8 alpha">
-                        <h2>Mapping results</h2>
-                    </section>
-
-                    <section  class="grid_10">
-                        <nav>
-                            <!--@thymesVar id="pageable" type="org.springframework.data.domain.Pageable"-->
-
-                            <ul style="text-align: left;" class="pager">
-
-                                <li th:if="${pageable.hasPrevious()}" class="btn-group" id="prev-button" >
-                                    <a rel="prev" href="#" th:onclick="'javascript:clickPrev(\'' + ${pageable.getPageNumber() - 1} + '\');'" >Previous</a>
-                                </li>
-                                <li th:unless="${pageable.hasPrevious()}" class="btn-group disabled" id="prev-button" >
-                                    <a href="#" >Previous</a>
-                                </li>
-
-                                <span class="search-results-count">Showing
-                                <span th:unless="${pageable.hasPrevious()}" id="start-display">1</span>
-                                <span th:if="${pageable.hasPrevious()}" id="start-display" th:text="${pageable.getOffset()}">1</span>
-                                    to  <span id="end-display" th:text="${totalterms} lt ${pageable.getOffset()} + ${pageable.getPageSize()} ?${totalterms}  : ${pageable.getOffset()} + ${pageable.getPageSize()}">10</span>
-                                    of <span id="total-display" th:text="${totalterms}">0</span> terms</span>
-
-                                <li th:if=" (${pageable.getOffset()} + ${pageable.getPageSize()}) gt ${totalterms}" class="btn-group disabled" id="next-button" >
-                                    <a href="#" >Next</a>
-                                </li>
-                                <li th:if=" (${pageable.getOffset()} + ${pageable.getPageSize()}) lt ${totalterms}" class="btn-group" id="next-button" >
-                                    <a rel="next" href="#" th:onclick="'javascript:clickNext(\'' + ${pageable.next().getPageNumber()} + '\');'">Next</a>
-                                </li>
-                            </ul>
+                    <h2>Mapping results</h2>
 
 
-                        </nav>
-                    </section>
-
-                    <section class="grid_6">
-                        <div style="float:right;">
-                            <!-- Single button -->
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Download <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
-                                    <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
-                                    <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
-                                </ul>
-                            </div>
-
+                    <div style="width: 50%;text-align: center;">
+                        <div id="progressbar">
+                            <div class="progress-label">Fetching mappings...</div>
                         </div>
-                    </section>
-                </div>
-
-                <div th:if="${limited}" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    You can only view a maximum of 100 results in the search interface. Choose download to get all the mappings
-                </div>
-
-
-
-                <section class="grid_6 alpha" id="search-extras">
-                    <div class="row">
-
-                        <form id="filter-form" method="post" action="search">
-                            <fieldset>
-                                <legend><span class="glyphicon glyphicon-filter">Filters</span></legend>
-
-                                <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
-
-                                <!--@thymesVar id="pageable" type="org.springframework.data.domain.Pageable"-->
-
-                                <input type="hidden" id="page" name="page" th:value="${pageable.getPageNumber()}"/>
-                                <input type="hidden" name="size" th:value="${pageable.getPageSize()}"/>
-                                <input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>
-
-
-                                <input name="inputSource"  th:each="inputSource : ${request.getInputSource()}" th:value="${inputSource}" type="hidden"/>
-                                <h3>Distance</h3>
-
-
-                                <div style="margin-left: 20px;">
-                                    <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${request.getDistance()}" th:value="${request.getDistance()}  " type="text"/>
-                                </div>
-
-                                <h3>Term sources</h3>
-
-                                <div>
-                                    <select id="datasource-select" name="mappingTarget" class="datasource-select" multiple="multiple" style="width:100%">
-                                        <!--th:with="types=${searchOptions.getTypes()}"-->
-                                        <!--&gt;-->
-                                        <option
-                                                th:each="source : ${all_datasources}"
-                                                th:value="${source.getPrefix().toLowerCase()}"
-                                                th:text="${{source.getPrefix()}}"
-                                                th:with="targetSources=${request.getMappingTarget()}"
-                                                th:selected="${#sets.contains(targetSources , source.getPrefix().toLowerCase() )}"  >
-                                            <!--&gt;-->
-                                        </option>
-                                    </select>
-                                    <div id="datasource-summary">
-
-                                    </div>
-                                </div>
-
-
-
-                                <h3>Mapping sources</h3>
-
-                                <div>
-                                    <!--@thymesVar id="onto" type="OntologyDocument"-->
-                                    <select id="mapping-source-select" name="mappingSource" class="mapping-source-select" multiple="multiple" style="width:100%">
-                                        <option
-                                                th:each="source : ${mapping_datasources}"
-                                                th:value="${source.getPrefix().toLowerCase()}"
-                                                th:text="${{source.getPrefix()}}"
-                                                th:with="mappingSources=${request.getMappingSource()}"
-                                                th:selected="${#sets.contains(mappingSources , source.getPrefix().toLowerCase())}"  >
-                                            <!--&gt;-->
-                                        </option>
-                                    </select>
-                                    <div id="mapping-summary">
-
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-default" onclick="clearFilter()">Clear filters</button>
-
-                            </fieldset>
-                        </form>
 
                     </div>
-                </section>
 
+                    <br/>
 
-                <section class="grid_18 beta" style="margin-top: 12px;">
+                    <div>
+                        <table id="example">
 
+                        </table>
 
-                    <!--@thymesVar id="request" type="uk.ac.ebi.spot.model.MappingSearchRequest"-->
-
-                    <div th:each="id : ${pagedIds}"
-                         th:attr="data-mapping-ids=${id},
-                                  data-mapping-sources=${#strings.setJoin(request.getMappingSource(), ',')},
-                                  data-mapping-targets=${#strings.setJoin(request.getMappingTarget(), ',')},
-                                  data-mapping-distance=${request.getDistance()}
-                                  "
-                    >
                     </div>
-                    <div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="img/infinity.gif"/></div>
-
-                </section>
 
 
 
+                </div>
 
+
+                <form>
+                    <input type="hidden" name="inputSource" th:value="${inputSource}"/>
+                    <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
+
+                    <input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>
+                </form>
             </div>
 
 
@@ -364,11 +259,14 @@
 
 
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
-<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
+<!--<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>-->
+<!--<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>-->
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>
+<!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>-->
+<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=1)}"></script>
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
@@ -376,39 +274,6 @@
 <script>
 
 
-    $(document).ready(function() {
-
-        $('#distance-slider').slider({
-            step: 1, min: 1, max: 6,
-            ticks: [1, 2, 3, 4, 5, 6],
-            ticks_labels: ['1', '2', '3', '4', '5', '6'],
-            ticks_snap_bounds: 50
-        }).on('change', function () {
-            $('#page').val(0);
-            $("#filter-form").submit();
-        });
-
-        $('.datasource-select').select2({placeholder: "Filter by datasource"})
-                .on('select2:select', function (e) {
-                    $('#page').val(0);
-                    $("#filter-form").submit();
-                })
-                .on('select2:unselect', function (e) {
-                    $('#page').val(0);
-                    $("#filter-form").submit();
-                });
-
-        $('.mapping-source-select').select2({placeholder: "Filter by mapping source"})
-                .on('select2:select', function (e) {
-                    $('#page').val(0);
-                    $("#filter-form").submit();
-                })
-                .on('select2:unselect', function (e) {
-                    $('#page').val(0);
-                    $("#filter-form").submit();
-                });
-
-    });
 
 
 </script>

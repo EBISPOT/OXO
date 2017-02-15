@@ -200,42 +200,49 @@
                 </div>
                 <div class="panel-body">
 
-                    <div>
-                                            <span>
+                    <!--<div>-->
+                                            <!--<span>-->
 
-                                            <span>Number of <span th:text="${datasource.getPrefix()}">prefix name</span> terms mapped: </span><span th:text="${termCount}">id...</span>
-                                            <form style="display: inline-block;" method="post" action="../search">
-                                                <!--<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>-->
-                                                <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
-                                                <input type="hidden" name="distance" value="1"/>
-                                                <button style="display: inline-block;" class="btn btn-default">View terms</button>
-                                            </form>
-                                            </span>
+                                            <!--<span>Number of <span th:text="${datasource.getPrefix()}">prefix name</span> terms with direct mappings: </span><span th:text="${termCount}">id...</span>-->
+                                            <!--<form style="display: inline-block;" method="post" action="../search">-->
+                                                <!--&lt;!&ndash;<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>&ndash;&gt;-->
+                                                <!--<input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>-->
+                                                <!--<input type="hidden" name="distance" value="1"/>-->
+                                                <!--<button style="display: inline-block;" class="btn btn-default">View terms</button>-->
+                                            <!--</form>-->
+                                            <!--</span>-->
+                    <!--</div>-->
+
+
+                    <div>
+
+
+
                     </div>
 
-                    <div>
+                    <div th:each="mapping : ${mappingCount}">
                                             <span>
 
-                                            <span>Total number of mapping from this datasource: </span><span th:text="${mappingCount}">id...</span>
+                                            <span class="ontology-source" th:text="${mapping.key}">id...</span><span th:text="${mapping.value}"></span> mappings
                                             <form style="display: inline-block;" method="post" action="../search">
-                                                <!--<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>-->
-                                                <input type="hidden" name="mappingSource" th:value="${datasource.getPrefix()}"/>
-                                                <input type="hidden" name="distance" value="1"/>
+                                                <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
+                                                <input type="hidden" name="mappingTarget" th:value="${mapping.key}"/>
+                                                <input type="hidden" name="distance" value="3"/>
                                                 <button  class="btn btn-default">View mappings</button>
                                             </form>
                                             </span>
                     </div>
 
 
-                    <div style="height: 600px" class="grid_16 omega">
+                    <!--<div style="height: 600px" class="grid_16 omega">-->
 
-                        <div id="mapping-vis" th:attr="data-datasource-prefix=${datasource.getPrefix()},data-api-path='../'">
-                            <div id="mapping-vis-spinner">
-                                <img src="../img/infinity.gif"/>
-                            </div>
+                        <!--<div id="mapping-vis" th:attr="data-datasource-prefix=${datasource.getPrefix()},data-api-path='../'">-->
+                            <!--<div id="mapping-vis-spinner">-->
+                                <!--<img src="../img/infinity.gif"/>-->
+                            <!--</div>-->
 
-                        </div>
-                    </div>
+                        <!--</div>-->
+                    <!--</div>-->
                 </div>
             </div>
 

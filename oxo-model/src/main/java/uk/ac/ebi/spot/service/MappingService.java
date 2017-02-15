@@ -118,31 +118,40 @@ public class MappingService {
         return mappingRepository.findInferredMappingsById(fromCurie, toCurie);
     }
 
-    public List<SearchResult> getMappingsSearch(Collection<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
+    public Page<SearchResult> getMappingsSearchByIds(List<String> identifiers, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix, Pageable pageable) {
 
         List<SearchResult> searchResults = new ArrayList<>();
 
-        for (String id : identifiers) {
+        int size =  pageable.getOffset() + pageable.getPageSize() > identifiers.size() ? identifiers.size() : pageable.getOffset() + pageable.getPageSize();
+
+        for (String id : identifiers.subList(pageable.getOffset(), size)) {
             Term fromTerm = termService.getTerm(id);
 
             // could check that source prefix and target prefixes are valid...
-
-            List<MappingResponse> mappingResponse = new ArrayList<>();
-
-            String fromCurie = id;
-            String fromLabel = null;
             if (fromTerm != null) {
-                mappingResponse = mappingQueryService.getMappingResponseSearch(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix);
-                fromCurie = fromTerm.getCurie();
-                fromLabel = fromTerm.getLabel();
+                SearchResult searchResult = mappingQueryService.getMappingResponseSearchById(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix);
+                searchResult.setCurie(fromTerm.getCurie());
+                searchResult.setLabel(fromTerm.getLabel());
+                searchResult.setQueryId(id);
+                searchResults.add(searchResult);
             }
-
-            searchResults.add(new SearchResult(fromCurie, fromLabel, mappingResponse));
+            else {
+                searchResults.add(new SearchResult(id, null,null, null, Collections.emptyList()));
+            }
         }
-
-        return searchResults;
+        return new PageImpl<SearchResult>(searchResults, pageable, identifiers.size());
     }
 
+
+    public Page<SearchResult> getMappingsSearchByDatasource(String fromDatasource, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix, Pageable pageable) {
+        // check teh datasrouce is valid
+        Datasource datasource = datasourceService.getDatasource(fromDatasource);
+
+        if (datasource != null) {
+            return mappingQueryService.getMappingResponseSearchByDatasource(datasource.getPrefix(), distance, sourcePrefix, targetPrefix, pageable);
+        }
+        return new PageImpl<SearchResult>(Collections.emptyList(), pageable, 0);
+    }
 
 
 
@@ -171,7 +180,25 @@ public class MappingService {
         return mappingQueryService.getMappingSummary(datasource);
     }
 
-    public int getMappingsCountBySource(String prefix) {
-        return mappingRepository.getMappingsCountBySource(prefix.toLowerCase());
+    /**
+     * Get a list of curies for a given target datasource and distance. This is an optimised convenience query used by the UI
+     * @param fromDatasource the from datasoource
+     * @param targetDatasource the target datasource for mappings
+     * @param distance defaults to 3
+     * @return
+     */
+    public List<String> getMappedTermCuries (String fromDatasource, String targetDatasource, int distance) {
+        return  mappingQueryService.getMappedTermCuries(fromDatasource, targetDatasource, distance);
     }
+
+    /**
+     * Get a list of target datasources and counts for a given input source and distance. This is an optimised convenience query used by the UI
+     * @param fromDatasource the from datasoource
+     * @param distance defaults to 3
+     * @return
+     */
+    public Map<String, Integer> getMappedTargetCounts (String fromDatasource, int distance) {
+        return  mappingQueryService.getMappedTargetCounts(fromDatasource, distance);
+    }
+
 }

@@ -58,10 +58,7 @@ public class DatasourceControllerUI {
 
 //            model.addAttribute("ids",ids);
 
-            int termCount = termService.getTermCountBySource(datasource.getPrefix());
-            int mappingCount = mappingService.getMappingsCountBySource(datasource.getPrefix());
-            model.addAttribute("termCount",termCount);
-            model.addAttribute("mappingCount",mappingCount);
+            model.addAttribute("mappingCount",mappingService.getMappedTargetCounts(prefix, 3));
             model.addAttribute("datasource",datasource);
         }
 

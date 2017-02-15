@@ -65,35 +65,17 @@ public class SearchControllerUI {
     ) {
 
         List<String> ids = new ArrayList<>(request.getIds());
-        int totalTerms = 0;
 
         if (!request.getIds().isEmpty()) {
             model.addAttribute("ids", ids);
-            totalTerms = ids.size();
+        } else if (request.getInputSource() !=null && !request.getMappingTarget().isEmpty()) {
 
-            int size =  pageable.getOffset() + pageable.getPageSize() > ids.size() ? ids.size() : pageable.getOffset() + pageable.getPageSize();
-            ids = ids.subList(pageable.getOffset(), size);
-
-        } else if (!request.getInputSource().isEmpty()) {
-            for (String prefix : request.getInputSource()) {
-                ids.addAll(termService.getTermsBySource(prefix, pageable).getContent().stream().map(Term::getCurie).collect(Collectors.toList()));
-                totalTerms += termService.getTermCountBySource(prefix);
-            }
-
-        } else if (!request.getMappingSource().isEmpty()) {
-            for (String prefix : request.getMappingSource()) {
-                ids.addAll
-                        (mappingService.getMappingBySource(prefix, pageable).getContent()
-                        .parallelStream().map(Mapping::getFromTerm).collect(Collectors.toList())
-                        .parallelStream().map(Term::getCurie).collect(Collectors.toList()));
-                totalTerms += mappingService.getMappingsCountBySource(prefix);
-            }
+            String source = request.getInputSource();
+            Set<String> target = request.getMappingTarget();
+            model.addAttribute("inputSource", source);
+            model.addAttribute("mappingTarget", target);
         }
 
-        model.addAttribute("totalterms", totalTerms);
-        model.addAttribute("pageable", pageable);
-        model.addAttribute("pagedIds", ids);
-        model.addAttribute("request", request);
         return "search";
     }
 

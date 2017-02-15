@@ -2,9 +2,7 @@ package uk.ac.ebi.spot.service;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -59,7 +57,7 @@ public class SearchResultsCsvBuilder {
                     row.add(response.getCurie());
                     row.add(response.getLabel());
                     row.add(StringUtils.join(response.getSourcePrefixes(), ','));
-                    row.add(StringUtils.join(response.getTargetPrefixes(), ','));
+                    row.add(response.getTargetPrefix());
                     row.add(String.valueOf(response.getDistance()));
 
                     csvWriter.writeNext(row.toArray(new String [row.size()]));

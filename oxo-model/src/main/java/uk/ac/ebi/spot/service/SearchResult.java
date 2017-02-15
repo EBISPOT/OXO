@@ -9,6 +9,8 @@ import java.util.List;
  */
 public class SearchResult {
 
+    String queryId;
+    String querySource;
     String curie;
     String label;
     List<MappingResponse> mappingResponseList;
@@ -16,10 +18,28 @@ public class SearchResult {
     public SearchResult() {
     }
 
-    public SearchResult(String curie, String label, List<MappingResponse> mappingResponseList) {
+    public SearchResult(String queryId, String querySource, String curie, String label, List<MappingResponse> mappingResponseList) {
+        this.queryId = queryId;
+        this.querySource = querySource;
         this.curie = curie;
         this.label = label;
         this.mappingResponseList = mappingResponseList;
+    }
+
+    public String getQueryId() {
+        return queryId;
+    }
+
+    public void setQueryId(String queryId) {
+        this.queryId = queryId;
+    }
+
+    public String getQuerySource() {
+        return querySource;
+    }
+
+    public void setQuerySource(String querySource) {
+        this.querySource = querySource;
     }
 
     public String getCurie() {

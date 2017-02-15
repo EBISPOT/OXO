@@ -13,7 +13,7 @@ import java.util.Set;
 public class MappingSearchRequest {
 
     private List<String> ids = new ArrayList<>();;
-    private Set<String> inputSource = new HashSet<>();
+    private String inputSource;
     private Set<String> mappingTarget = new HashSet<>();
     private Set<String> mappingSource = new HashSet<>();
     private int distance = 3;
@@ -24,18 +24,18 @@ public class MappingSearchRequest {
         this.mappingTarget = mappingTarget;
     }
 
-    public MappingSearchRequest(List<String> ids, Set<String> inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
+    public MappingSearchRequest(List<String> ids, String inputSource, Set<String> mappingSource, Set<String> mappingTarget) {
         this.ids = ids;
         this.inputSource = inputSource;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
     }
 
-    public Set<String> getInputSource() {
+    public String getInputSource() {
         return inputSource;
     }
 
-    public void setInputSource(Set<String> inputSource) {
+    public void setInputSource(String inputSource) {
         this.inputSource = inputSource;
     }
 

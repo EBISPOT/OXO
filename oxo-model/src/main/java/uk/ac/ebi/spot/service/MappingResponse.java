@@ -12,17 +12,17 @@ public class MappingResponse {
     private String curie;
     private String label;
     private Collection<String> sourcePrefixes;
-    private Collection<String> targetPrefixes;
+    private String targetPrefix;
     private int distance;
 
     public MappingResponse() {
     }
 
-    public MappingResponse(String curie, String label, Collection<String> sourcePrefixes, Collection<String> targetPrefixes, int distance) {
+    public MappingResponse(String curie, String label, Collection<String> sourcePrefixes, String targetPrefix, int distance) {
         this.curie = curie;
         this.label = label;
         this.sourcePrefixes = sourcePrefixes;
-        this.targetPrefixes = targetPrefixes;
+        this.targetPrefix = targetPrefix;
         this.distance = distance;
     }
 
@@ -50,12 +50,12 @@ public class MappingResponse {
         this.sourcePrefixes = sourcePrefixes;
     }
 
-    public Collection<String> getTargetPrefixes() {
-        return targetPrefixes;
+    public String getTargetPrefix() {
+        return targetPrefix;
     }
 
-    public void setTargetPrefixes(Collection<String> targetPrefixes) {
-        this.targetPrefixes = targetPrefixes;
+    public void setTargetPrefix(String targetPrefix) {
+        this.targetPrefix = targetPrefix;
     }
 
     public int getDistance() {
