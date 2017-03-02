@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,19 +125,21 @@ public class MappingService {
 
         int size =  pageable.getOffset() + pageable.getPageSize() > identifiers.size() ? identifiers.size() : pageable.getOffset() + pageable.getPageSize();
 
-        for (String id : identifiers.subList(pageable.getOffset(), size)) {
-            Term fromTerm = termService.getTerm(id);
+        if (pageable.getOffset() <= size) {
+            for (String id : identifiers.subList(pageable.getOffset(), size)) {
+                Term fromTerm = termService.getTerm(id);
 
-            // could check that source prefix and target prefixes are valid...
-            if (fromTerm != null) {
-                SearchResult searchResult = mappingQueryService.getMappingResponseSearchById(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix);
-                searchResult.setCurie(fromTerm.getCurie());
-                searchResult.setLabel(fromTerm.getLabel());
-                searchResult.setQueryId(id);
-                searchResults.add(searchResult);
-            }
-            else {
-                searchResults.add(new SearchResult(id, null,null, null, Collections.emptyList()));
+                // could check that source prefix and target prefixes are valid...
+                if (fromTerm != null) {
+                    SearchResult searchResult = mappingQueryService.getMappingResponseSearchById(fromTerm.getCurie(), distance, sourcePrefix, targetPrefix);
+                    searchResult.setCurie(fromTerm.getCurie());
+                    searchResult.setLabel(fromTerm.getLabel());
+                    searchResult.setQueryId(id);
+                    searchResults.add(searchResult);
+                }
+                else {
+                    searchResults.add(new SearchResult(id, null,null, null, Collections.emptyList()));
+                }
             }
         }
         return new PageImpl<SearchResult>(searchResults, pageable, identifiers.size());
@@ -144,13 +147,20 @@ public class MappingService {
 
 
     public Page<SearchResult> getMappingsSearchByDatasource(String fromDatasource, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix, Pageable pageable) {
-        // check teh datasrouce is valid
-        Datasource datasource = datasourceService.getDatasource(fromDatasource);
+        // check the datasrouce is valid
+
+        Datasource datasource = null;
+        if (fromDatasource != null) {
+             datasource = datasourceService.getDatasource(fromDatasource);
+        }
 
         if (datasource != null) {
             return mappingQueryService.getMappingResponseSearchByDatasource(datasource.getPrefix(), distance, sourcePrefix, targetPrefix, pageable);
         }
-        return new PageImpl<SearchResult>(Collections.emptyList(), pageable, 0);
+        else  {
+            return mappingQueryService.getMappingResponseSearchByDatasource(fromDatasource, distance, sourcePrefix, targetPrefix, pageable);
+        }
+//        return new PageImpl<SearchResult>(Collections.emptyList(), pageable, 0);
     }
 
 

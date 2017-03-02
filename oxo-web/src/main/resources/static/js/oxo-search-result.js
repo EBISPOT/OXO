@@ -4,10 +4,23 @@ $(document).ready(function() {
 });
 
 
+var withProgress = true;
+
+var hideTableInfo = true;
+var hideFromCol = false;
+var apiPath = ''
 
 function initialisePage() {
 
-    addProgressBar();
+    withProgress =  $("#example").data("with-progress") ? $("#example").data("with-progress") : true;
+    hideTableInfo =  $("#example").data("hide-table-info") ?  $("#example").data("hide-table-info"): false;
+    hideFromCol =  $("#example").data("hide-from-col") ?  $("#example").data("hide-from-col"): false;
+
+    apiPath = $("#example").data("api-path") ? $("#example").data("api-path"): '';
+    console.log(apiPath)
+    if (withProgress) {
+        addProgressBar();
+    }
 
     // need to determine if this is a search by id or search by datasource
 
@@ -30,12 +43,15 @@ function initialisePage() {
     };
 
     var resultsData = [];
-    doSearch('api/search?size=100', requestData, resultsData)
+    doSearch(apiPath+'api/search?size=100', requestData, resultsData)
 
 }
 
-function doSearch(url, requestData, resultsData) {
+function doSearch(url, requestData, resultsData, noMappings) {
 
+    if (!noMappings) {
+        noMappings = 0;
+    }
     $.ajax({
         url: url,
         dataType: 'json',
@@ -53,24 +69,29 @@ function doSearch(url, requestData, resultsData) {
                 var mappings = result.mappingResponseList;
 
                 var requestId = result.curie;
-                var requestLabel = result.label;
+                var requestLabel = result.label != 'null' ? result.label : undefined;
 
                 if (mappings.length == 0) {
-                    var row = [requestId + " (" + requestLabel + " )",'' ,'' ,'' ,''];
+                    var row = [result.queryId, '','No mapping', '' ,'', '','' ,''];
                     resultsData.push(row);
+                    noMappings += 1;
                 }
                 $.each(mappings, function (index, mapping) {
 
                     var targetSource = mapping.targetPrefix;
                     var mappingId = mapping.curie;
-                    var mappingLabel = mapping.label;
+                    var mappingLabel = mapping.label != 'null' ? mapping.label : undefined;
+                    var mappingSources = mapping.sourcePrefixes;
                     var mappingSourcesLength = mapping.sourcePrefixes.length;
                     var distance = mapping.distance;
 
                     var row = [
-                        requestId + " (" + requestLabel + " )",
-                        mappingId + " (" + mappingLabel + " )",
+                        requestId,
+                        requestLabel,
+                        mappingId,
+                        mappingLabel,
                         targetSource,
+                        mappingSources,
                         mappingSourcesLength,
                         distance
                     ];
@@ -83,12 +104,18 @@ function doSearch(url, requestData, resultsData) {
             updateProgress(parseInt(pageNumber / totalPages * 100));
 
             if (data._links.next) {
-                doSearch(data._links.next.href, requestData, resultsData)
+                doSearch(data._links.next.href, requestData, resultsData, noMappings)
             }
             else {
                 // progress complete
                 updateProgress(100);
                 progressComplete();
+                // $('#mappings-count').text(resultsData.length - noMappings)
+                if (noMappings > 0) {
+                    $('#unmapped').text(noMappings)
+                    $('#mapping-summary').show()
+                }
+
                 drawTable(resultsData)
             }
         }
@@ -98,39 +125,167 @@ function doSearch(url, requestData, resultsData) {
 
 
 function drawTable(resultsData) {
+
+    dom = '<"top"if>rt<"bottom"lp><"clear">'
+
+    if (hideTableInfo) {
+        dom = 'rt';
+    }
+
+    var hide =  [ 1, 3, 5 ];
+    if (hideFromCol) {
+        hide =  [ 0, 1, 3, 5 ];
+
+    }
+
     var table = $('#example').DataTable({
         "displayLength": 50,
-        "deferRender": true,
-        // "columnDefs": [
-        //     { "visible": false, "targets": 0 }
-        // ],
-        // "order": [[ 0, 'asc' ]],
-        // "displayLength": 25,
-        // "drawCallback": function ( settings ) {
-        //     var api = this.api();
-        //     var rows = api.rows( {page:'current'} ).nodes();
-        //     var last=null;
-        //
-        //     api.column(0, {page:'current'} ).data().each( function ( group, i ) {
-        //         if ( last !== group ) {
-        //             $(rows).eq( i ).before(
-        //                 '<tr class="group"><td colspan="5">'+group+'</td></tr>'
-        //             );
-        //
-        //             last = group;
-        //         }
-        //     } );
-        // },
+        "initComplete": function () {
+            this.api().columns([4, 7]).every( function () {
+                var column = this;
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo( $(column.header()).append($('<br/>')) )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+                    } )
+                    .on( 'click', function(e) {
+                        e.stopPropagation();
+                    });
+                column.data().unique().sort().each( function ( d, j ) {
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                } );
+            } );
+            // handle column 6 (provenance)
+            var provenanceColumn = this.api().columns([5]);
+            this.api().columns([6]).every(function () {
+                var column = this;
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo( $(column.header()).append($('<br/>')) )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        provenanceColumn
+                            .search( val ? val : '', true, false)
+                            .draw();
+                    } )
+                    .on( 'click', function(e) {
+                        e.stopPropagation();
+                    });
 
+                provenanceColumn.data().unique().sort().each( function ( d, j ) {
+                    var uniq = {}
+                    $.each(d, function (index, val) {
+                        $.each(val, function (i1, val1) {
+                            if (!uniq[val1]) {
+                                select.append( '<option value="'+val1+'">'+val1+'</option>' )
+                                uniq[val1] = 1
+                            }
+                        });
+                    })
+                } );
+            } );
+
+        },
+        "deferRender": true,
+        'dom': dom,
+        "columnDefs": [
+            {
+                "render": function ( data, type, row ) {
+                    return renderId(data, row[1]);
+                },
+                "width": "20%",
+                "targets": 0
+            },
+            {
+                "render": function ( data, type, row ) {
+                    return renderId(data, row[3]);
+                },
+                "width": "20%",
+                "targets": 2
+            },
+            {
+                "render": function ( data, type, row ) {
+                    return renderDatasource(data);
+                },
+                "width": "10%",
+                "targets": 4
+            },
+            {
+                "render": function ( data, type, row ) {
+                    return renderMappingCount(data, row[0], row[2]);
+                },
+                "width": "10%",
+                "targets": 6
+            },
+            {
+                "width":"10%",
+                "targets": 7
+            },
+            { "visible": false,  "targets": hide }
+        ],
         data: resultsData,
         columns: [
-            { title: "fromId" },
-            { title: "toId" },
-            { title: "target" },
-            { title: "no. of mappings" },
-            { title: "distance" }
+            { title: "Input" },
+            { title: "Input label" },
+            { title: "Mapped id" },
+            { title: "Mapped label" },
+            { title: "Id source" },
+            { title: "Provenance list" },
+            { title: "Provenance" },
+            { title: "Distance" }
         ]
     } );
+}
+
+function renderId(id, label) {
+
+    var cell = $('<span/>');
+
+    var targetLink = $('<a class="nounderline" target="_blank" style="border-bottom-width: 0px;"></a>').attr('href', apiPath+'terms/' + id);
+    var curie =  $('<span class="term-source"></span>').text(id)
+
+    if (id == 'No mapping') {
+        targetLink = $('<span></span>');
+        curie =  $('<span class="no-mapping"></span>').text(id)
+    }
+
+
+    targetLink.append(curie);
+    cell.append(targetLink)
+    if (label) {
+        cell.append (" (" + label + ")")
+    }
+    return cell.html();
+
+}
+
+function renderDatasource(targetSource) {
+    var cell = $('<span/>');
+    var targetLink = $('<a class="nounderline" target="_blank" style="border-bottom-width: 0px;"></a>').attr('href', apiPath+'datasources/' + targetSource);
+    var targetSpan =  $('<span class="ontology-source"></span>').text(targetSource)
+
+    targetLink.append(targetSpan);
+    cell.append(targetLink)
+    return cell.html();
+}
+
+function renderMappingCount(count, from, to) {
+    var cell = $('<span/>');
+    var sourceLink = $('<a/>',
+        {
+            href : apiPath+'mappings?fromId=' + from + '&' + 'toId=' + to,
+            text :  count,
+            target : "_blank"
+        }
+    );
+    cell.append(sourceLink)
+    return cell.html();
 }
 
 
@@ -139,7 +294,9 @@ function getApiPath(element) {
 }
 
 function progressComplete() {
-    $( ".progress-label" ).text( "Complete!" );
+    if (withProgress) {
+        $( ".progress-label" ).text( "Complete!" );
+    }
 }
 
 function addProgressBar() {
@@ -160,5 +317,7 @@ function addProgressBar() {
 }
 
 function updateProgress(value) {
-    $("#progressbar").progressbar( "value", value)
+    if (withProgress) {
+        $("#progressbar").progressbar( "value", value)
+    }
 }

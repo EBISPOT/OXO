@@ -34,12 +34,14 @@
     <!-- also inform ES so we can host your colour palette file -->
     <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/embl-petrol-colours.css" type="text/css" media="screen"/>
 
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
+    <link rel="stylesheet" href="../static/css/oxo.css" th:href="@{css/oxo.css}" type="text/css" media="screen"/>
 
     <!--<link  rel="stylesheet" th:href="@{webjars/bootstrap-select/1.9.4/css/bootstrap-select.css}" href="/webjars/bootstrap-select/1.9.4/css/bootstrap-select.css"  type="text/css" media="screen"></link>-->
     <link  rel="stylesheet" th:href="@{webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
     <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
+
     <link  rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"  type="text/css" media="screen"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
 
@@ -174,40 +176,80 @@
 
             <div class="grid_24 alpha">
                 <div class="row">
-                    <h2>Mapping results</h2>
+                    <section class="grid_8 alpha">
+                        <h2>Mapping results</h2>
 
+                    </section>
 
-                    <div style="width: 50%;text-align: center;">
-                        <div id="progressbar">
-                            <div class="progress-label">Fetching mappings...</div>
+                    <section class="grid_10 alpha">
+                        <div>
+                            <div id="progressbar" class="center-block">
+                                <div class="progress-label">Fetching mappings...</div>
+                            </div>
                         </div>
 
-                    </div>
-
-                    <br/>
-
-                    <div>
-                        <table id="example">
-
-                        </table>
-
-                    </div>
+                    </section>
 
 
+                    <section class="grid_6">
+                        <div style="float:right;">
+                            <!-- Single button -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Download <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
+                                    <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
+                                    <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
+                                </ul>
+                            </div>
 
+                        </div>
+                    </section>
                 </div>
 
+                <div class="grid_24 alpha">
+                    <div class="row">
 
-                <form>
-                    <input type="hidden" name="inputSource" th:value="${inputSource}"/>
-                    <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
+                        <div id="mapping-summary" style="display: none;">
+                            <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
+                            <!--<br/>-->
+                            <span>Did not map:<span id="unmapped"></span></span>
 
-                    <input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>
-                </form>
+                        </div>
+
+                        <div id="filter">
+
+
+                            <form id="filter-form"  method="post" action="search">
+                                <input type="hidden" name="inputSource" th:value="${inputSource}"/>
+                                <input type="hidden" name="distance" th:value="${request.getDistance()}"/>
+                                <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
+                                <input th:each="mappingSource : ${mappingSource}" type="hidden" name="mappingSource" th:value="${mappingSource}"/>
+                                <input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>
+
+                                <!--<div style="margin-left: 20px;">-->
+                                <!--<input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${request.getDistance()}" th:value="${request.getDistance()}  " type="text"/>-->
+                                <!--</div>-->
+                            </form>
+                        </div>
+
+                        <!--<div id="oxo-mapping-table"-->
+                        <!--th:attr="data-mapping-ids=${#strings.setJoin(ids, ',')},-->
+                        <!--data-mapping-input=${inputSource},-->
+                        <!--data-mapping-targets=${#strings.setJoin(mappingTarget, ',')},-->
+                        <!--data-mapping-distance=${request.getDistance()},-->
+                        <!--data-api-path=''">-->
+                        <div>
+                            <table id="example" style="    border-collapse: collapse;">
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
             </div>
-
-
-
         </div>
     </div>
 
@@ -259,11 +301,11 @@
 
 
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<!--<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>-->
-<!--<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>-->
+<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
+<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>-->
 <script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=1)}"></script>
@@ -273,8 +315,31 @@
 
 <script>
 
+    //    $(document).ready(function() {
+    //
+    ////        $('#distance-slider').slider({
+    //        new Slider('#distance-slider', {
+    //            step: 1, min: 1, max: 6,
+    //            ticks: [1, 2, 3, 4, 5, 6],
+    //            ticks_labels: ['1', '2', '3', '4', '5', '6'],
+    //            ticks_snap_bounds: 50
+    //        }).on('change', function () {
+    ////            $('#page').val(0);
+    ////            $("#filter-form").submit();
+    //        });
+    //    });
 
+    function exportData(format) {
 
+        console.log("format " + format)
+        var filterForm = $('#filter-form');
+        if (filterForm) {
+            filterForm.attr('action', 'api/search?format='+format);
+            filterForm.submit();
+            filterForm.attr('action', 'search');
+        }
+
+    }
 
 </script>
 </body>

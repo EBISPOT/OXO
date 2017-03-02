@@ -39,7 +39,10 @@ public class IndexController {
     MappingService mappingService;
 
     @RequestMapping(path = {"", "index"})
-    public String home() {
+    public String home(Model model) {
+
+        model.addAttribute("datasources",datasourceService.getDatasourceWithMappings());
+
         return "index";
     }
 

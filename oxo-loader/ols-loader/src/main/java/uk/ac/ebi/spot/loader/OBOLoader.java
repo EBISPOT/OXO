@@ -22,6 +22,7 @@ import java.util.*;
  * @date 11/05/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
+@Deprecated
 @Component
 public class OBOLoader implements Loader {
 
@@ -68,7 +69,7 @@ public class OBOLoader implements Loader {
         for (OntologyResourceConfig config : configs) {
             Collection<Mapping> mappings = new HashSet<>();
 
-            Datasource datasource = new Datasource(config.getNamespace(), null, Collections.emptySet(), config.getTitle(), config.getDescription(), SourceType.ONTOLOGY);
+            Datasource datasource = new Datasource(config.getNamespace(), null,null, Collections.emptySet(), config.getTitle(), config.getDescription(), SourceType.ONTOLOGY);
 
             try {
                 OntologyLoader loader = OntologyLoaderFactory.getLoader(config);

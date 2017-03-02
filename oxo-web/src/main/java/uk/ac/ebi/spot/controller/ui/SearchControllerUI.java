@@ -1,9 +1,7 @@
 package uk.ac.ebi.spot.controller.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,17 +9,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.ac.ebi.spot.model.Datasource;
-import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.MappingSearchRequest;
-import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.DatasourceService;
-import uk.ac.ebi.spot.service.MappingResponse;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author Simon Jupp
@@ -43,7 +36,7 @@ public class SearchControllerUI {
 
     @ModelAttribute("all_datasources")
     public List<Datasource> getDatasources() {
-        return datasourceService.getDatasurceWithMappings();
+        return datasourceService.getDatasourceWithMappings();
     }
 
     @ModelAttribute("mapping_datasources")
@@ -68,6 +61,10 @@ public class SearchControllerUI {
 
         if (!request.getIds().isEmpty()) {
             model.addAttribute("ids", ids);
+
+            if (!request.getMappingTarget().isEmpty()) {
+                model.addAttribute("mappingTarget", request.getMappingTarget());
+            }
         } else if (request.getInputSource() !=null && !request.getMappingTarget().isEmpty()) {
 
             String source = request.getInputSource();
@@ -75,6 +72,8 @@ public class SearchControllerUI {
             model.addAttribute("inputSource", source);
             model.addAttribute("mappingTarget", target);
         }
+
+        model.addAttribute("request", request);
 
         return "search";
     }

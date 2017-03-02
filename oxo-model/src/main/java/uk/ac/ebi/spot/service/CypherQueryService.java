@@ -39,32 +39,37 @@ public class CypherQueryService implements MappingQueryService {
 
     private static String MAPPING_BY_DATASOURCE_QUERY_PART1="MATCH (fd:Datasource)<-[:HAS_SOURCE]-(ft:Term),(td:Datasource)<-[:HAS_SOURCE]-(tt:Term)\n";
 
-    private static String MAPPING_BY_DATASOURCE_QUERY_PART2= "WITH ft, tt, td\n" +
+    private static String MAPPING_BY_DATASOURCE_QUERY_PART2= "WITH ft, fd, tt, td\n" +
             "MATCH path =  (ft)-[m:MAPPING*1..%s]-(tt) \n" +
-            "WITH ft, tt, td, length(path) as length, extract ( r in m |  r.sourcePrefix) as source\n";
+            "WHERE fd <> td\n" +
+            "WITH ft, tt, td, length(path) as length, extract ( r in m |  r.sourcePrefix) as edges\n";
 
 
-    private static String MAPPING_BY_DATASOURCE_QUERY_PART3= "UNWIND source as source1\n" +
-            "RETURN distinct(ft.curie) as fromCurie, ft.label as fromLabel, tt.curie as curie, tt.label as label, MIN(length) as dist, td.prefix as datasources, collect (distinct source1) as mappingSources ORDER BY fromCurie";
+    private static String MAPPING_BY_DATASOURCE_QUERY_PART3= "UNWIND edges as edge\n" +
+            "WITH ft, tt, length,  td.prefix as targetPrefix, collect (distinct edge) as edgeSource ORDER BY ft.curie, length\n" +  // order to get shortest path first
+            "WITH ft, tt, collect ( [length, targetPrefix, edgeSource])[0] as shortest\n" +   // move forward with only shortest path
+//            "UNWIND tmp as shortest\n" +
+            "RETURN distinct (ft.curie) as fromCurie, ft.label as fromLabel, tt.curie as curie, tt.label as label, shortest[0] as dist, shortest[1] as datasources, shortest[2] as mappingSources";
+//            "RETURN distinct(ft.curie) as fromCurie, ft.label as fromLabel, tt.curie as curie, tt.label as label, MIN(length) as dist, td.prefix as datasources, collect (distinct source1) as mappingSources ORDER BY fromCurie";
 
     private String getMappingQuery2 (String id, String fromDatasource, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
+
+        if (id == null && fromDatasource == null && sourcePrefix.isEmpty()) {
+            log.error("You must supply either an input id, mapping source or datasource to get mappings");
+            throw new RuntimeException("You must supply either an input id, mapping source or datasource to get mappings");
+        }
+
         // build the query
         String query = MAPPING_BY_DATASOURCE_QUERY_PART1;
         // filter from and target datasources
 
-        query += "WHERE ";
-
         // query by id
         if (id != null) {
-            query += " ft.curie = '" + id + "' ";
+            query += "WHERE ft.curie = '" + id + "' ";
         }
         // query by datasource
         else if (fromDatasource != null) {
-            query += " fd.prefix = '" + fromDatasource + "'";
-        }
-        else {
-            log.error("You must supply either an input id or datasource to get mappings");
-            throw new RuntimeException("You must supply either an input id or datasource to get mappings");
+            query += "WHERE fd.prefix = '" + fromDatasource + "'";
         }
 
         // add list of targets
@@ -91,7 +96,7 @@ public class CypherQueryService implements MappingQueryService {
                     .map(sourcePrefixWrap)
                     .collect(Collectors.joining(" OR "));
 
-            query+= "(" + sourceFilter + ")\n";
+            query+= "WHERE (" + sourceFilter + ")\n";
         }
 
         query +=MAPPING_BY_DATASOURCE_QUERY_PART3;
@@ -108,6 +113,7 @@ public class CypherQueryService implements MappingQueryService {
         Result results = neo4jOperations.query(query, Collections.EMPTY_MAP);
 
         List<MappingResponse> target = new ArrayList<>();
+
         SearchResult searchResult = new SearchResult(id, null,null, null, target);
         for (Map<String, Object> row : results)  {
             MappingResponse response = new MappingResponse();
@@ -221,7 +227,7 @@ public class CypherQueryService implements MappingQueryService {
     }
 
     private static String MAPPED_TERM_IDS = "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(ft:Term)-[m:MAPPING*1..%s]-(tt:Term)-[:HAS_SOURCE]->(td:Datasource) \n" +
-            " WHERE fd.prefix = '%s' AND td.prefix = '%s' return distinct(fd.curie) as curie";
+            " WHERE fd.prefix = '%s' AND td.prefix = '%s'  AND fd <> td return distinct(fd.curie) as curie";
     @Override
     public List<String> getMappedTermCuries(String fromDatasource, String targetDatasource, int distance) {
         String query = String.format(MAPPED_TERM_IDS, distance, fromDatasource, targetDatasource);
@@ -235,7 +241,7 @@ public class CypherQueryService implements MappingQueryService {
     }
 
     private static String MAPPED_TARGET_COUNTS_QUERY = "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(ft:Term)-[m:MAPPING*1..%s]-(tt:Term)-[:HAS_SOURCE]->(td:Datasource) \n"+
-            " WHERE fd.prefix = '%s' return td.prefix as datasource, count(distinct(tt.curie)) as count ORDER BY count DESC";
+            " WHERE fd.prefix = '%s' AND fd <> td return td.prefix as datasource, count(distinct(tt.curie)) as count ORDER BY count DESC";
     @Override
     public LinkedHashMap<String, Integer> getMappedTargetCounts(String fromDatasource, int distance) {
         String query = String.format(MAPPED_TARGET_COUNTS_QUERY, distance, fromDatasource);

@@ -24,20 +24,24 @@ public class SearchResultAssembler implements ResourceAssembler<SearchResult, Re
     @Override
     public Resource<SearchResult> toResource(SearchResult searchResult) {
         Resource<SearchResult> resource = new Resource<SearchResult>(searchResult);
-        String id = searchResult.getCurie();
-        final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(TermController.class).getTerm(id));
 
-        final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(MappingController.class).mappings(null, null, searchResult.getCurie(), null));
+        // only add links if valid term as non results are also retruned in a search
+
+        if (searchResult.getCurie()!=null) {
+            String id = searchResult.getCurie();
+            final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(TermController.class).getTerm(id));
+
+            final ControllerLinkBuilder ml = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(MappingController.class).mappings(null, null, searchResult.getCurie(), null));
 
 
-        resource.add(lb.withSelfRel());
-        resource.add(new Link(
-                ml.toUriComponentsBuilder().build().toUriString(),
-                "mappings"
-        ));
-
+            resource.add(lb.withSelfRel());
+            resource.add(new Link(
+                    ml.toUriComponentsBuilder().build().toUriString(),
+                    "mappings"
+            ));
+        }
 
         return resource;
     }

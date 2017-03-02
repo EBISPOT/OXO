@@ -22,8 +22,12 @@ public class Datasource implements Serializable {
     @JsonIgnore
     private Long id;
 
+    // always LC
     @Property(name="prefix")
     private String prefix;
+
+    @Property(name="preferredPrefix")
+    private String preferredPrefix;
 
     @Property(name="idorgNamespace")
     private String idorgNamespace;
@@ -46,8 +50,9 @@ public class Datasource implements Serializable {
     @Property(name = "sourceType")
     private SourceType source;
 
-    public Datasource(String prefix, String idorgNamespace, Set<String> alternatePrefix, String name, String description, SourceType source) {
+    public Datasource(String prefix, String preferredPrefix, String idorgNamespace, Set<String> alternatePrefix, String name, String description, SourceType source) {
         this.prefix = prefix;
+        this.preferredPrefix = preferredPrefix;
         this.idorgNamespace = idorgNamespace;
         this.alternatePrefix = alternatePrefix;
         this.name = name;
@@ -57,6 +62,17 @@ public class Datasource implements Serializable {
 
     public Datasource() {
 
+    }
+
+    public String getPreferredPrefix() {
+        if (preferredPrefix == null) {
+            return getPrefix();
+        }
+        return preferredPrefix;
+    }
+
+    public void setPreferredPrefix(String preferredPrefix) {
+        this.preferredPrefix = preferredPrefix;
     }
 
     public Set<String> getAlternateIris() {

@@ -1,0 +1,11 @@
+.no-mapping{
+  background-color: #ff0100;
+  padding:2px;
+  padding-right:4px;
+  color: white;
+  /*font-size: larger;*/
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: middle;
+}

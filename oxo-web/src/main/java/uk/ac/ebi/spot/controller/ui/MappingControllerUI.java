@@ -131,6 +131,7 @@ public class MappingControllerUI {
             if (userSource == null) {
                 userSource = new Datasource(
                         user.getOrcid(),
+                        user.getGivenName(),
                         null,
                         new HashSet<String>(),
                         user.getGivenName(),

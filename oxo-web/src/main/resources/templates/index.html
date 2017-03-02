@@ -173,18 +173,28 @@
 
 
                         <form id="queryForm" method="post" action="search">
-                            <legend>Enter a list of ids</legend>
                             <fieldset>
+                                <legend>Enter a list of ids</legend>
+
                                 <div style="float:right; font-size: 0.7em">
                                     <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
                                 </div>
+
+                                <!--@thymesVar id="source" type="uk.ac.ebi.spot.model.Datasource"-->
+                                <label for="mappingTarget">
+                                </label>
+                                <select style="width: 100%;" id="mappingTarget" name="mappingTarget">
+                                    <option hidden="hidden" value="" selected="selected">Choose a target (optional)</option>
+
+                                    <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
+                                </select>
                                 <label for="identifiers">
                                 </label>
                                 <textarea id="identifiers" name="id-list" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
                                 <input type="hidden" name="distance" value="3"/>
                                 <div style="float: right; padding-right: 4px">
                                     <input type="button" name="submit" value="Clear" class="submit" style="float: right" onclick="clearAll();"/>
-                                    <input onclick="submitIds()" type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
+                                    <input onClick="return submitIds()" type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
                                 </div>
                             </fieldset>
                         </form>
@@ -271,15 +281,14 @@
 
 <script>
 
-    function submitIds() {
+    function submitIds(e) {
 
-        var form = $('#queryForm');
+//        var form = $('#queryForm');
 //        form.on('submit', function (e) {
-//            e.preventDefault();
 //        });
 
         var ids = $('#identifiers').val();
-        if (ids) {
+        if (ids != '') {
             $.each(ids.split('\n'), function (index, id) {
                 $('<input/>').attr({
                     type: 'hidden',
@@ -288,8 +297,10 @@
                 }).appendTo($('#queryForm'));
             });
 
-            form.submit();
+            return true
         }
+
+        return false;
 
     }
 

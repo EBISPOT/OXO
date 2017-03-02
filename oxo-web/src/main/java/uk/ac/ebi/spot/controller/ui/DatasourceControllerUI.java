@@ -58,7 +58,7 @@ public class DatasourceControllerUI {
 
 //            model.addAttribute("ids",ids);
 
-            model.addAttribute("mappingCount",mappingService.getMappedTargetCounts(prefix, 3));
+//            model.addAttribute("mappingCount",mappingService.getMappedTargetCounts(prefix, 3));
             model.addAttribute("datasource",datasource);
         }
 

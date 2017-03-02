@@ -55,7 +55,7 @@ public class DatasourceService {
         return datasourceRepository.findAll(pageable);
     }
 
-    public List<Datasource> getDatasurceWithMappings () {
+    public List<Datasource> getDatasourceWithMappings() {
         return datasourceRepository.getDatasourcesWithMappings();
     }
 

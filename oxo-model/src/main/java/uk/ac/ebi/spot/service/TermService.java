@@ -63,7 +63,7 @@ public class TermService {
     }
 
     /**
-     * This method saves a term. The term must have a valid datasource that we know about. If the datasoruce is valid, but the prefix
+     * This method saves a term. The term must have a valid datasource that we know about. If the datasource is valid, but the prefix
      * isn't we will change the prefix to match the datasource.
      * @param term
      * @return
@@ -111,7 +111,7 @@ public class TermService {
             throw new TermCreationException("Can't create term as prefix does not match a known prefix for this datasource");
         }
 
-        // if the source is valid, but the prefix isn't, then change the prefix to match the preferred prefix for that source
+        // todo think need to remove this for the EDAM case if the source is valid, but the prefix isn't, then change the prefix to match the preferred prefix for that source
         if (!prefix.equals(datasource.getPrefix())) {
             Curie newCurie = CurieUtils.getCurie(datasource.getPrefix(), term.getIdentifier());
             term.setCurie(newCurie.toString());
@@ -135,7 +135,7 @@ public class TermService {
     }
 
     /**
-     * Given a term id this method will look if term already exists, otherwsie it will use the prefix to determine if its form
+     * Given a term id this method will look if term already exists, otherwsie it will use the prefix to determine if its from
      * a datasource that already exists and create it. The Prefix must be valid i.e. unique to a datasource we know about.
      * @param id
      * @param label

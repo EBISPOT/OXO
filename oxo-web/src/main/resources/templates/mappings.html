@@ -289,12 +289,12 @@
 										</a>
 									</td>
 									<td>
-										<a th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
+										<a th:href="@{datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
 										<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
 									</td>
 									<td th:text="${mapping.getDate()}"></td>
 									<td>
-										<a th:href="@{../mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
+										<a th:href="@{mappings/{id}(id=${mapping.getMappingId()})}" th:text="View">View</a>
 									</td>
 								</tr>
 							</table>

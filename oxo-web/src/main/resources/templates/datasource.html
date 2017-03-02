@@ -36,7 +36,6 @@
 
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
-    <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{../css/oxo-d3.css}" type="text/css" media="screen"/>
 
 
     <!-- for production the above can be replaced with -->
@@ -200,49 +199,14 @@
                 </div>
                 <div class="panel-body">
 
-                    <!--<div>-->
-                                            <!--<span>-->
+                    <div id="graphic" th:attr="data-prefix=${datasource.getPrefix()}" style="min-width: 310px; max-width: 100%; height: 400px; margin: 0 auto"></div>
 
-                                            <!--<span>Number of <span th:text="${datasource.getPrefix()}">prefix name</span> terms with direct mappings: </span><span th:text="${termCount}">id...</span>-->
-                                            <!--<form style="display: inline-block;" method="post" action="../search">-->
-                                                <!--&lt;!&ndash;<input th:each="id : ${ids}" type="hidden" name="ids" th:value="${id}"/>&ndash;&gt;-->
-                                                <!--<input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>-->
-                                                <!--<input type="hidden" name="distance" value="1"/>-->
-                                                <!--<button style="display: inline-block;" class="btn btn-default">View terms</button>-->
-                                            <!--</form>-->
-                                            <!--</span>-->
-                    <!--</div>-->
+                    <form id="mapping-count-form" method="post" action="../search">
+                        <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
+                        <input id="mappingTarget" type="hidden" name="mappingTarget"/>
+                        <input type="hidden" name="distance" value="3"/>
+                    </form>
 
-
-                    <div>
-
-
-
-                    </div>
-
-                    <div th:each="mapping : ${mappingCount}">
-                                            <span>
-
-                                            <span class="ontology-source" th:text="${mapping.key}">id...</span><span th:text="${mapping.value}"></span> mappings
-                                            <form style="display: inline-block;" method="post" action="../search">
-                                                <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
-                                                <input type="hidden" name="mappingTarget" th:value="${mapping.key}"/>
-                                                <input type="hidden" name="distance" value="3"/>
-                                                <button  class="btn btn-default">View mappings</button>
-                                            </form>
-                                            </span>
-                    </div>
-
-
-                    <!--<div style="height: 600px" class="grid_16 omega">-->
-
-                        <!--<div id="mapping-vis" th:attr="data-datasource-prefix=${datasource.getPrefix()},data-api-path='../'">-->
-                            <!--<div id="mapping-vis-spinner">-->
-                                <!--<img src="../img/infinity.gif"/>-->
-                            <!--</div>-->
-
-                        <!--</div>-->
-                    <!--</div>-->
                 </div>
             </div>
 
@@ -298,8 +262,12 @@
 
 <script type="text/javascript" th:src="@{../webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
 <script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="../static/js/oxo.js" th:src="@{../js/oxo.js}"></script>
-<script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{../js/oxo-flare.js}"></script>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript" src="../static/js/oxo-hchart.js" th:src="@{../js/oxo-hchart.js(v=1)}"></script>
+
+
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>

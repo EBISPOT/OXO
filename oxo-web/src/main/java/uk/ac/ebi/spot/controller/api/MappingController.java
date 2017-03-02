@@ -30,6 +30,7 @@ import uk.ac.ebi.spot.service.MappingService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Simon Jupp
@@ -114,6 +115,24 @@ public class MappingController implements
             return new HttpEntity<String>(ow.writeValueAsString(object));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Can't get summary view");
+        }
+    }
+
+    @CrossOrigin
+    @RequestMapping(path = "/summary/counts", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    HttpEntity<String> getMappingSummaryCounts(
+            @RequestParam(value = "datasource", required = true) String datasource,
+            @RequestParam(value = "distance",defaultValue = "3", required = false) int distance
+    ) throws ResourceNotFoundException {
+
+
+        Map<String, Integer> object = mappingService.getMappedTargetCounts(datasource, distance);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        try {
+            return new HttpEntity<String>(ow.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Can't get summary counts view");
         }
     }
 

@@ -65,15 +65,13 @@ public class SearchController {
             SearchResultsCsvBuilder csvBuilder = new SearchResultsCsvBuilder(seperator.charAt(0), response.getOutputStream());
             csvBuilder.writeHeaders();
 
-            int page = 0;
-            PageRequest pageRequest = new PageRequest(page, 100);
-            List<SearchResult> map = getSearchResults(request, pageRequest).getContent();
+            PageRequest pageRequest = new PageRequest(0, 100);
+            Page<SearchResult> resultsPage = getSearchResults(request, pageRequest);
+            List<SearchResult> map = resultsPage.getContent();
             csvBuilder.writeResultsAsCsv(map);
-            while (!map.isEmpty()) {
-                map = getSearchResults(request, pageRequest).getContent();
-                csvBuilder.writeResultsAsCsv(map);
-                page++;
-                pageRequest = new PageRequest(page, 100);
+            while (resultsPage.hasNext()) {
+                resultsPage = getSearchResults(request, resultsPage.nextPageable());
+                csvBuilder.writeResultsAsCsv(resultsPage.getContent());
             }
 
 
@@ -128,14 +126,15 @@ public class SearchController {
     }
 
     private Page<SearchResult> getSearchResults(MappingSearchRequest request, Pageable pageable) {
-        if (request.getIds().isEmpty() && request.getInputSource() == null) {
+        if (request.getIds().isEmpty() && request.getInputSource() == null && request.getMappingSource().isEmpty() ) {
             // handle error
-            throw new RuntimeException("Must supply an id or input datasources to search");
+            throw new RuntimeException("Must supply an id, mapping sources or input datasources to search");
         }
         // if Ids are provided then we know what to lookup
         List<String> ids =request.getIds();;
         if (!ids.isEmpty()) {
-            return mappingService.getMappingsSearchByIds(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
+            Page<SearchResult> results =  mappingService.getMappingsSearchByIds(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
+            return results;
         }
         String inputSource = request.getInputSource();
         return mappingService.getMappingsSearchByDatasource(inputSource, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);

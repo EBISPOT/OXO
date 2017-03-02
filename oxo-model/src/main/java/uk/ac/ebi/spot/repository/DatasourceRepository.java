@@ -20,7 +20,7 @@ public interface DatasourceRepository  extends GraphRepository<Datasource> {
     @Query("match (n:Datasource) WHERE n.prefix = {0} OR {0} IN n.alternatePrefix return n")
     Datasource findByPrefix(String prefix);
 
-    @Query("match (n:Datasource)<-[:HAS_SOURCE]-(:Term)-[MAPPING]-() RETURN distinct n")
+    @Query("match (n:Datasource)<-[:HAS_SOURCE]-(:Term)-[MAPPING]-() RETURN distinct n ORDER BY n.name")
     List<Datasource> getDatasourcesWithMappings();
 
     @Query("MATCH ()-[r:MAPPING]->()\n" +
