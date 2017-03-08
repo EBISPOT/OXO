@@ -181,7 +181,7 @@ public class TermService {
      * @throws UnknownDatasourceException
      * @throws UnknownTermException
      */
-    @Transactional
+    @Transactional("transactionManager")
     public Term update(Term term) throws UnknownDatasourceException, UnknownTermException {
 
         Term t = termGraphRepository.findByCurie(term.getCurie());

@@ -64,6 +64,7 @@ public class DatasourceService {
         return datasourceRepository.getMappingDatasources();
     }
 
+    @Transactional("transactionManager")
     public Datasource save (Datasource datasource) throws DuplicateKeyException {
         try {
 
@@ -79,7 +80,7 @@ public class DatasourceService {
         }
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     public Datasource update (Datasource datasource) throws InvalidCurieException, DuplicateKeyException {
         Datasource d = datasourceRepository.findByPrefix(datasource.getPrefix());
 
@@ -89,6 +90,7 @@ public class DatasourceService {
         }
 
         datasource.setId(d.getId());
+        datasource.setPrefix(d.getPrefix());
         d = datasourceRepository.save(datasource);
         Collection<Term> terms = termGraphRepository.findByDatasource(d.getPrefix(), 0, Integer.MAX_VALUE);
 

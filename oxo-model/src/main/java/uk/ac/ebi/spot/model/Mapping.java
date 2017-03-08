@@ -42,7 +42,6 @@ public class Mapping {
     @DateString("yy-MM-dd")
     private Date date;
 
-
     public Mapping() {
     }
 

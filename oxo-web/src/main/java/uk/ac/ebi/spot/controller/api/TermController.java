@@ -17,12 +17,18 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.*;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
 import uk.ac.ebi.spot.exception.UnknownDatasourceException;
 import uk.ac.ebi.spot.exception.UnknownTermException;
 import uk.ac.ebi.spot.model.Term;
+import uk.ac.ebi.spot.security.model.OrcidPrinciple;
+import uk.ac.ebi.spot.security.repository.UserRepository;
 import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +51,9 @@ public class TermController  implements
 
     @Autowired
     private TermService termService;
+
+    @Autowired
+    UserRepository userRepository;
 
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Term>> terms(
@@ -110,7 +119,12 @@ public class TermController  implements
     }
 
     @RequestMapping(path = "/{curie}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.PATCH)
-    HttpEntity<Term> patchTerm(@PathVariable("curie") String curie, @RequestParam(required = false, name = "label") String label, @RequestParam(required = false, name = "uri") String uri) throws ResourceNotFoundException {
+    HttpEntity<Term> patchTerm(@RequestParam(value = "apikey",required=false) String apikey, @PathVariable("curie") String curie, @RequestParam(required = false, name = "label") String label, @RequestParam(required = false, name = "uri") String uri) throws ResourceNotFoundException {
+
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to update terms");
+        }
+
         Term t = new Term();
         t.setCurie(curie);
 
@@ -147,6 +161,12 @@ public class TermController  implements
     @ExceptionHandler ({DuplicateKeyException.class, UnknownDatasourceException.class, InvalidCurieException.class})
     public void handleError(HttpServletResponse response, Exception exception) throws IOException {
         response.sendError(HttpStatus.UNPROCESSABLE_ENTITY.value(), exception.getMessage());
+    }
+
+    // throw a 422
+    @ExceptionHandler ({UnauthorizedUserException.class})
+    public void handleUnauthorisedError(HttpServletResponse response, Exception exception) throws IOException {
+        response.sendError(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
     }
 
 }

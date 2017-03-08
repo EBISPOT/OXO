@@ -236,8 +236,8 @@ function drawTable(resultsData) {
             { title: "Mapped id" },
             { title: "Mapped label" },
             { title: "Id source" },
-            { title: "Provenance list" },
-            { title: "Provenance" },
+            { title: "Evidence list" },
+            { title: "Evidence" },
             { title: "Distance" }
         ]
     } );

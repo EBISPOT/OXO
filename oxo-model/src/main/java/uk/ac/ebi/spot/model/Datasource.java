@@ -50,6 +50,12 @@ public class Datasource implements Serializable {
     @Property(name = "sourceType")
     private SourceType source;
 
+    @Property(name="licence")
+    private String licence;
+
+    @Property(name="versionInfo")
+    private String versionInfo;
+
     public Datasource(String prefix, String preferredPrefix, String idorgNamespace, Set<String> alternatePrefix, String name, String description, SourceType source) {
         this.prefix = prefix;
         this.preferredPrefix = preferredPrefix;
@@ -105,6 +111,22 @@ public class Datasource implements Serializable {
 
     public String getOrcid() {
         return orcid;
+    }
+
+    public String getVersionInfo() {
+        return versionInfo;
+    }
+
+    public void setVersionInfo(String versionInfo) {
+        this.versionInfo = versionInfo;
+    }
+
+    public String getLicence() {
+        return licence;
+    }
+
+    public void setLicence(String licence) {
+        this.licence = licence;
     }
 
     public void setOrcid(String orcid) {
