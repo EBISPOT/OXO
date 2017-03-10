@@ -28,6 +28,7 @@ import uk.ac.ebi.spot.exception.UnknownDatasourceException;
 import uk.ac.ebi.spot.exception.UnknownTermException;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.security.model.OrcidPrinciple;
+import uk.ac.ebi.spot.security.model.Role;
 import uk.ac.ebi.spot.security.repository.UserRepository;
 import uk.ac.ebi.spot.service.TermService;
 
@@ -73,8 +74,10 @@ public class TermController  implements
     }
 
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
-    HttpEntity<Term> saveTerm(@RequestBody Term term) throws ResourceNotFoundException, InvalidCurieException {
-
+    HttpEntity<Term> saveTerm(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody Term term) throws ResourceNotFoundException, InvalidCurieException {
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to create terms");
+        }
         return new ResponseEntity<Term>(termService.save(term), HttpStatus.OK);
 
     }
@@ -91,7 +94,11 @@ public class TermController  implements
     }
 
     @RequestMapping(path = "/{curie}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.PUT)
-    HttpEntity<Term> updateTerm(@PathVariable("curie") String curie, @RequestBody Term term) throws ResourceNotFoundException {
+    HttpEntity<Term> updateTerm(@RequestParam(value = "apikey",required=false) String apikey, @PathVariable("curie") String curie, @RequestBody Term term) throws ResourceNotFoundException {
+
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to update terms");
+        }
         term.setCurie(curie);
         try {
             return new ResponseEntity<Term>(termService.update(term), HttpStatus.OK);
@@ -144,7 +151,14 @@ public class TermController  implements
 
     @RequestMapping(path = "/{curie}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    void deleteTerm(@PathVariable("curie") String curie, @RequestBody Term term) throws ResourceNotFoundException {
+    void deleteTerm(@RequestParam(value = "apikey",required=false) String apikey, @PathVariable("curie") String curie, @RequestBody Term term) throws ResourceNotFoundException {
+
+        if (userRepository.findByApikey(apikey) == null) {
+            if (!userRepository.findByApikey(apikey).getRole().equals(Role.ADMIN)) {
+                throw new UnauthorizedUserException("User with this api key are not authorised to delete terms");
+            }
+        }
+
         term.setCurie(curie);
         termService.delete(term);
 

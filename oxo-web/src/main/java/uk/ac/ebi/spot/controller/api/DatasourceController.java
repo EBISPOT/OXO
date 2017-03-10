@@ -17,10 +17,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
 import uk.ac.ebi.spot.model.Datasource;
+import uk.ac.ebi.spot.security.repository.UserRepository;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.TermService;
 
@@ -45,6 +47,8 @@ public class DatasourceController implements
     @Autowired
     private DatasourceService datasourceService;
 
+    @Autowired
+    UserRepository userRepository;
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Datasource>> sources(
             Pageable pageable,
@@ -56,7 +60,11 @@ public class DatasourceController implements
     }
 
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
-    HttpEntity<Datasource> saveSource(@RequestBody Datasource datasource) throws ResourceNotFoundException {
+    HttpEntity<Datasource> saveSource(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody Datasource datasource) throws ResourceNotFoundException {
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to update datasources");
+        }
+
         return new ResponseEntity<Datasource>(datasourceService.save(datasource), HttpStatus.OK);
     }
 
@@ -72,7 +80,10 @@ public class DatasourceController implements
 
 
     @RequestMapping(path = "/{prefix}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.PUT)
-    HttpEntity<Datasource> updateSource(@PathVariable("prefix") String prefix, @RequestBody Datasource datasource) throws ResourceNotFoundException, InvalidCurieException {
+    HttpEntity<Datasource> updateSource(@RequestParam(value = "apikey",required=false) String apikey, @PathVariable("prefix") String prefix, @RequestBody Datasource datasource) throws ResourceNotFoundException, InvalidCurieException {
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to update datasources");
+        }
         datasource.setPrefix(prefix);
         return new ResponseEntity<Datasource>(datasourceService.update(datasource), HttpStatus.OK);
     }
@@ -100,5 +111,13 @@ public class DatasourceController implements
         resource.add(ControllerLinkBuilder.linkTo(DatasourceController.class).withRel("datasource"));
         return resource;
     }
+
+    // throw a 422
+    @ExceptionHandler ({UnauthorizedUserException.class})
+    public void handleUnauthorisedError(HttpServletResponse response, Exception exception) throws IOException {
+        response.sendError(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
+    }
+
 }
+
 

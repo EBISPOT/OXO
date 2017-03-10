@@ -135,7 +135,7 @@ public class TermService {
     }
 
     /**
-     * Given a term id this method will look if term already exists, otherwsie it will use the prefix to determine if its from
+     * Given a term id this method will look if term already exists, otherwise it will use the prefix to determine if its from
      * a datasource that already exists and create it. The Prefix must be valid i.e. unique to a datasource we know about.
      * @param id
      * @param label

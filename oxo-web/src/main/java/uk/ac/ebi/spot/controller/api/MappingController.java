@@ -19,6 +19,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
@@ -26,6 +28,9 @@ import uk.ac.ebi.spot.exception.MappingException;
 import uk.ac.ebi.spot.exception.UnknownDatasourceException;
 import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.MappingRequest;
+import uk.ac.ebi.spot.security.model.OrcidUser;
+import uk.ac.ebi.spot.security.model.Role;
+import uk.ac.ebi.spot.security.repository.UserRepository;
 import uk.ac.ebi.spot.service.MappingService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +53,9 @@ public class MappingController implements
 
     @Autowired
     MappingAssembler mappingAssembler;
+
+    @Autowired
+    UserRepository userRepository;
 
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Mapping>> mappings(
@@ -81,7 +89,10 @@ public class MappingController implements
     }
 
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
-    HttpEntity<Mapping> saveMapping(@RequestBody MappingRequest mappingRequest) throws ResourceNotFoundException, MappingException, InvalidCurieException {
+    HttpEntity<Mapping> saveMapping(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody MappingRequest mappingRequest) throws ResourceNotFoundException, MappingException, InvalidCurieException {
+        if (userRepository.findByApikey(apikey) == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to create mapings");
+        }
         return new ResponseEntity<Mapping>(mappingService.save(mappingRequest.getFromId(), mappingRequest.getToId(), mappingRequest.getDatasourcePrefix(), mappingRequest.getSourceType(), mappingRequest.getScope()), HttpStatus.OK);
     }
 
@@ -93,8 +104,15 @@ public class MappingController implements
 
     @RequestMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    void deleteTerm(@PathVariable("id") String id, @RequestBody Mapping mapping) throws ResourceNotFoundException {
-        throw new UnsupportedOperationException("Can't delete datasources");
+    void deleteTerm(@RequestParam(value = "apikey",required=false) String apikey, @PathVariable("id") String id, @RequestBody Mapping mapping) throws ResourceNotFoundException {
+        OrcidUser user = userRepository.findByApikey(apikey);
+        if (user == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to create mapings");
+        }
+        if (user.getRole().equals(Role.ADMIN) || user.getOrcid().equals(mapping.getDatasource().getOrcid())) {
+            // todo drop mappings
+        }
+        throw new UnsupportedOperationException("Can't delete mappings");
     }
 
     @CrossOrigin

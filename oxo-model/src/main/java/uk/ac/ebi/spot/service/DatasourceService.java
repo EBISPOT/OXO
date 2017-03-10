@@ -68,6 +68,10 @@ public class DatasourceService {
     public Datasource save (Datasource datasource) throws DuplicateKeyException {
         try {
 
+            if (datasourceRepository.findByPrefix(datasource.getPrefix()) != null) {
+                throw new DuplicateKeyException("Duplicate key exception, datasource already exists using this prefix: " + datasource.getPrefix());
+            }
+
             datasource.getAlternatePrefix().add(datasource.getPrefix());
             Set<String> lcStrings = datasource.getAlternatePrefix().stream().map(String::toLowerCase).collect(Collectors.toSet());
             datasource.getAlternatePrefix().addAll(lcStrings);

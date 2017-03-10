@@ -17,7 +17,7 @@ import java.util.Collection;
 @RepositoryRestResource(exported = false)
 public interface TermGraphRepository extends GraphRepository<Term> {
 
-    Term findByCurie(String prefix);
+    Term findByCurie(String curie);
 
     @Query(value = "MATCH (n:Term)-[HAS_SOURCE]->(d:Datasource) WHERE d.prefix = {0} RETURN n SKIP {1} LIMIT {2}")
     Collection<Term> findByDatasource(String prefix, long skip, long limit);
