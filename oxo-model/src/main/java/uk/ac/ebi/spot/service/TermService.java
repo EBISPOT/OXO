@@ -187,7 +187,11 @@ public class TermService {
         Term t = termGraphRepository.findByCurie(term.getCurie());
 
         if (t == null) {
-            throw new UnknownTermException("Can't update as term doesn't exist:" + term.getCurie());
+            Document document = documentRepository.findOneByIdentifier(term.getCurie());
+            if (document == null) {
+                throw new UnknownTermException("Can't update as term doesn't exist:" + term.getCurie());
+            }
+            t = termGraphRepository.findByCurie(document.getCurie());
         }
 
         if (term.getLabel() != null) {

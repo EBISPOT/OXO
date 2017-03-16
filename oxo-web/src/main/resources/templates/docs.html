@@ -12,7 +12,7 @@
          More info: h5bp.com/b/378 -->
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
 
-    <title>Home &lt; Ontology Xref Service &lt; EMBL-EBI</title>
+    <title>Docs &lt; Ontology Xref Service &lt; EMBL-EBI</title>
     <meta name="description" content="EMBL-EBI Ontology Lookup Service is a repository of bio-medical ontologies and provides a powerful REST API for searching and accessing ontology term information"/><!-- Describe what this page is about -->
     <meta name="keywords" content="ontology, ontologies, bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
     <meta name="author" content="Samples Phenotypes and Ontologies Team, EMBL-EBI"/><!-- Your [project-name] here -->
@@ -38,7 +38,6 @@
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
 
-    <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{css/oxo-d3.css}" type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -123,8 +122,8 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first active"><a href="index">OxO</a></li>
-                    <li><a href="docs">Documentation</a></li>
+                    <li class="first"><a href="index">OxO</a></li>
+                    <li class="active"><a href="docs">Documentation</a></li>
                     <li class="last" ><a href="about">About</a></li>
                     <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
                     <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
@@ -152,81 +151,15 @@
             <div class="grid_24 alpha">
 
 
-                <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This is a beta site under active development.
-                </div>
+
 
                 <section class="grid_19">
 
-                    <div class="jumbotron">
-                        <!--<h1>Welcome to the OLS</h1>-->
-                        <!--<p>Use OLS to search and visualise biomedical ontologies</p>-->
-                        <h4>Welcome to the EMBL-EBI Ontology Xref Service (OxO).</h4>
-                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mapping from a variety of sources
-                            and allows you to upload and edit your own mappings by logging in with your ORCiD ID.
-                        </p>
-                    </div>
-
-                </section>
-
-                <section>
-
-                    <div  style="height:800px;" class="grid_8 alpha">
-
-
-                        <form id="queryForm" method="post" action="search">
-                            <fieldset>
-                                <legend>Enter a list of ids</legend>
-
-                                <div style="float:right; font-size: 0.7em">
-                                    <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
-                                </div>
-
-                                <!--@thymesVar id="source" type="uk.ac.ebi.spot.model.Datasource"-->
-                                <label for="mappingTarget">
-                                </label>
-                                <select style="width: 100%; margin-bottom: 10px;;" id="mappingTarget" name="mappingTarget">
-                                    <option hidden="hidden" value="" selected="selected">Choose a target (optional)</option>
-
-                                    <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
-                                </select>
-                                <label for="identifiers">
-                                </label>
-                                <textarea id="identifiers" name="id-list" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
-                                <input type="hidden" name="distance" value="3"/>
-                                <div style="float: right; padding-right: 4px">
-                                    <input type="button" name="submit" value="Clear" class="submit" style="float: right" onclick="clearAll();"/>
-                                    <input onClick="return submitIds()" type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-
-                    <div style="height: 600px" class="grid_16 omega">
-
-                        <select onchange="jumpToSource(this.options[this.selectedIndex].value)" style="width: 60%; margin-top: 10px;" id="mappingSourcesSelect" name="mappingTarget">
-                            <option hidden="hidden" value="" selected="selected">Jump to datasource...</option>
-
-                            <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
-                        </select>
-
-                        <div id="mapping-vis">
-                            <div style="   position:absolute;
-                               top:50%;
-                               left:50%;
-                               margin-top:-25px;
-                               margin-left:-25px;"  id="mapping-vis-spinner">
-                                <img src="img/infinity.gif"/>
-                            </div>
-
-                        </div>
-                    </div>
+                    <p>Coming soon...</p>
 
                 </section>
 
             </div>
-
-
 
         </div>
     </div>
@@ -278,46 +211,11 @@
 </div>
 
 
-<script type="text/javascript" th:src="@{webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
-<script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
-<script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{js/oxo-flare.js}"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
 
-<script>
-
-    function submitIds(e) {
-
-//        var form = $('#queryForm');
-//        form.on('submit', function (e) {
-//        });
-
-        var ids = $('#identifiers').val();
-        if (ids != '') {
-            $.each(ids.split('\n'), function (index, id) {
-                $('<input/>').attr({
-                    type: 'hidden',
-                    name: 'ids',
-                    value: id
-                }).appendTo($('#queryForm'));
-            });
-
-            return true
-        }
-
-        return false;
-
-    }
-
-    function jumpToSource(source) {
-        window.location = 'datasources/' +source;
-    }
-
-
-</script>
 
 </body>
 </html>
