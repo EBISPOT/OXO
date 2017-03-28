@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.service;
 
 import uk.ac.ebi.spot.index.Document;
 import uk.ac.ebi.spot.model.Datasource;
+import uk.ac.ebi.spot.model.IndexableTermInfo;
 import uk.ac.ebi.spot.model.Term;
 
 import javax.xml.crypto.Data;
@@ -22,26 +23,22 @@ public class DocumentBuilder {
 
         Datasource datasource = term.getDatasource();
 
+        return getDocumentFromTerm(new IndexableTermInfo(term.getCurie(), term.getIdentifier(), term.getUri(), datasource.getAlternatePrefix().toArray(new String [datasource.getAlternatePrefix().size()])));
+
+    }
+
+    public static Document getDocumentFromTerm(IndexableTermInfo term) {
         Set<String> identifiers = new HashSet<>();
 
         identifiers.add(term.getCurie());
         identifiers.add(term.getCurie().replaceAll(":", "_"));
-        identifiers.add(term.getIdentifier());
+        identifiers.add(term.getId());
         if (term.getUri() != null) {
             identifiers.add(term.getUri());
         }
-        for (String s: datasource.getAlternatePrefix()) {
-            identifiers.add(s+COLON+term.getIdentifier());
+        for (String s: term.getAlternatePrefixes()) {
+            identifiers.add(s+COLON+term.getId());
         }
-
-        for (String s: datasource.getAlternateIris()) {
-            identifiers.add(s+term.getIdentifier());
-        }
-
-//        identifiers.add("http://identifiers.org/"+datasource.getIdorgNamespace()+"/"+term.getCurie());
-
         return new Document(term.getCurie(), identifiers);
-
     }
-
 }

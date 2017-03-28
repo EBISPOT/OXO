@@ -3,6 +3,7 @@ package uk.ac.ebi.spot.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -30,11 +31,14 @@ import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.MappingRequest;
 import uk.ac.ebi.spot.security.model.OrcidUser;
 import uk.ac.ebi.spot.security.model.Role;
-import uk.ac.ebi.spot.security.repository.UserRepository;
+import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.MappingService;
+import uk.ac.ebi.spot.util.MappingDistance;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,7 +59,7 @@ public class MappingController implements
     MappingAssembler mappingAssembler;
 
     @Autowired
-    UserRepository userRepository;
+    OrcidUserRepository userRepository;
 
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Mapping>> mappings(
@@ -88,12 +92,20 @@ public class MappingController implements
         return new ResponseEntity<>(mappingAssembler.toResource(page), HttpStatus.OK);
     }
 
+//    @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+//    HttpEntity<Mapping> saveMapping(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody MappingRequest mappingRequest) throws ResourceNotFoundException, MappingException, InvalidCurieException {
+//        if (userRepository.findByApikey(apikey) == null) {
+//            throw new UnauthorizedUserException("User with this api key are not authorised to create mapings");
+//        }
+//        return new ResponseEntity<Mapping>(mappingService.save(mappingRequest), HttpStatus.OK);
+//    }
+
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
-    HttpEntity<Mapping> saveMapping(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody MappingRequest mappingRequest) throws ResourceNotFoundException, MappingException, InvalidCurieException {
+    HttpEntity<Iterable<Mapping>> saveAllMappings(@RequestParam(value = "apikey",required=false) String apikey, @RequestBody Collection<MappingRequest> mappingRequest) throws MappingException, InvalidCurieException {
         if (userRepository.findByApikey(apikey) == null) {
             throw new UnauthorizedUserException("User with this api key are not authorised to create mapings");
         }
-        return new ResponseEntity<Mapping>(mappingService.save(mappingRequest.getFromId(), mappingRequest.getToId(), mappingRequest.getDatasourcePrefix(), mappingRequest.getSourceType(), mappingRequest.getScope()), HttpStatus.OK);
+        return new ResponseEntity<Iterable<Mapping>>(mappingService.saveAll(mappingRequest), HttpStatus.OK);
     }
 
 //    @RequestMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.PUT)
@@ -115,6 +127,9 @@ public class MappingController implements
         throw new UnsupportedOperationException("Can't delete mappings");
     }
 
+
+    private static Object summaryCache = null;
+    private static Map<String, Object> datasourceSummaryCache = new HashMap();
     @CrossOrigin
     @RequestMapping(path = "/summary", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
@@ -123,10 +138,17 @@ public class MappingController implements
     ) throws ResourceNotFoundException {
         Object object = null;
         if (datasource != null) {
-            object = mappingService.getSummaryJson(datasource);
+            if (!datasourceSummaryCache.containsKey(datasource))  {
+                object = mappingService.getSummaryJson(datasource);
+                datasourceSummaryCache.put(datasource, object);
+            }
+            object = datasourceSummaryCache.get(datasource);
         }
         else {
-           object =  mappingService.getSummaryJson();
+            if (summaryCache == null) {
+                summaryCache =  mappingService.getSummaryJson();
+            }
+            object = summaryCache;
         }
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         try {
@@ -141,9 +163,12 @@ public class MappingController implements
     @ResponseStatus(value = HttpStatus.OK)
     HttpEntity<String> getMappingSummaryCounts(
             @RequestParam(value = "datasource", required = true) String datasource,
-            @RequestParam(value = "distance",defaultValue = "3", required = false) int distance
+            @RequestParam(value = "distance", required = false) Integer distance
     ) throws ResourceNotFoundException {
 
+        if (distance == null) {
+            distance = MappingDistance.DEFAULT_MAPPING_DISTANCE;
+        }
 
         Map<String, Integer> object = mappingService.getMappedTargetCounts(datasource, distance);
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();

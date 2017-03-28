@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" th:href="@{../webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css}" type="text/css" media="screen"/>
     <link  rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"  type="text/css" media="screen"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+    <link  rel="stylesheet" th:href="@{../webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -148,13 +149,13 @@
                     <li class="first active"><a href="../index">OxO</a></li>
                     <li><a href="../docs">Documentation</a></li>
                     <li class="last" ><a href="../about">About</a></li>
-                    <li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                    <li th:if="not ${username} and not ${readonly}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
                         </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username} and not ${readonly}" class="functional">
                         <a href="../myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
@@ -171,6 +172,10 @@
         <div class="container">
 
             <div class="grid_24 alpha">
+
+                <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
+                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
+                </div>
 
                 <!--@thymesVar id="message" type="String"-->
                 <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
@@ -227,7 +232,7 @@
                             </div>
                         </div>
 
-                        <div th:if="${term}" class="panel panel-default">
+                        <div th:if="${term} and not ${readonly}" class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Add new Mapping</h3>
                             </div>
@@ -267,6 +272,15 @@
                                 <h3 class="panel-title">Network</h3>
                             </div>
                             <div class="panel-body">
+                                <div id="mapping-vis">
+                                    <div style="   position:absolute;
+                                       top:50%;
+                                       left:50%;
+                                       margin-top:-25px;
+                                       margin-left:-25px;"  id="mapping-vis-spinner">
+                                        <img src="../img/infinity.gif"/>
+                                    </div>
+                                </div>
                                 <div id="mynetwork" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
                             </div>
                         </div>
@@ -289,16 +303,21 @@
 
                                 <div class="grid_24 alpha">
 
-                                    <div>
-                                        <table  style="border-collapse: collapse;" data-hide-from-col="true" data-hide-table-info="true" data-api-path="../" data-with-progress="false" id="example">
-                                        </table>
-                                    </div>
-
                                     <form>
+                                        <span>Mapping Distance: </span>
+                                        <div style="margin-left: 15px;display: inline;">
+                                            <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
+                                        </div>
                                         <input type="hidden" name="inputSource" th:value="${inputSource}"/>
                                         <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
                                         <input type="hidden" name="ids" th:value="${id}"/>
                                     </form>
+
+
+                                    <div>
+                                        <table  style="border-collapse: collapse;" data-hide-from-col="true" data-hide-table-info="true" data-api-path="../" data-with-progress="false" id="example">
+                                        </table>
+                                    </div>
 
                                     <!--<div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>-->
 
@@ -371,7 +390,7 @@
 <!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{../js/oxo.js}"></script>-->
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{../js/oxo-search-result.js}"></script>
+<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{../js/oxo-search-result.js(v=1)}"></script>
 
 <script type="text/javascript" src="../static/js/vis.js" th:src="@{../js/vis.js}"></script>
 
@@ -380,6 +399,7 @@
 <script type="text/javascript" src="/webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js" th:src="@{../webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js}"></script>
 <script type="text/javascript" src="/webjars/handlebars/4.0.5/handlebars.min.js" th:src="@{../webjars/handlebars/4.0.5/handlebars.min.js}"></script>
 <script type="text/javascript" src="/webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js" th:src="@{../webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js}"></script>
+<script type="text/javascript" th:src="@{../webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
@@ -396,7 +416,21 @@
         }};
 
         instance.start(options)
+
+        $('#distance-slider').bootstrapSlider({
+            step: 1, min: 1, max: 3,
+            ticks: [1, 2, 3],
+            ticks_labels: ['1', '2', '3'],
+            ticks_snap_bounds: 50
+        }).on('slideStop', function () {
+            reinitialiseTable()
+            drawGraph()
+
+        });
+
     });
+
+
 </script>
 
 </body>

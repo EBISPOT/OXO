@@ -4,11 +4,18 @@
 
 $(document).ready(function() {
 
+    refreshChartData()
+});
 
-    prefix =  $("#graphic").data("prefix");
+function refreshChartData() {
+    $("#graphic").html('');
+    $("#mapping-vis").show()
+
+    var prefix =  $("#graphic").data("prefix");
+    var distance = $("input[name=distance]").val() ? $("input[name=distance]").val() : 1;
 
     $.ajax({
-        url: '../api/mappings/summary/counts?datasource='+prefix,
+        url: '../api/mappings/summary/counts?datasource='+prefix+'&distance='+distance,
         dataType: 'json',
         method: 'GET',
         contentType: "application/json; charset=utf-8",
@@ -17,10 +24,7 @@ $(document).ready(function() {
             drawChart(data)
         }
     });
-
-
-
-});
+}
 
 function drawChart(data) {
 
@@ -29,6 +33,7 @@ function drawChart(data) {
     console.log(Object.keys(data))
     $.each(data,function(key,value){
         reformatted.push( [key, value])
+        $("#mapping-vis").hide()
     });
 
     console.log(JSON.stringify(reformatted))

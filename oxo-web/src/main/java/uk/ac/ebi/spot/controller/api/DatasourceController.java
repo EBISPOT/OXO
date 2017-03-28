@@ -22,7 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
 import uk.ac.ebi.spot.model.Datasource;
-import uk.ac.ebi.spot.security.repository.UserRepository;
+import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.TermService;
 
@@ -48,7 +48,7 @@ public class DatasourceController implements
     private DatasourceService datasourceService;
 
     @Autowired
-    UserRepository userRepository;
+    OrcidUserRepository userRepository;
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Datasource>> sources(
             Pageable pageable,

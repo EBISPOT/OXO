@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,10 +40,24 @@ import java.net.MalformedURLException;
 @EnableTransactionManagement
 public class OxoNeo4jConfiguration extends Neo4jConfiguration {
 
+    @Value("${oxo.neo.driver}")
+    String driver;
+    @Value("${oxo.neo.uri}")
+    String uri;
     @Bean
     public SessionFactory getSessionFactory() {
         // with domain entity base package(s)
-        return new SessionFactory("uk.ac.ebi.spot.model");
+        return new SessionFactory(getConfiguration(), "uk.ac.ebi.spot.model");
+    }
+
+
+    public org.neo4j.ogm.config.Configuration getConfiguration() {
+        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
+       config
+           .driverConfiguration()
+           .setDriverClassName(driver)
+           .setURI(uri);
+       return config;
     }
 
     @Override

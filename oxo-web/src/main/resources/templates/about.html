@@ -125,13 +125,13 @@
                     <li class="first"><a href="index">OxO</a></li>
                     <li><a href="docs">Documentation</a></li>
                     <li class="last active" ><a href="about">About</a></li>
-                    <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                    <li th:if="not ${username}  and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
                           </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username} and not ${readonly}" class="functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
@@ -160,9 +160,14 @@
                     mappings from a subset of vocabularies in the <a href="//www.nlm.nih.gov/research/umls/">UMLS</a>.</p>
 
                     <p>
-                        The semantics of a cross reference is weakly specified, in most cases they mean some kind of operational equivalence, but there is no guarantee.
-                        Sometimes cross references are used to indicate other types of relationships such as parent/child or that the terms are related in some other way (such as linking a disease concept to a pathway accession that is somehow related to that disease).
+                        The semantics of a cross-reference is weakly specified, in most cases they mean some kind of operational equivalence, but there is no guarantee.
+                        Sometimes cross-references are used to indicate other types of relationships such as parent/child or that the terms are related in some other way (such as linking a disease concept to a pathway accession that is somehow related to that disease).
                         OxO aim to provide simple and convenient access to cross-references, but is not a mapping prediction service, so always treat these xrefs with caution, especially if you are seeking true equivalence between two ontologies.
+                    </p>
+
+                    <p>
+                        OxO gives you access to existing mappings, you can also explore the neighbourhood of a mapping using the distance controller. By default OxO shows you direct asserted mappings, but you can use the slider on various pages to look for mapping that are up to
+                        three hops away. You may see some terms that don't have labels associated to them, we are doing our best to find labels for all of these terms, but sometimes the labels are missing from the sources where we extract mappings.
                     </p>
 
                     <p>

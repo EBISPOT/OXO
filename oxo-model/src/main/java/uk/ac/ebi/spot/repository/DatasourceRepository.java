@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.repository;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -20,7 +21,8 @@ public interface DatasourceRepository  extends GraphRepository<Datasource> {
     @Query("match (n:Datasource) WHERE n.prefix = {0} OR {0} IN n.alternatePrefix return n")
     Datasource findByPrefix(String prefix);
 
-    @Query("match (n:Datasource)<-[:HAS_SOURCE]-(:Term)-[MAPPING]-() RETURN distinct n ORDER BY n.name")
+    @Query("match (n:Datasource)<-[:HAS_SOURCE]-(:Term) RETURN distinct n ORDER BY n.name")
+    @Cacheable("dataSourcesWithMappings")
     List<Datasource> getDatasourcesWithMappings();
 
     @Query("MATCH ()-[r:MAPPING]->()\n" +

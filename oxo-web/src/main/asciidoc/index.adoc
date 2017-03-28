@@ -1,0 +1,15 @@
+== OxO Documentation
+
+=== What are you looking for?
+
+link:website[Website documentation]:: Documentation on how to use the OxO website
+link:developer[Developer documentation]:: Documentation for developers including how to use the OxO REST API.
+
+== FAQ
+
+* Where can I get help with OxO? +
+e-mail ols-support@ebi.ac.uk or open an issue on link:https://github.com/EBISPOT/OLS/issues[Github]
+* How can I hear about updates to OxO? +
+Sign up to the link:https://listserver.ebi.ac.uk/mailman/listinfo/ols-announce[OLS announce mailing list] or follow us on link:https://twitter.com/EBIOLS[Twitter]
+* How can I build a local version of OxO? ? +
+See the documentation link:installation-guide[here]

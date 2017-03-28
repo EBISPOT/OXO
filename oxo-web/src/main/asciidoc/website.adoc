@@ -1,0 +1,6 @@
+== Ontology Xrefs
+OxO provides a database of ontology cross-references (or xrefs). These xrefs have been extrated from various sources including ontologies loaded into the Ontology Lookup Service and from sources such as the UMLS. OxO also allows users to upload their own mappings.
+
+== How to use the website
+The OxO website provides an interface for search the OxO database. From the homepage you can search for mappings for a given identifier. OxO supports searching by a range of identifier types including both orefixed CURIE identifeirs and full
+ontology term URIs. OxO contains an extensive set of known identifier prefixes that it uses to resolve identifiers (e.g. both MSH and MeSH are known prefixes used to identify terms from the MesH vocabulary)

@@ -4,11 +4,17 @@ $(document).ready(function() {
 });
 
 
+var table;
+function reinitialiseTable() {
+    table.destroy()
+    initialisePage()
+}
+
 var withProgress = true;
 
 var hideTableInfo = true;
 var hideFromCol = false;
-var apiPath = ''
+var apiPath = '';
 
 function initialisePage() {
 
@@ -31,6 +37,7 @@ function initialisePage() {
     // if no id, for now the UI only supports search with an input data source and a target ontology
     var inputSource = $("input[name=inputSource]").val() ? $("input[name=inputSource]").val() : undefined;
     var mappingTarget = $("input[name=mappingTarget]").val() ? $("input[name=mappingTarget]").map(function(){return $(this).val();}).get() : [];
+    var distance = $("input[name=distance]").val() ? $("input[name=distance]").val() : 1;
 
     // construct the API request object
 
@@ -39,7 +46,7 @@ function initialisePage() {
         ids : values,
         inputSource :  inputSource,
         mappingTarget: mappingTarget,
-        distance: 3     // default to 3 but todo allow users to change
+        distance: distance
     };
 
     var resultsData = [];
@@ -138,7 +145,7 @@ function drawTable(resultsData) {
 
     }
 
-    var table = $('#example').DataTable({
+    table = $('#example').DataTable({
         "displayLength": 50,
         "initComplete": function () {
             this.api().columns([4, 7]).every( function () {

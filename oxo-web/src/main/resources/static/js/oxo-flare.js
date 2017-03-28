@@ -9,9 +9,9 @@ $(document).ready(function() {
     var apiPath = $("#mapping-vis").data("api-path") ?  $("#mapping-vis").data("api-path") : '';
 
     
-    var diameter = 600,
+    var diameter = 800,
         radius = diameter / 2,
-        innerRadius = radius - 120;
+        innerRadius = radius - 140;
 
     var cluster = d3.layout.cluster()
         .size([360, innerRadius])
@@ -53,7 +53,7 @@ $(document).ready(function() {
             .data(nodes.filter(function(n) { return !n.children; }))
             .enter().append("text")
             .attr("class", "node")
-            .attr("dy", ".31em")
+            .attr("dy", ".29em")
             .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
             .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
             .text(function(d) { return d.key; })

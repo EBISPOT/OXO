@@ -1,5 +1,7 @@
 package uk.ac.ebi.spot.model;
 
+import uk.ac.ebi.spot.util.MappingDistance;
+
 /**
  * @author Simon Jupp
  * @date 14/06/2016
@@ -9,7 +11,7 @@ public class MappingQuery {
 
     private String id;
     private String sourcePrefix = null;
-    private int distance = 2;
+    private int distance = MappingDistance.DEFAULT_MAPPING_DISTANCE;
 
     public MappingQuery() {
     }

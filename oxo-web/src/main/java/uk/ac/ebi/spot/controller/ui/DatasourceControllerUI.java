@@ -10,12 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
+import uk.ac.ebi.spot.util.MappingDistance;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +62,7 @@ public class DatasourceControllerUI {
 
 //            model.addAttribute("mappingCount",mappingService.getMappedTargetCounts(prefix, 3));
             model.addAttribute("datasource",datasource);
+            model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
         }
 
 

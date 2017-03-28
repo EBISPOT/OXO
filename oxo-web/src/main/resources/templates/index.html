@@ -39,6 +39,7 @@
 
 
     <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{css/oxo-d3.css}" type="text/css" media="screen"/>
+    <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -126,13 +127,13 @@
                     <li class="first active"><a href="index">OxO</a></li>
                     <li><a href="docs">Documentation</a></li>
                     <li class="last" ><a href="about">About</a></li>
-                    <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                    <li th:if="not ${username} and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
-                          </form>
+                        </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username}  and not ${readonly}" class="functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
@@ -153,25 +154,24 @@
 
 
                 <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This is a beta site under active development.
+                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
                 </div>
 
-                <section class="grid_19">
+                <section class="grid_24">
 
                     <div class="jumbotron">
                         <!--<h1>Welcome to the OLS</h1>-->
                         <!--<p>Use OLS to search and visualise biomedical ontologies</p>-->
                         <h4>Welcome to the EMBL-EBI Ontology Xref Service (OxO).</h4>
-                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mapping from a variety of sources
-                            and allows you to upload and edit your own mappings by logging in with your ORCiD ID.
-                        </p>
+                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mapping from a variety of sources including the
+                            <a href="http://www.ebi.ac.uk/ols">Ontology Lookup Service</a> and a subset of mappings provided by the <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a>. We're still developing the service so please get in touch if you have any feedback</p>
                     </div>
 
                 </section>
 
                 <section>
 
-                    <div  style="height:800px;" class="grid_8 alpha">
+                    <div  style="height:800px;" class="grid_7 alpha">
 
 
                         <form id="queryForm" method="post" action="search">
@@ -192,8 +192,28 @@
                                 </select>
                                 <label for="identifiers">
                                 </label>
+                                <span>Mapping Distance: </span>
+                                <!--<div class="context-help">-->
+                                                    <!--<span class="context-help-label clickable" style=" float: left; color: #666;" data-icon="?">-->
+                                                        <!--What's this?-->
+                                                    <!--</span>-->
+
+                                    <!--<div class="context-help-wrapper" style="display: none;">-->
+                                        <!--<div class="context-help-content" style="display: block;">-->
+                                            <!--<div style="text-align:right;"><span onclick="toggleContextHelp(this); return false;" class="icon icon-functional clickable" data-icon="x">-->
+
+                                            <!--</span>-->
+                                            <!--</div>-->
+                                            <!--<p>-->
+                                                <!--Type or copy and paste your ZOOMA search terms in here. Each search term should-->
+                                                <!--be on a new line. If you have type information, put a tab then your type,-->
+                                            <!--</p>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+                                <input id="distance-slider" name="distance" data-slider-id='ex1Slider' data-slider-value="2" value="2" type="text"/>
                                 <textarea id="identifiers" name="id-list" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
-                                <input type="hidden" name="distance" value="3"/>
                                 <div style="float: right; padding-right: 4px">
                                     <input type="button" name="submit" value="Clear" class="submit" style="float: right" onclick="clearAll();"/>
                                     <input onClick="return submitIds()" type="submit" name="submit" value="Find mappings" class="submit" style="float: right; margin-right: 4px"/>
@@ -202,7 +222,7 @@
                         </form>
                     </div>
 
-                    <div style="height: 600px" class="grid_16 omega">
+                    <div style="height: 600px" class="grid_17 omega">
 
                         <select onchange="jumpToSource(this.options[this.selectedIndex].value)" style="width: 60%; margin-top: 10px;" id="mappingSourcesSelect" name="mappingTarget">
                             <option hidden="hidden" value="" selected="selected">Jump to datasource...</option>
@@ -282,6 +302,7 @@
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
 <script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
 <script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{js/oxo-flare.js}"></script>
+<script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
@@ -315,6 +336,16 @@
     function jumpToSource(source) {
         window.location = 'datasources/' +source;
     }
+
+    $(document).ready(function() {
+        $('#distance-slider').slider({
+            step: 1, min: 1, max: 3,
+            ticks: [1, 2, 3],
+            ticks_labels: ['1', '2', '3'],
+            ticks_snap_bounds: 50
+        })
+    });
+
 
 
 </script>

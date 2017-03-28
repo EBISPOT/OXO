@@ -18,7 +18,7 @@ import uk.ac.ebi.spot.model.MappingRequest;
 import uk.ac.ebi.spot.model.SourceType;
 import uk.ac.ebi.spot.security.model.OrcidPrinciple;
 import uk.ac.ebi.spot.security.model.OrcidUser;
-import uk.ac.ebi.spot.security.repository.UserRepository;
+import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingService;
 
@@ -35,7 +35,7 @@ import java.util.List;
 public class MappingControllerUI {
 
     @Autowired
-    UserRepository userRepository;
+    OrcidUserRepository userRepository;
 
     @Autowired
     DatasourceService datasourceService;
@@ -141,12 +141,9 @@ public class MappingControllerUI {
                 userSource = datasourceService.getOrCreateDatasource(userSource);
             }
 
+            mappingRequest.setDatasourcePrefix(userSource.getPrefix());
             mappingService.save(
-                    mappingRequest.getFromId(),
-                    mappingRequest.getToId(),
-                    userSource.getPrefix(),
-                    mappingRequest.getSourceType(),
-                    mappingRequest.getScope()
+                    mappingRequest
             );
             // get or create datasource from user detail
             redirectAttributes.addFlashAttribute("message", "Successfully created mapping to " + mappingRequest.getToId());

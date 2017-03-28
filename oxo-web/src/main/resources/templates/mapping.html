@@ -146,13 +146,13 @@
 					<li class="first active"><a href="../index">OxO</a></li>
 					<li><a href="../docs">Documentation</a></li>
 					<li class="last" ><a href="../about">About</a></li>
-					<li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
-					<li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+					<li th:if="not ${username} and not ${readonly}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
+					<li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
 						Logout <span th:text="${username}">user</span>
 						<form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
 						</form>
 					</a></li>
-					<li th:if="${username}" class="functional">
+					<li th:if="${username} and not ${readonly}" class="functional">
 						<a href="../myaccount" class="icon icon-functional" data-icon="5">
 							My mappings
 						</a>

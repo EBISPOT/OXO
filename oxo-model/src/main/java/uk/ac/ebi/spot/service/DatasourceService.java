@@ -52,10 +52,15 @@ public class DatasourceService {
     }
 
     public Page<Datasource> getDatasources(Pageable pageable) {
-        return datasourceRepository.findAll(pageable);
+        return datasourceRepository.findAll(pageable,0);
     }
 
+    private List<Datasource> cachedDatasourcesWithMappings = new ArrayList<>();
     public List<Datasource> getDatasourceWithMappings() {
+//        if (cachedDatasourcesWithMappings.isEmpty()) {
+//               cachedDatasourcesWithMappings = datasourceRepository.getDatasourcesWithMappings();
+//        }
+//        return cachedDatasourcesWithMappings;
         return datasourceRepository.getDatasourcesWithMappings();
     }
 

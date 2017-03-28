@@ -16,6 +16,7 @@ import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.MappingResponse;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
+import uk.ac.ebi.spot.util.MappingDistance;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -51,6 +52,7 @@ public class TermControllerUI {
             mappingRequest.setSourceType(SourceType.USER);
             mappingRequest.setScope(Scope.EXACT);
             model.addAttribute("mappingRequest", mappingRequest);
+            model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
         }
 
 

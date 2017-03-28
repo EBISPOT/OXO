@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import uk.ac.ebi.spot.model.IndexableTermInfo;
 import uk.ac.ebi.spot.model.Term;
 
 import java.util.Collection;
@@ -24,5 +25,8 @@ public interface TermGraphRepository extends GraphRepository<Term> {
 
     @Query(value = "MATCH (n:Term)-[HAS_SOURCE]->(d:Datasource) WHERE d.prefix = {0} RETURN count(n)")
     int getTermCountBySource(String prefix);
+
+    @Query(value = "Match (t:Term)-[:HAS_SOURCE]->(d:Datasource) RETURN t.curie as curie, t.id as id, t.uri as uri, d.alternatePrefix as alternatePrefixes")
+    Iterable<IndexableTermInfo> getAllIndexableTerms();
 
 }

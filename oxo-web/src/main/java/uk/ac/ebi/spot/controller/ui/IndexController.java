@@ -15,6 +15,7 @@ import uk.ac.ebi.spot.security.model.OrcidPrinciple;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
+import uk.ac.ebi.spot.util.MappingDistance;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,9 +43,21 @@ public class IndexController {
     public String home(Model model) {
 
         model.addAttribute("datasources",datasourceService.getDatasourceWithMappings());
+        model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
 
         return "index";
     }
+
+    @RequestMapping(path = "docs")
+    public String docs(Model model) {
+        return "docs";
+    }
+
+    @RequestMapping(path = "about")
+    public String about(Model model) {
+        return "about";
+    }
+
 
     @Secured("ROLE_USER")
     @RequestMapping(path = "myaccount")

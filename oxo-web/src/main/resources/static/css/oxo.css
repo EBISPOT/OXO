@@ -9,3 +9,41 @@
   margin-right: 4px;
   vertical-align: middle;
 }
+
+#ex1Slider .slider-selection {
+    background: #BABABA;
+}
+
+
+.context-help-wrapper {
+    position: relative;
+    top: 20px;
+    left: 20px;
+    z-index: 1;
+    display: none;
+}
+
+.context-help-content {
+    position: absolute;
+    border: 1px solid #000000;
+    background-color: #f7f7f7;
+    display: none;
+}
+
+.context-help-label {
+    font-weight: inherit;
+    color: inherit;
+}
+
+.context-help-label:after {
+    font-family: 'EBI-Generic';
+    font-size: 70%;
+    color: inherit !important;
+    content: attr(data-icon);
+    vertical-align: super;
+    margin: 0 0 0 0;
+}
+
+.clickable {
+    cursor: pointer;
+}

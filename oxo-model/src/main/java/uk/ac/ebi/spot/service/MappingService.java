@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.service;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import uk.ac.ebi.spot.repository.MappingRepository;
 import uk.ac.ebi.spot.repository.TermGraphRepository;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Simon Jupp
@@ -46,24 +48,49 @@ public class MappingService {
 
     /**
      * Save a mapping between two terms. Terms must have a prefix that is from a known datasource
-     * @param fromId
-     * @param toId
-     * @param datasourcePrefix
-     * @param sourceType
-     * @param scope
      * @return
      * @throws UnknownTermException
      * @throws UnknownDatasourceException
      */
     @Transactional("transactionManager")
-    public Mapping save(String fromId, String toId, String datasourcePrefix, SourceType sourceType, Scope scope) throws MappingException, UnknownTermException, UnknownDatasourceException, InvalidCurieException {
+    public Mapping save(MappingRequest mappingRequest) throws MappingException, UnknownTermException, UnknownDatasourceException, InvalidCurieException {
+        return mappingRepository.save(getMappingFromRequest(mappingRequest));
+    }
+
+    @Transactional("transactionManager")
+    public Iterable<Mapping> saveAll(Collection<MappingRequest> mappingRequests)  {
+
+        Collection<Mapping> mappings = new ArrayList<>();
+        StopWatch timer = new StopWatch();
+        System.out.println("preparing to save mappings");
+        timer.start();
+
+        for (MappingRequest mappingRequest: mappingRequests) {
+            try {
+                mappings.add(getMappingFromRequest(mappingRequest));
+            } catch (Exception e) {
+                log.warn(e.getMessage());
+            }
+
+        }
+        timer.split();
+        System.out.println(TimeUnit.NANOSECONDS.toSeconds(timer.getSplitNanoTime()));
+
+        System.out.println("mappings ready to save");
+        Iterable<Mapping> mappingssaved = mappingRepository.save(mappings);
+        System.out.println("mappings saved");
+        timer.split();
+        System.out.println(TimeUnit.NANOSECONDS.toSeconds(timer.getSplitNanoTime()));
+        timer.stop();
+        return mappingssaved;
+    }
+
+    private Mapping getMappingFromRequest(MappingRequest mappingRequest) throws InvalidCurieException {
+        Term fromT = termService.getOrCreateTerm(mappingRequest.getFromId(), null, null);
+        Term toT = termService.getOrCreateTerm(mappingRequest.getToId(), null, null);
 
 
-        Term fromT = termService.getOrCreateTerm(fromId, null, null);
-        Term toT = termService.getOrCreateTerm(toId, null, null);
-
-
-        Mapping mapping = mappingRepository.findOneByMappingBySourceAndId(fromT.getCurie(), toT.getCurie(), datasourcePrefix, scope.toString());
+        Mapping mapping = mappingRepository.findOneByMappingBySourceAndId(fromT.getCurie(), toT.getCurie(), mappingRequest.getDatasourcePrefix(), mappingRequest.getScope().toString());
 
         if (mapping != null) {
             throw new MappingException("Mapping between these identifiers already exists from this source");
@@ -71,7 +98,7 @@ public class MappingService {
         mapping = new Mapping();
 
 
-        Datasource datasource = datasourceService.getDatasource(datasourcePrefix);
+        Datasource datasource = datasourceService.getDatasource(mappingRequest.getDatasourcePrefix());
         if (datasource == null) {
             throw new UnknownDatasourceException("You can only create mappings for an existing datasource");
         }
@@ -79,10 +106,11 @@ public class MappingService {
         mapping.setToTerm(toT);
         mapping.setDatasource(datasource);
         mapping.setSourcePrefix(datasource.getPrefix());
-        mapping.setSourceType(sourceType);
-        mapping.setScope(scope);
+        mapping.setSourceType(mappingRequest.getSourceType());
+        mapping.setScope(mappingRequest.getScope());
         mapping.setDate(new Date());
-        return mappingRepository.save(mapping);
+
+        return mapping;
     }
 
     public List<Mapping> getMappingBySource(String sourcePrefix) {
@@ -151,7 +179,7 @@ public class MappingService {
 
         Datasource datasource = null;
         if (fromDatasource != null) {
-             datasource = datasourceService.getDatasource(fromDatasource);
+            datasource = datasourceService.getDatasource(fromDatasource);
         }
 
         if (datasource != null) {
@@ -210,5 +238,6 @@ public class MappingService {
     public Map<String, Integer> getMappedTargetCounts (String fromDatasource, int distance) {
         return  mappingQueryService.getMappedTargetCounts(fromDatasource, distance);
     }
+
 
 }

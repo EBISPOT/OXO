@@ -152,13 +152,13 @@
                     <li class="first active"><a href="index">OxO</a></li>
                     <li><a href="docs">Documentation</a></li>
                     <li class="last" ><a href="about">About</a></li>
-                    <li th:unless="${username}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                    <li th:if="not ${username} and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
                         </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username} and not ${readonly}" class="functional">
                         <a href="myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
@@ -174,7 +174,14 @@
     <div id="content" role="main" class="grid_24 clearfix">
         <div class="container">
 
+
             <div class="grid_24 alpha">
+
+                <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
+                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
+                </div>
+
+
                 <div class="row">
                     <section class="grid_8 alpha">
                         <h2>Mapping results</h2>
@@ -212,6 +219,7 @@
                 <div class="grid_24 alpha">
                     <div class="row">
 
+                        <span>Max distance set to <span th:text="${request.getDistance()}"></span></span>
                         <div id="mapping-summary" style="display: none;">
                             <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
                             <!--<br/>-->
@@ -308,7 +316,7 @@
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>-->
-<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=1)}"></script>
+<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=2)}"></script>
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>

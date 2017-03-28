@@ -20,8 +20,7 @@ import uk.ac.ebi.spot.model.*;
 import uk.ac.ebi.spot.repository.TermGraphRepository;
 import uk.ac.ebi.spot.util.CurieUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * @author Simon Jupp
@@ -44,6 +43,9 @@ public class TermService {
 
     @Autowired
     MappingQueryService mappingQueryService;
+
+    @Autowired
+    MappingQueryService cypherQueryService;
 
     @Autowired
     Session session;
@@ -223,9 +225,37 @@ public class TermService {
 
     }
 
+    public void rebuildIndexes(String source) {
 
-    public Object getSummaryGraphJson(String curie) {
-        return mappingQueryService.getMappingSummaryGraph(curie);
+
+
+        documentRepository.deleteAll();
+
+        List<Document> chunk = new ArrayList<Document>();
+
+        for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms()) {
+            if (t != null) {
+                chunk.add(DocumentBuilder.getDocumentFromTerm(t));
+                if (chunk.size() == 10000) {
+                    log.info("Saving 10000 documents...");
+                    documentRepository.save(chunk);
+                    chunk =  new ArrayList<Document>();
+                }
+            }
+        }
+
+        if (!chunk.isEmpty()) {
+            documentRepository.save(chunk);
+        }
+
+    }
+
+    public void rebuildIndexes() {
+        rebuildIndexes(null);
+    }
+
+    public Object getSummaryGraphJson(String curie, int distance) {
+        return mappingQueryService.getMappingSummaryGraph(curie,distance);
     }
 
     public int getTermCountBySource(String prefix) {

@@ -20,7 +20,7 @@
         <dependency>
               <groupId>org.neo4j</groupId>
               <artifactId>neo4j-ogm-embedded-driver</artifactId>
-              <version>2.0.4</version>
+              <version>2.0.6</version>
             </dependency>
 
         <dependency>
@@ -39,5 +39,31 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <finalName>oxo-solr-config</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/solr-assembly-descriptor.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>

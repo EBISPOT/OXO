@@ -5,12 +5,17 @@ var colorMap={"efo": "blue", "uberon":"green", "Wikipedia": "red", "BTO": "yello
 
 
 $(document).ready(function() {
+    drawGraph();
+}) ;
 
-    // $("#mapping-vis-spinner").show();
+function drawGraph () {
+
+    $("#mapping-vis-spinner").show();
     var curie = $("div[data-get-mapping-vis]").data('get-mapping-vis');
     var relativePath = $("div[data-get-mapping-vis]").data("api-path") ? $("div[data-get-mapping-vis]").data("api-path") : '';
+    var distance = $("input[name=distance]").val() ? $("input[name=distance]").val() : 1;
 
-    $.getJSON(relativePath+"api/terms/"+curie+"/graph", function(json) {})
+    $.getJSON(relativePath+"api/terms/"+curie+"/graph?distance="+distance, function(json) {})
         .success(function(json){
             var container = document.getElementById('mynetwork');
             for(var i=0;i<json.nodes.length;i++){
@@ -25,10 +30,10 @@ $(document).ready(function() {
                 json.links[i]["to"]=   json.links[i]["target"]
                 json.links[i]["from"]=   json.links[i]["source"]
 
-                console.log(json.links[i]["color"])
-                if (json.links[i]["color"]===undefined){
-                    console.log("Undefined ontology found: "+json.links[i]["mappingSource"])
-                }
+                // console.log(json.links[i]["color"])
+                // if (json.links[i]["color"]===undefined){
+                //     console.log("Undefined ontology found: "+json.links[i]["mappingSource"])
+                // }
             }
 
             var nodes = new vis.DataSet(json.nodes)
@@ -41,18 +46,18 @@ $(document).ready(function() {
             };
 
 
-            console.log(nodes)
-            console.log(edges)
-            console.log(data)
+            // console.log(nodes)
+            // console.log(edges)
+            // console.log(data)
 
             var options = {};
             var network = new vis.Network(container, data, options);
 
-            // $("#mapping-vis-spinner").hide();
+            $("#mapping-vis-spinner").hide();
 
         })
         .fail(function(e){console.log(e);console.log("Webservice call did not work!")})
     ;
-}) ;
+}
 
 

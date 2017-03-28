@@ -11,10 +11,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.model.MappingSearchRequest;
 import uk.ac.ebi.spot.model.Term;
+import uk.ac.ebi.spot.security.model.OrcidUser;
+import uk.ac.ebi.spot.security.model.Role;
+import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.SearchResult;
 import uk.ac.ebi.spot.service.SearchResultsCsvBuilder;
@@ -40,6 +44,9 @@ public class SearchController {
 
     @Autowired
     TermService termService;
+
+    @Autowired
+    OrcidUserRepository userRepository;
 
     @Autowired SearchResultAssembler searchResultAssembler;
 
@@ -125,6 +132,29 @@ public class SearchController {
 
     }
 
+    @RequestMapping(path = "/rebuild", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    public HttpEntity<String> rebuildIndexes(
+            @RequestParam(value = "apikey",required=false) String apikey
+
+    ) {
+        OrcidUser user = userRepository.findByApikey(apikey);
+        if (user == null) {
+            throw new UnauthorizedUserException("User with this api key are not authorised to create mapings");
+        }
+        if (!user.getRole().equals(Role.ADMIN) ) {
+            // rebuild indexes
+            throw new RuntimeException("Only admins can rebuild indexes");
+        }
+
+        termService.rebuildIndexes();
+
+        return new ResponseEntity<String>("Indexes rebuilt", HttpStatus.OK);
+
+
+
+
+    }
+
     private Page<SearchResult> getSearchResults(MappingSearchRequest request, Pageable pageable) {
         if (request.getIds().isEmpty() && request.getInputSource() == null && request.getMappingSource().isEmpty() ) {
             // handle error
@@ -146,11 +176,5 @@ public class SearchController {
 
         }
     };
-
-
-    @ExceptionHandler({Exception.class})
-    public void handleError(HttpServletResponse response, Exception exception) throws IOException {
-        response.sendError(HttpStatus.UNPROCESSABLE_ENTITY.value(), exception.getMessage());
-    }
 
 }

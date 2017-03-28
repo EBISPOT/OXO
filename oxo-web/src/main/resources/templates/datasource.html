@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
+    <link  rel="stylesheet" th:href="@{../webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
     <!--
@@ -124,13 +125,13 @@
                     <li class="first active"><a href="../index">OxO</a></li>
                     <li><a href="../docs">Documentation</a></li>
                     <li class="last" ><a href="../about">About</a></li>
-                    <li th:unless="${username}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                    <li th:if="not ${username} and not ${readonly}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
                         Logout <span th:text="${username}">user</span>
                         <form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
                         </form>
                     </a></li>
-                    <li th:if="${username}" class="functional">
+                    <li th:if="${username} and not ${readonly}" class="functional">
                         <a href="../myaccount" class="icon icon-functional" data-icon="5">
                             My mappings
                         </a>
@@ -145,6 +146,11 @@
 
     <div id="content" role="main" class="grid_24 clearfix">
         <div class="container">
+
+
+            <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
+                <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
+            </div>
 
             <!--@thymesVar id="message" type="String"-->
             <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
@@ -171,6 +177,12 @@
                         </div>
                         <div th:if="${datasource.getDescription()}">
                             <span th:text="${datasource.getDescription()}">id...</span>
+                        </div>
+                        <div th:if="${datasource.getVersionInfo()}">
+                            <span>Version info: </span><span th:text="${datasource.getDescription()}">id...</span>
+                        </div>
+                        <div th:if="${datasource.getLicence()}">
+                            <span>Licence info: </span><a th:href="${datasource.getLicence()}" th:text="${datasource.getLicence()}">id...</a>
                         </div>
                         <div>
                             <span>Prefix: </span><span class="ontology-source" th:text="${datasource.getPrefix()}">id...</span>
@@ -199,13 +211,30 @@
                 </div>
                 <div class="panel-body">
 
-                    <div id="graphic" th:attr="data-prefix=${datasource.getPrefix()}" style="min-width: 310px; max-width: 100%; height: 400px; margin: 0 auto"></div>
 
                     <form id="mapping-count-form" method="post" action="../search">
                         <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
                         <input id="mappingTarget" type="hidden" name="mappingTarget"/>
-                        <input type="hidden" name="distance" value="3"/>
+                        <span>Mapping Distance: </span>
+                        <div style="margin-left: 15px;display: inline;">
+                            <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}  " type="text"/>
+                        </div>
                     </form>
+                    <div id="graphic" th:attr="data-prefix=${datasource.getPrefix()},data-distance=${distance}" style="min-width: 310px; max-width: 100%; height: 400px; margin: 0 auto">
+
+
+                    </div>
+
+                    <div id="mapping-vis">
+                        <div style="   position:absolute;
+                           top:50%;
+                           left:50%;
+                           margin-top:-25px;
+                           margin-left:-25px;"  id="mapping-vis-spinner">
+                            <img src="../img/infinity.gif"/>
+                        </div>
+
+                    </div>
 
                 </div>
             </div>
@@ -263,14 +292,29 @@
 <script type="text/javascript" th:src="@{../webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
 <script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
 
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="//code.highcharts.com/highcharts.js"></script>
+<script src="//code.highcharts.com/modules/exporting.js"></script>
 <script type="text/javascript" src="../static/js/oxo-hchart.js" th:src="@{../js/oxo-hchart.js(v=1)}"></script>
+<script type="text/javascript" th:src="@{../webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
 
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
 
+<script>
+    $(document).ready(function() {
+
+        $('#distance-slider').slider({
+            step: 1, min: 1, max: 3,
+            ticks: [1, 2, 3],
+            ticks_labels: ['1', '2', '3'],
+            ticks_snap_bounds: 50
+        }).on('slideStop', function () {
+            refreshChartData()
+        });
+
+       });
+</script>
 </body>
 </html>

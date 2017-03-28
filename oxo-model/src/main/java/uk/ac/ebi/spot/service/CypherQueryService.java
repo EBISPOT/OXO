@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.spot.model.IndexableTermInfo;
+import uk.ac.ebi.spot.util.MappingDistance;
 
 import java.util.*;
 import java.util.function.Function;
@@ -26,8 +28,6 @@ public class CypherQueryService implements MappingQueryService {
 
     @Autowired
     Neo4jOperations neo4jOperations;
-
-    private static String DEFAULT_DISTANCE = "3";
 
     public CypherQueryService() {
 
@@ -85,7 +85,7 @@ public class CypherQueryService implements MappingQueryService {
         // add distance
 
         if (distance < 0) {
-            query += MAPPING_BY_DATASOURCE_QUERY_PART2.replace("%s", DEFAULT_DISTANCE);
+            query += MAPPING_BY_DATASOURCE_QUERY_PART2.replace("%s", Integer.toString(MappingDistance.DEFAULT_MAPPING_DISTANCE));
         } else {
             query += MAPPING_BY_DATASOURCE_QUERY_PART2.replace("%s", Integer.toString(distance));
         }
@@ -174,7 +174,7 @@ public class CypherQueryService implements MappingQueryService {
 
 
     private static String SUMMARY_MAPPING_QUERY =
-            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-(:Term)-[m:MAPPING]-(:Term)-[:HAS_SOURCE]->(td:Datasource)\n" +
+            "MATCH (fd:Datasource)<-[:HAS_SOURCE]-()-[m:MAPPING]->()-[:HAS_SOURCE]->(td)\n" +
                     " WHERE_CLAUSE \n"+
                     "WITH { source : fd.prefix,  sourceType : fd.sourceType, size: count(distinct m), target : td.prefix, targetType : td.sourceType} as row\n" +
                     "RETURN collect(row) as result";
@@ -203,23 +203,19 @@ public class CypherQueryService implements MappingQueryService {
     }
 
     private static String SUMMARY_GRAPH_QUERY =
-            "MATCH path= shortestPath( (ft:Term)-[m:MAPPING*1..3]-(tt:Term))\n" +
+            "MATCH path= (ft:Term)-[m:MAPPING*1..%s]-(tt:Term)\n" +
                     "WHERE ft.curie = {curie}\n" +
                     "UNWIND nodes(path) as n\n" +
                     "UNWIND rels(path) as r\n" +
                     "WITH n, r\n" +
                     "MATCH (n)-[HAS_SOURCE]-(d:Datasource)\n" +
-                    "RETURN {nodes: collect( distinct {id: n.curie, group : d.prefix}), links: collect (distinct {source: startNode(r).curie, target: endNode(r).curie, mappingSource: r.sourcePrefix}  )} as result";
-
-
-
-
-
+                    "RETURN {nodes: collect( distinct {id: n.curie, group : d.prefix}), links: collect (distinct {source: startNode(r).curie, target: endNode(r).curie}  )} as result";
     @Override
-    public Object getMappingSummaryGraph(String curie) {
+    public Object getMappingSummaryGraph(String curie, int distance) {
         HashMap params = new HashMap();
         params.put("curie", curie) ;
-        Result results = neo4jOperations.query(SUMMARY_GRAPH_QUERY,params );
+        String query = String.format(SUMMARY_GRAPH_QUERY, distance);
+        Result results = neo4jOperations.query(query,params );
         for (Map<String, Object> row : results)  {
             return row.get("result");
         }
@@ -254,7 +250,6 @@ public class CypherQueryService implements MappingQueryService {
     }
 
 
-
     // todo remove fixing to lower case
     private static Function<String,String> sourcePrefixWrap = new Function<String,String>() {
         @Override public String apply(String s) {
@@ -267,6 +262,7 @@ public class CypherQueryService implements MappingQueryService {
             return new StringBuilder().append("'").append(s).append("'").append(" in td.alternatePrefix").toString();
         }
     };
+
 
 
     /**
@@ -286,13 +282,12 @@ public class CypherQueryService implements MappingQueryService {
                     "RETURN ft.curie as fromCurie, ft.label as fromLabel, tt.curie as curie, tt.label as label, collect (distinct td.prefix) as datasources, collect (distinct source1) as mappingSources, length(path) as dist\n" +
                     "ORDER BY dist";
 
-
     @Deprecated
     private String getMappingQuery (String id, String fromDatasource, int distance, Collection<String> sourcePrefix, Collection<String> targetPrefix) {
         String query = "";
 
         if (distance < 0) {
-            query = MATCH_MAPPING.replace("%s", DEFAULT_DISTANCE);
+            query = MATCH_MAPPING.replace("%s", Integer.toString(MappingDistance.DEFAULT_MAPPING_DISTANCE));
         } else {
             query = MATCH_MAPPING.replace("%s", Integer.toString(distance));
         }
@@ -330,5 +325,7 @@ public class CypherQueryService implements MappingQueryService {
         return query;
 
     }
+
+
 
 }

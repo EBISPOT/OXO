@@ -29,7 +29,7 @@ import uk.ac.ebi.spot.exception.UnknownTermException;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.security.model.OrcidPrinciple;
 import uk.ac.ebi.spot.security.model.Role;
-import uk.ac.ebi.spot.security.repository.UserRepository;
+import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public class TermController  implements
     private TermService termService;
 
     @Autowired
-    UserRepository userRepository;
+    OrcidUserRepository userRepository;
 
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Term>> terms(
@@ -110,11 +110,12 @@ public class TermController  implements
     @CrossOrigin
     @RequestMapping(path = "/{curie}/graph", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    HttpEntity<String> getTermMappingGraph(@PathVariable("curie") String curie) throws ResourceNotFoundException {
+    HttpEntity<String> getTermMappingGraph(@PathVariable("curie") String curie,
+                                           @RequestParam(value = "distance", defaultValue = "1", required = false) Integer distance) throws ResourceNotFoundException {
         Term page = termService.getTerm(curie);
 
         if (page != null) {
-            Object object=  termService.getSummaryGraphJson(page.getCurie());
+            Object object=  termService.getSummaryGraphJson(page.getCurie(), distance);
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             try {
                 return new HttpEntity<String>(ow.writeValueAsString(object));

@@ -1,5 +1,7 @@
 package uk.ac.ebi.spot.model;
 
+import uk.ac.ebi.spot.util.MappingDistance;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +18,7 @@ public class MappingSearchRequest {
     private String inputSource;
     private Set<String> mappingTarget = new HashSet<>();
     private Set<String> mappingSource = new HashSet<>();
-    private int distance = 3;
+    private int distance = MappingDistance.DEFAULT_MAPPING_DISTANCE;
 
     public MappingSearchRequest(List<String> ids, Set<String> mappingSource, Set<String> mappingTarget) {
         this.ids = ids;

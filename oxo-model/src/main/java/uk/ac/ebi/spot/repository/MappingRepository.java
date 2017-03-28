@@ -48,7 +48,7 @@ public interface MappingRepository  extends GraphRepository<Mapping> {
     List<Mapping> findMappingsById(String fromId, long skip, long limit);
 
 
-    @Query("match path = allShortestPaths ( (f:Term)-[r:MAPPING*1..10]-(t:Term) ) WHERE f.curie = {0} AND t.curie = {1} with rels(path) as m, length(path) as l WHERE l> 1 return m")
+    @Query("match path = allShortestPaths ( (f:Term)-[r:MAPPING*1..3]-(t:Term) ) WHERE f.curie = {0} AND t.curie = {1} with rels(path) as m, length(path) as l WHERE l> 1 return m")
     List<Mapping> findInferredMappingsById(String fromId, String toId);
 
 

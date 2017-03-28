@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import uk.ac.ebi.spot.model.IndexableTermInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +40,7 @@ public interface MappingQueryService {
      * @param curie
      * @return
      */
-    Object getMappingSummaryGraph(String curie);
+    Object getMappingSummaryGraph(String curie, int distance);
 
     /**
      * Get an Object that reflects a mapping summary
