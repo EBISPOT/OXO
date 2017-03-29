@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.spot.model.IndexableTermInfo;
 import uk.ac.ebi.spot.util.MappingDistance;
 
 import java.util.*;
@@ -29,11 +28,11 @@ public class CypherQueryService implements MappingQueryService {
     @Autowired
     Neo4jOperations neo4jOperations;
 
-    CrunchifyCache<String, LinkedHashMap<String, SearchResult>> cypherSearchResultsCache;
+    SimpleCache<String, LinkedHashMap<String, SearchResult>> cypherSearchResultsCache;
 
     public CypherQueryService() {
 
-        cypherSearchResultsCache = new CrunchifyCache<String, LinkedHashMap<String, SearchResult>>(120, 60, 20);
+        cypherSearchResultsCache = new SimpleCache<String, LinkedHashMap<String, SearchResult>>(120, 60, 20);
     }
 
     /**
