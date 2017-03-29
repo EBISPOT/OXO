@@ -50,7 +50,7 @@ function initialisePage() {
     };
 
     var resultsData = [];
-    doSearch(apiPath+'api/search?size=100', requestData, resultsData)
+    doSearch(apiPath+'api/search?size=500', requestData, resultsData)
 
 }
 

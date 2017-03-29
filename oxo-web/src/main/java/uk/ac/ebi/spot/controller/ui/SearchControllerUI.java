@@ -34,15 +34,6 @@ public class SearchControllerUI {
     @Autowired
     DatasourceService datasourceService;
 
-    @ModelAttribute("all_datasources")
-    public List<Datasource> getDatasources() {
-        return datasourceService.getDatasourceWithMappings();
-    }
-
-    @ModelAttribute("mapping_datasources")
-    public List<Datasource> getMappingSources() {
-        return datasourceService.getMappingSources();
-    }
 
     @GetMapping
     public String search() {

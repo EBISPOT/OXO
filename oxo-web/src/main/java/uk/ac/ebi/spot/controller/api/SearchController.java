@@ -72,7 +72,7 @@ public class SearchController {
             SearchResultsCsvBuilder csvBuilder = new SearchResultsCsvBuilder(seperator.charAt(0), response.getOutputStream());
             csvBuilder.writeHeaders();
 
-            PageRequest pageRequest = new PageRequest(0, 100);
+            PageRequest pageRequest = new PageRequest(0, 5000);
             Page<SearchResult> resultsPage = getSearchResults(request, pageRequest);
             List<SearchResult> map = resultsPage.getContent();
             csvBuilder.writeResultsAsCsv(map);

@@ -41,7 +41,7 @@ function populateExamples() {
 
 function exportData(format) {
 
-    console.log("fomart " + format)
+    // console.log("fomart " + format)
     var filterForm = $('#filter-form');
     if (filterForm) {
         filterForm.attr('action', 'api/search?format='+format);

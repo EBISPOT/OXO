@@ -70,10 +70,15 @@
         }
         .progress-label {
             position: absolute;
-            left: 50%;
+            left: 45%;
             top: 4px;
             font-weight: bold;
             text-shadow: 1px 1px 0 #fff;
+        }
+
+        .ui-progressbar .ui-progressbar-value {
+            margin: 0px;
+            height: 100%;
         }
 
     </style>
@@ -178,7 +183,7 @@
             <div class="grid_24 alpha">
 
                 <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
+                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
                 </div>
 
 
@@ -189,7 +194,7 @@
                     </section>
 
                     <section class="grid_10 alpha">
-                        <div>
+                        <div style="padding-top: 5px;">
                             <div id="progressbar" class="center-block">
                                 <div class="progress-label">Fetching mappings...</div>
                             </div>
@@ -199,7 +204,7 @@
 
 
                     <section class="grid_6">
-                        <div style="float:right;">
+                        <div style="padding-top:5px; float:right;">
                             <!-- Single button -->
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -219,7 +224,7 @@
                 <div class="grid_24 alpha">
                     <div class="row">
 
-                        <span>Max distance set to <span th:text="${request.getDistance()}"></span></span>
+                        <div style="padding-left: 9px;">Max distance set to <span th:text="${request.getDistance()}"></span></div>
                         <div id="mapping-summary" style="display: none;">
                             <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
                             <!--<br/>-->

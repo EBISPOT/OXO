@@ -174,7 +174,7 @@
             <div class="grid_24 alpha">
 
                 <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development and subject to change.
+                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
                 </div>
 
                 <!--@thymesVar id="message" type="String"-->
@@ -218,9 +218,9 @@
                                 <div>
                                     <span>Type: </span><span th:text="${term.getDatasource().getSource()}">id...</span>
                                 </div>
-                                <div th:if="${term.getDatasource().getIdorgNamespace()}">
-                                    <span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>
-                                </div>
+                                <!--<div th:if="${term.getDatasource().getIdorgNamespace()}">-->
+                                    <!--<span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>-->
+                                <!--</div>-->
 
                                 <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
                                     <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}/terms(ontology=${term.getDatasource().getPrefix()},iri=${term.getUri()})} + '\''"  class="btn btn-default">View in OLS</button>

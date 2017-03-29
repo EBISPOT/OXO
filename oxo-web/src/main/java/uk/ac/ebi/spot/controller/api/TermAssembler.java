@@ -7,7 +7,10 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.spot.model.Datasource;
+import uk.ac.ebi.spot.model.SourceType;
 import uk.ac.ebi.spot.model.Term;
 import uk.ac.ebi.spot.service.TermService;
 
@@ -25,6 +28,7 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
     @Autowired
     private TermService termService;
 
+    private static String olsBase = "http://www.ebi.ac.uk/ols/api/terms?obo_id=";
     @Override
     public Resource<Term> toResource(Term term) {
         Resource<Term> resource = new Resource<Term>(term);
@@ -49,6 +53,13 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
                 ml.toUriComponentsBuilder().build().toUriString(),
                 "mappings"
         ));
+
+        if (term.getDatasource().getSource().equals(SourceType.ONTOLOGY)) {
+            resource.add(new Link(
+                    olsBase+id,
+                    "ols"
+            ));
+        }
 
         return resource;
     }
