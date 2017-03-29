@@ -29,8 +29,11 @@ public class CypherQueryService implements MappingQueryService {
     @Autowired
     Neo4jOperations neo4jOperations;
 
+    CrunchifyCache<String, LinkedHashMap<String, SearchResult>> cypherSearchResultsCache;
+
     public CypherQueryService() {
 
+        cypherSearchResultsCache = new CrunchifyCache<String, LinkedHashMap<String, SearchResult>>(120, 60, 20);
     }
 
     /**
@@ -137,26 +140,34 @@ public class CypherQueryService implements MappingQueryService {
 
         String query = getMappingQuery2(null, fromDatasource, distance, sourcePrefix, targetPrefix);
 
-        Result results = neo4jOperations.query(query, Collections.EMPTY_MAP);
-
         LinkedHashMap<String, SearchResult> idToSearchResultMap = new LinkedHashMap<String, SearchResult>();
-        for (Map<String, Object> row : results)  {
-            String fromCurie = (String) row.get("fromCurie");
-            String fromLabel = (String) row.get("fromLabel");
 
-            if (!idToSearchResultMap.containsKey(fromCurie)) {
-                idToSearchResultMap.put(fromCurie, new SearchResult(null, fromDatasource, fromCurie, fromLabel, new ArrayList<MappingResponse>()));
+        if (cypherSearchResultsCache.get(query) != null) {
+            idToSearchResultMap =  cypherSearchResultsCache.get(query);
+        } else {
+            Result results = neo4jOperations.query(query, Collections.EMPTY_MAP);
+
+
+            for (Map<String, Object> row : results)  {
+                String fromCurie = (String) row.get("fromCurie");
+                String fromLabel = (String) row.get("fromLabel");
+
+                if (!idToSearchResultMap.containsKey(fromCurie)) {
+                    idToSearchResultMap.put(fromCurie, new SearchResult(null, fromDatasource, fromCurie, fromLabel, new ArrayList<MappingResponse>()));
+                }
+
+
+                MappingResponse response = new MappingResponse();
+                response.setCurie((String) row.get("curie"));
+                response.setLabel((String) row.get("label"));
+                response.setSourcePrefixes( Arrays.asList((String[]) row.get("mappingSources")));
+                response.setTargetPrefix( (String) row.get("datasources"));
+                response.setDistance(Integer.parseInt(row.get("dist").toString()));
+
+                idToSearchResultMap.get(fromCurie).getMappingResponseList().add(response);
             }
 
-
-            MappingResponse response = new MappingResponse();
-            response.setCurie((String) row.get("curie"));
-            response.setLabel((String) row.get("label"));
-            response.setSourcePrefixes( Arrays.asList((String[]) row.get("mappingSources")));
-            response.setTargetPrefix( (String) row.get("datasources"));
-            response.setDistance(Integer.parseInt(row.get("dist").toString()));
-
-            idToSearchResultMap.get(fromCurie).getMappingResponseList().add(response);
+            cypherSearchResultsCache.put(query, idToSearchResultMap);
         }
 
         int size =  pageable.getOffset() + pageable.getPageSize() > idToSearchResultMap.values().size() ? idToSearchResultMap.values().size() : pageable.getOffset() + pageable.getPageSize();

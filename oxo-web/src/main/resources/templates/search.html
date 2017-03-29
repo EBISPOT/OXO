@@ -225,6 +225,11 @@
                     <div class="row">
 
                         <div style="padding-left: 9px;">Max distance set to <span th:text="${request.getDistance()}"></span></div>
+
+                        <div id="large-warning" style="display: none;border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
+                            You are trying to view over 50,000 mappings! Please use the download link.
+                        </div>
+
                         <div id="mapping-summary" style="display: none;">
                             <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
                             <!--<br/>-->
@@ -321,7 +326,7 @@
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js(v=1)}"></script>-->
-<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=2)}"></script>
+<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{js/oxo-search-result.js(v=2.1)}"></script>
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>

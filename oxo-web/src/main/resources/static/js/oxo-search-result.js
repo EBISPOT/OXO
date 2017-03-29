@@ -70,7 +70,11 @@ function doSearch(url, requestData, resultsData, noMappings) {
 
             var pageNumber = data.page.number;
             var totalPages = data.page.totalPages;
-
+            var totalElement = data.page.totalElements;
+            if (totalElement > 50000) {
+                $('#large-warning').show()
+            }
+            
             $.each(data._embedded.searchResults, function (index, result) {
 
                 var mappings = result.mappingResponseList;

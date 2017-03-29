@@ -179,7 +179,7 @@
                             <span th:text="${datasource.getDescription()}">id...</span>
                         </div>
                         <div th:if="${datasource.getVersionInfo()}">
-                            <span>Version info: </span><span th:text="${datasource.getDescription()}">id...</span>
+                            <span>Version info: </span><span th:text="${datasource.getVersionInfo()}">id...</span>
                         </div>
                         <div th:if="${datasource.getLicence()}">
                             <span>Licence info: </span><a th:href="${datasource.getLicence()}" th:text="${datasource.getLicence()}">id...</a>
@@ -289,7 +289,7 @@
 </div>
 
 
-<script type="text/javascript" th:src="@{../webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
+<!--<script type="text/javascript" th:src="@{../webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>-->
 <script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
 
 <script src="//code.highcharts.com/highcharts.js"></script>
