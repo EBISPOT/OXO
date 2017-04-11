@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * @author Simon Jupp
- * @date 13/05/2016
+ * @since 13/05/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class MappingSource {

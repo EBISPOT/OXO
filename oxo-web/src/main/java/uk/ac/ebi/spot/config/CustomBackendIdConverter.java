@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 /**
  * @author Simon Jupp
- * @date 05/08/2016
+ * @since 05/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Component

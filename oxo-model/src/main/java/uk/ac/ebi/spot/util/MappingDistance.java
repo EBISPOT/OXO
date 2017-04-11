@@ -2,7 +2,7 @@ package uk.ac.ebi.spot.util;
 
 /**
  * @author Simon Jupp
- * @date 28/03/2017
+ * @since 28/03/2017
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class MappingDistance {

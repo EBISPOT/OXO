@@ -5,7 +5,7 @@
  * A dynamic, browser-based visualization library.
  *
  * @version 4.9.0
- * @date    2015-10-01
+ * @since    2015-10-01
  *
  * @license
  * Copyright (C) 2011-2015 Almende B.V, http://almende.com
@@ -42160,7 +42160,7 @@ return /******/ (function(modules) { // webpackBootstrap
      * Sets up the dashedLine functionality for drawing
      * Original code came from http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
      * @author David Jordan
-     * @date 2012-08-08
+     * @since 2012-08-08
      */
     CanvasRenderingContext2D.prototype.dashedLine = function (x, y, x2, y2, pattern) {
       this.beginPath();

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Simon Jupp
- * @date 16/08/2016
+ * @since 16/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Controller

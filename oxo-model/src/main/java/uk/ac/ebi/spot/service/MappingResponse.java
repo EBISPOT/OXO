@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * @author Simon Jupp
- * @date 30/08/2016
+ * @since 30/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class MappingResponse {

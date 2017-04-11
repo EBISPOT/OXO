@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 /**
  * @author Simon Jupp
- * @date 21/03/2017
+ * @since 21/03/2017
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Configuration

@@ -4,7 +4,7 @@ import uk.ac.ebi.spot.util.MappingDistance;
 
 /**
  * @author Simon Jupp
- * @date 14/06/2016
+ * @since 14/06/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class MappingQuery {

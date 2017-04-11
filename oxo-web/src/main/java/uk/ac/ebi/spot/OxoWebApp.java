@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 
 /**
  * @author Simon Jupp
- * @date 14/06/2016
+ * @since  14/06/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @SpringBootApplication

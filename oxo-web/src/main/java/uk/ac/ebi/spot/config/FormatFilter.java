@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * @author Simon Jupp
- * @date 06/10/2016
+ * @since 06/10/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  *
  * filter that will detect url params format=tsv or format-csv and set the appropriate request header for content negotiation

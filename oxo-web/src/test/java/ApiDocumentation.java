@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * @author Simon Jupp
- * @date 20/03/2017
+ * @since 20/03/2017
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @RunWith(SpringJUnit4ClassRunner.class)

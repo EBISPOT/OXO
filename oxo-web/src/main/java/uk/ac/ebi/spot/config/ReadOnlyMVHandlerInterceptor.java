@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Simon Jupp
- * @date 21/03/2017
+ * @since 21/03/2017
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class ReadOnlyMVHandlerInterceptor extends HandlerInterceptorAdapter {

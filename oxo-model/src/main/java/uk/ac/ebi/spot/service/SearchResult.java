@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * @author Simon Jupp
- * @date 05/09/2016
+ * @since 05/09/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class SearchResult {

@@ -16,7 +16,7 @@ import uk.ac.ebi.spot.service.TermService;
 
 /**
  * @author Simon Jupp
- * @date 08/08/2016
+ * @since 08/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Component

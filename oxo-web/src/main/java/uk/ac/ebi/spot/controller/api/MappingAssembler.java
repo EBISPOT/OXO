@@ -10,7 +10,7 @@ import uk.ac.ebi.spot.model.Mapping;
 
 /**
  * @author Simon Jupp
- * @date 09/08/2016
+ * @since 09/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Component

@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * @author Simon Jupp
- * @date 04/08/2016
+ * @since 04/08/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @SolrDocument(solrCoreName = "mapping")

@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  * @author Simon Jupp
- * @date 11/05/2016
+ * @since 11/05/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @NodeEntity(label="Term")
