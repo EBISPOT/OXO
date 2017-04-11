@@ -3,7 +3,7 @@
     <parent>
         <artifactId>oxo</artifactId>
         <groupId>uk.ac.ebi.spot</groupId>
-        <version>0.0.1</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>uk.ac.ebi.spot</groupId>
             <artifactId>oxo-model</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
