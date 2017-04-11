@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uk.ac.ebi.spot</groupId>
 	<artifactId>oxo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.11</version>
 	<modules>
 		<module>oxo-web</module>
 		<module>oxo-model</module>
@@ -58,7 +57,7 @@
 		<connection>scm:git:https://github.com/EBISPOT/OLS-mapping-service.git</connection>
 		<url>http://github.com/EBISPOT/OLS-mapping-service</url>
 		<developerConnection>scm:git:https://github.com/EBISPOT/OLS-mapping-service.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>0.0.11</tag>
 	</scm>
 
 	<distributionManagement>
@@ -82,7 +81,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.4.5.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
