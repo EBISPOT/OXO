@@ -30,7 +30,7 @@ function drawChart(data) {
 
     var reformatted = [];
 
-    console.log(Object.keys(data))
+    // console.log(Object.keys(data))
     $.each(data,function(key,value){
         reformatted.push( [key, value])
         $("#mapping-vis").hide()
@@ -38,9 +38,12 @@ function drawChart(data) {
 
     console.log(JSON.stringify(reformatted))
 
-    Highcharts.chart('graphic', {
+    var chart = Highcharts.chart('graphic', {
         chart: {
-            type: 'column'
+            type: 'bar'
+        },
+        credits:{
+            enabled:false
         },
         title: {
             text: 'Mappings by target'
@@ -48,7 +51,7 @@ function drawChart(data) {
         xAxis: {
             type: 'category',
             labels: {
-                rotation: -45,
+                // rotation: -45,
                 style: {
                     fontSize: '13px',
                     fontFamily: 'Verdana, sans-serif'
@@ -56,7 +59,8 @@ function drawChart(data) {
                 formatter: function(){
                     return "<a style='border-bottom-width: 0px;' class='nounderline' href='"+this.value +"'><span class='ontology-source'>" + this.value + "</span></a>"
                 },
-                useHTML: true
+                useHTML: true,
+                step : 1
             },
             categories: Object.keys(data),
 
@@ -76,7 +80,7 @@ function drawChart(data) {
                 point: {
                     events: {
                         click: function () {
-                            console.log('clicked' + this.category)
+                            // console.log('clicked' + this.category)
                             $('#mappingTarget').val(this.category)
                             $('#mapping-count-form').submit()
                         }
@@ -85,9 +89,14 @@ function drawChart(data) {
                 minPointLength: 3,
                 events: {
                     legendItemClick: function(ev) {
-                        console.log(ev.point.category)
+                        // console.log(ev.point.category)
                     }
                 }
+            }
+        },
+        events: {
+            redraw: function(event) {
+                console.log("size" + this.xAxis.categories)
             }
         },
         series: [{
@@ -95,6 +104,12 @@ function drawChart(data) {
             data: reformatted
         }]
     });
+
+    var height = reformatted.length * 40;
+    if (height < 200) {
+        height = 200;
+    }
+    chart.setSize(undefined, height)
 
 }
 

@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Controller
+@CrossOrigin
 @RequestMapping("/api/search")
 public class SearchController {
 

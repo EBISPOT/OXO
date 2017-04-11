@@ -47,6 +47,7 @@ import java.util.Map;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Controller
+@CrossOrigin
 @RequestMapping("/api/mappings")
 @ExposesResourceFor(Mapping.class)
 public class MappingController implements
@@ -130,7 +131,6 @@ public class MappingController implements
 
     private static Object summaryCache = null;
     private static Map<String, Object> datasourceSummaryCache = new HashMap();
-    @CrossOrigin
     @RequestMapping(path = "/summary", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     HttpEntity<String> getMappingSummary(

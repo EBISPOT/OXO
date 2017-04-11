@@ -39,6 +39,7 @@
 
 
     <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{css/oxo-d3.css}" type="text/css" media="screen"/>
+    <link  rel="stylesheet" th:href="@{webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
     <link  rel="stylesheet" th:href="@{webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
 
     <!-- for production the above can be replaced with -->
@@ -51,6 +52,14 @@
     <style type="text/css">
         /* You have the option of setting a maximum width for your page, and making sure everything is centered */
         /* body { max-width: 1600px; margin: 0 auto; } */
+        legend {
+            margin-bottom: 0;
+        }
+
+        form fieldset {
+            margin-top: 0;
+        }
+
     </style>
 
 
@@ -81,7 +90,7 @@
     </ul>
 </div>
 
-<div id="wrapper" class="container_24">
+<div id="wrapper" class="container_24" style="min-width: 1000px;">
 
     <header>
 
@@ -146,7 +155,7 @@
 
     </header>
 
-    <div id="content" role="main" class="grid_24 clearfix">
+    <div id="content" role="main" class="grid_24 clearfix" >
         <div class="container">
 
             <!--@thymesVar id="summary" type="uk.ac.ebi.spot.ols.controller.ui.HomeController.SummaryInfo"-->
@@ -163,57 +172,57 @@
                         <!--<h1>Welcome to the OLS</h1>-->
                         <!--<p>Use OLS to search and visualise biomedical ontologies</p>-->
                         <h4>Welcome to the EMBL-EBI Ontology Xref Service (OxO).</h4>
-                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mapping from a variety of sources including the
-                            <a href="http://www.ebi.ac.uk/ols">Ontology Lookup Service</a> and a subset of mappings provided by the <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a>. We're still developing the service so please get in touch if you have any feedback</p>
+                        <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mappings from a variety of sources including the
+                            <a href="http://www.ebi.ac.uk/ols">Ontology Lookup Service</a> and a subset of mappings provided by the <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a>. We're still developing the service so please <a href="contact">get in touch</a> if you have any feedback.</p>
                     </div>
 
                 </section>
 
                 <section>
 
-                    <div  style="height:800px;" class="grid_7 alpha">
+                    <div  style="height:1000px;" class="grid_7 alpha">
 
 
                         <form id="queryForm" method="post" action="search">
                             <fieldset>
-                                <legend>Enter a list of ids</legend>
-
-                                <div style="float:right; font-size: 0.7em">
-                                    <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
-                                </div>
+                                <legend>Search OxO by term id</legend>
 
                                 <!--@thymesVar id="source" type="uk.ac.ebi.spot.model.Datasource"-->
                                 <label for="mappingTarget">
                                 </label>
-                                <select style="width: 100%; margin-bottom: 10px;;" id="mappingTarget" name="mappingTarget">
-                                    <option hidden="hidden" value="" selected="selected">Choose a target (optional)</option>
-
+                                <span>Choose a target (optional)</span>
+                                <select style="width: 100%; margin-bottom: 10px;;" id="mappingTarget" name="mappingTarget" class="datasource-select" >
+                                    <option></option>
                                     <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
                                 </select>
                                 <label for="identifiers">
                                 </label>
                                 <span>Mapping Distance: </span>
                                 <!--<div class="context-help">-->
-                                                    <!--<span class="context-help-label clickable" style=" float: left; color: #666;" data-icon="?">-->
-                                                        <!--What's this?-->
-                                                    <!--</span>-->
+                                <!--<span class="context-help-label clickable" style=" float: left; color: #666;" data-icon="?">-->
+                                <!--What's this?-->
+                                <!--</span>-->
 
-                                    <!--<div class="context-help-wrapper" style="display: none;">-->
-                                        <!--<div class="context-help-content" style="display: block;">-->
-                                            <!--<div style="text-align:right;"><span onclick="toggleContextHelp(this); return false;" class="icon icon-functional clickable" data-icon="x">-->
+                                <!--<div class="context-help-wrapper" style="display: none;">-->
+                                <!--<div class="context-help-content" style="display: block;">-->
+                                <!--<div style="text-align:right;"><span onclick="toggleContextHelp(this); return false;" class="icon icon-functional clickable" data-icon="x">-->
 
-                                            <!--</span>-->
-                                            <!--</div>-->
-                                            <!--<p>-->
-                                                <!--Type or copy and paste your ZOOMA search terms in here. Each search term should-->
-                                                <!--be on a new line. If you have type information, put a tab then your type,-->
-                                            <!--</p>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
+                                <!--</span>-->
+                                <!--</div>-->
+                                <!--<p>-->
+                                <!--Type or copy and paste your ZOOMA search terms in here. Each search term should-->
+                                <!--be on a new line. If you have type information, put a tab then your type,-->
+                                <!--</p>-->
+                                <!--</div>-->
+                                <!--</div>-->
                                 <!--</div>-->
 
                                 <div style="margin-left: 20px;">
                                     <input id="distance-slider" name="distance" data-slider-id='ex1Slider' data-slider-value="2" value="2" type="text"/>
+                                </div>
+                                <span>Enter list of identifiers:</span>
+                                <div style="float:right; font-size: 0.8em">
+                                    <a href="#" onclick="populateExamples(); return false;">Show me some examples...</a>
                                 </div>
                                 <textarea id="identifiers" name="id-list" style="resize: none; width: 98%; height: 600px; overflow: auto;"></textarea>
                                 <div style="float: right; padding-right: 4px">
@@ -224,24 +233,43 @@
                         </form>
                     </div>
 
-                    <div style="height: 600px" class="grid_17 omega">
+                    <div style="height: 800px" class="grid_17 omega">
 
-                        <select onchange="jumpToSource(this.options[this.selectedIndex].value)" style="width: 60%; margin-top: 10px;" id="mappingSourcesSelect" name="mappingTarget">
-                            <option hidden="hidden" value="" selected="selected">Jump to datasource...</option>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">OxO summary</h3>
+                            </div>
+                            <div class="panel-body">
 
-                            <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
-                        </select>
+                                <p>
+                                    To use OxO either search for mappings using a particular identifier (e.g. MESH:D009202) or select a datasource below to view all mappings between datasources.
+                                </p>
 
-                        <div id="mapping-vis">
-                            <div style="   position:absolute;
-                               top:50%;
-                               left:50%;
-                               margin-top:-25px;
-                               margin-left:-25px;"  id="mapping-vis-spinner">
-                                <img src="img/infinity.gif"/>
+
+                                <div style="text-align:right;height:80px;width:100%;">
+                                    <select  style="width: 60%; margin-top: 10px;" id="mappingSourcesSelect" class="mappingSourcesSelect" >
+                                        <option></option>
+                                        <option th:each="source : ${datasources}" th:value="${source.getPrefix()}" th:text="${{source.getName()}}"></option>
+                                    </select>
+                                </div>
+
+                                <div id="mapping-vis">
+                                    <div style="   position:absolute;
+                                       top:50%;
+                                       left:50%;
+                                       margin-top:-25px;
+                                       margin-left:-25px;"  id="mapping-vis-spinner">
+                                        <img src="img/infinity.gif"/>
+                                    </div>
+
+                                </div>
+
                             </div>
 
+
+
                         </div>
+
                     </div>
 
                 </section>
@@ -304,7 +332,9 @@
 <script type="text/javascript" th:src="@{webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
 <script type="text/javascript" src="../static/js/oxo.js" th:src="@{js/oxo.js}"></script>
 <script type="text/javascript" src="../static/js/oxo-flare.js" th:src="@{js/oxo-flare.js}"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script type="text/javascript" th:src="@{webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
+<script type="text/javascript" th:src="@{webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
 
 
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
@@ -321,11 +351,13 @@
         var ids = $('#identifiers').val();
         if (ids != '') {
             $.each(ids.split('\n'), function (index, id) {
-                $('<input/>').attr({
-                    type: 'hidden',
-                    name: 'ids',
-                    value: id
-                }).appendTo($('#queryForm'));
+                if (id != '') {
+                    $('<input/>').attr({
+                        type: 'hidden',
+                        name: 'ids',
+                        value: id
+                    }).appendTo($('#queryForm'));
+                }
             });
 
             return true
@@ -346,6 +378,16 @@
             ticks_labels: ['1', '2', '3'],
             ticks_snap_bounds: 50
         })
+
+        $('.datasource-select').select2({placeholder: "Datasources"});
+
+        $('.mappingSourcesSelect').select2({placeholder: "Jump to a datasource"})
+                .on('select2:select', function (e) {
+                    console.log("selected:  " + $(e.currentTarget).val())
+                    jumpToSource($(e.currentTarget).val())
+                });
+
+
     });
 
 
@@ -353,13 +395,13 @@
 </script>
 
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-69391170-2', 'auto');
-  ga('send', 'pageview');
+    ga('create', 'UA-69391170-2', 'auto');
+    ga('send', 'pageview');
 
 </script>
 

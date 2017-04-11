@@ -43,6 +43,7 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/api/terms")
+@CrossOrigin
 @ExposesResourceFor(Term.class)
 @ControllerAdvice(basePackageClasses = RepositoryRestExceptionHandler.class)
 public class TermController  implements

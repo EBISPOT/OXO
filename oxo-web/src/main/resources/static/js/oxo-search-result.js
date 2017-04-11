@@ -1,12 +1,9 @@
-$(document).ready(function() {
-
-    initialisePage()
-});
-
 
 var table;
 function reinitialiseTable() {
-    table.destroy()
+    if (table) {
+        table.destroy()
+    }
     initialisePage()
 }
 

@@ -72,7 +72,7 @@
         <dependency>
             <groupId>uk.ac.ebi.spot</groupId>
             <artifactId>sping-security-orcid-stateless</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.8</version>
         </dependency>
 
         <dependency>

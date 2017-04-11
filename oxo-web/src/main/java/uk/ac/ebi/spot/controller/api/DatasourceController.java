@@ -35,6 +35,7 @@ import java.io.IOException;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @Controller
+@CrossOrigin
 @RequestMapping("/api/datasources")
 @ExposesResourceFor(Datasource.class)
 @ControllerAdvice(basePackageClasses = RepositoryRestExceptionHandler.class)

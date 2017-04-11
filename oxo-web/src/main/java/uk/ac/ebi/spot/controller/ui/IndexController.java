@@ -58,6 +58,11 @@ public class IndexController {
         return "about";
     }
 
+    @RequestMapping(path = "contact")
+    public String contact(Model model) {
+        return "contact";
+    }
+
 
     @Secured("ROLE_USER")
     @RequestMapping(path = "myaccount")
