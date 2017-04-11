@@ -55,9 +55,9 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git://github.com/EBISPOT/OLS-mapping-service.git</connection>
+		<connection>scm:git:https://github.com/EBISPOT/OLS-mapping-service.git</connection>
 		<url>http://github.com/EBISPOT/OLS-mapping-service</url>
-		<developerConnection>scm:git://github.com/EBISPOT/OLS-mapping-service.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/EBISPOT/OLS-mapping-service.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
