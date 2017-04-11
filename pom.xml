@@ -54,9 +54,9 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/simonjupp/spring-security-orcid-stateless.git</connection>
-		<url>http://github.com/simonjupp/spring-security-orcid-stateless</url>
-		<developerConnection>scm:git:https://github.com/simonjupp/spring-security-orcid-stateless.git</developerConnection>
+		<connection>scm:git://github.com/EBISPOT/OLS-mapping-service.git</connection>
+		<url>https://github.com/EBISPOT/OLS-mapping-service</url>
+		<developerConnection>scm:git://github.com/EBISPOT/OLS-mapping-service.git</developerConnection>
 		<tag>0.0.1</tag>
 	</scm>
 
