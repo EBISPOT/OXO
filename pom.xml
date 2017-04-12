@@ -74,7 +74,7 @@
 		</snapshotRepository>
 		<site>
 			<id>nexus-site</id>
-			<url>dav:http://gromit.ebi.ac.uk:8081/repository/spot-ols-site/</url>
+			<url>dav:http://gromit.ebi.ac.uk:8081/repository/spot-oxo-site/</url>
 		</site>
 	</distributionManagement>
 
