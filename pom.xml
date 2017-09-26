@@ -64,16 +64,16 @@
 		<repository>
 			<id>nexus-release</id>
 			<name>Releases</name>
-			<url>http://gromit.ebi.ac.uk:8081/repository/maven-releases/</url>
+			<url>https://www.ebi.ac.uk/spot/nexus/repository/maven-releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>nexus-snapshot</id>
 			<name>Snapshot</name>
-			<url>http://gromit.ebi.ac.uk:8081/repository/maven-snapshots/</url>
+			<url>https://www.ebi.ac.uk/spot/nexus/repository/maven-snapshots/</url>
 		</snapshotRepository>
 		<site>
 			<id>nexus-site</id>
-			<url>dav:http://gromit.ebi.ac.uk:8081/repository/spot-oxo-site/</url>
+			<url>dav:https://www.ebi.ac.uk/spot/nexus/repository/spot-oxo-site/</url>
 		</site>
 	</distributionManagement>
 
