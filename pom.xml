@@ -121,7 +121,7 @@
 		<repository>
 			<id>nexus-public</id>
 			<name>Public Repository</name>
-			<url>http://gromit.ebi.ac.uk:8081/repository/maven-public/</url>
+			<url>https://www.ebi.ac.uk/spot/nexus/repository/maven-public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
