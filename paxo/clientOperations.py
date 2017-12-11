@@ -198,15 +198,17 @@ def curationOntologyFinalScore(scoredMatrix):
     #print scoredMatrix
     for counter, line in enumerate(scoredMatrix):
         print line
-
         if line[1] not in endmap:
             endmap.append(line[1])
             unified.append(line)
         else:
-            print "Double entry Found!!! Will replace now! "
+            #print "Double entry Found!!! Will replace now! "
             index=endmap.index(line[1])
             if unified[index][2]<scoredMatrix[counter][2]:
                 unified[index]=scoredMatrix[counter] #Replace that line with the higher score!
+            #print "unified[index] is now"
+            #print unified[index]
+            #print
     return unified
 
 
@@ -254,6 +256,10 @@ sections=config.sections()[2:]
 #Could/Should be changed so parameters come from the config file
 params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "threshold":0.6}
 
+#ordo_hp {'misses': 532, 'alternatives': 60}
+#params={"fuzzyUpperLimit": 0.66, "fuzzyLowerLimit": 0.89,"fuzzyUpperFactor": 0.2,"fuzzyLowerFactor":0.0149, "oxoDistanceOne":0.45, "oxoDistanceTwo":0.5, "oxoDistanceThree":0.414, "synFuzzyFactor":0.357, "synOxoFactor": 0.38, "threshold":0.6}
+
+
 ###Score all Ontologies in the config file
 #scoreListOntologies(sections)
 
@@ -263,6 +269,7 @@ params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fu
 #scoreOntologies("doid","ordo")
 #scoreOntologies("hp","doid")
 #scoreOntologies("hp","mp")
+#scoreOntologies("ordo","mp")
 
 #scoreOntologies("mesh","hp")
 #scoreOntologies("mesh","doid")
@@ -273,26 +280,26 @@ params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fu
 ### Execute Calculate and validate for a certain file
 #calculateAndValidateOntologyPrimaryScore('hp_doid', 'loom', 'Loom/DOID_HP_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
 #calculateAndValidateOntologyPrimaryScore('hp_doid', 'silver','silver_nov/Consensus-3-hp-doid.tsv', params, True, {'uri1':0, 'uri2':2, 'scorePosition':4 , 'delimiter':'\t'})
-#calculateAndValidateOntologyPrimaryScore('ordo_hp', 'loom', 'Loom/ordo_hp_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
-#calculateAndValidateOntologyPrimaryScore('ordo_hp', 'silver','silver_nov/Consensus-3-hp-ordo.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
+###calculateAndValidateOntologyPrimaryScore('ordo_hp', 'loom', 'Loom/ordo_hp_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
+#print calculateAndValidateOntologyPrimaryScore('ordo_hp', 'silver','silver_nov/Consensus-3-hp-ordo.tsv', params, False, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
 
-##calculateAndValidateOntologyPrimaryScore('mp_hp', 'loom','Loom/MP_HP_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2 , 'delimiter':','})
-##calculateAndValidateOntologyPrimaryScore('mp_hp', 'silver','silver_nov/Consensus-3-hp-mp.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
-calculateAndValidateOntologyPrimaryScore('ordo_doid', 'loom' ,'Loom/DOID_ORDO_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
-calculateAndValidateOntologyPrimaryScore('ordo_doid', 'silver','silver_nov/Consensus-3-doid-ordo.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
-##calculateAndValidateOntologyPrimaryScore('ordo_mp', 'loom', 'Loom/mp_ordo_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
-##calculateAndValidateOntologyPrimaryScore('ordo_mp', 'silver','silver_nov/Consensus-3-mp-ordo.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
-#calculateAndValidateOntologyPrimaryScore('mp_doid', 'loom', 'Loom/DOID_MP_loom.csv', params, True, {'uri1':1, 'uri2':0, 'scorePosition':2, 'delimiter':','})
-#calculateAndValidateOntologyPrimaryScore('mp_doid', 'silver','silver_nov/Consensus-3-mp-doid.tsv', params, True, {'uri1':0, 'uri2':2, 'scorePosition':4 , 'delimiter':'\t'})
+#calculateAndValidateOntologyPrimaryScore('mp_hp', 'loom','Loom/MP_HP_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2 , 'delimiter':','})
+#calculateAndValidateOntologyPrimaryScore('mp_hp', 'silver','silver_nov/Consensus-3-hp-mp.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
+#calculateAndValidateOntologyPrimaryScore('ordo_doid', 'loom' ,'Loom/DOID_ORDO_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
+#calculateAndValidateOntologyPrimaryScore('ordo_doid', 'silver','silver_nov/Consensus-3-doid-ordo.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
+#calculateAndValidateOntologyPrimaryScore('ordo_mp', 'loom', 'Loom/mp_ordo_loom.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
+#calculateAndValidateOntologyPrimaryScore('ordo_mp', 'silver','silver_nov/Consensus-3-mp-ordo.tsv', params, True, {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'})
+###calculateAndValidateOntologyPrimaryScore('mp_doid', 'loom', 'Loom/DOID_MP_loom.csv', params, True, {'uri1':1, 'uri2':0, 'scorePosition':2, 'delimiter':','})
+###calculateAndValidateOntologyPrimaryScore('mp_doid', 'silver','silver_nov/Consensus-3-mp-doid.tsv', params, True, {'uri1':0, 'uri2':2, 'scorePosition':4 , 'delimiter':'\t'})
 
 
-#calculateAndValidateOntologyPrimaryScore('mesh_doid', 'loom', 'Loom/DOID_MESH_loom_new.csv', params, True)
-#calculateAndValidateOntologyPrimaryScore('mesh_hp', 'loom', 'Loom/mesh_hp_loom_new.csv', params, True)
-#calculateAndValidateOntologyPrimaryScore('mesh_mp', 'loom', 'Loom/mesh_mp_loom_new.csv', params, True)
+#calculateAndValidateOntologyPrimaryScore('mesh_doid', 'loom', 'Loom/DOID_MESH_loom_new.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
+#calculateAndValidateOntologyPrimaryScore('mesh_hp', 'loom', 'Loom/mesh_hp_loom_new.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
+#calculateAndValidateOntologyPrimaryScore('mesh_mp', 'loom', 'Loom/mesh_mp_loom_new.csv', params, True, {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','})
 
 
 ###Execute functions for terms (#Broken since last change?)
-#print flaskMapping.scoreTermLabel("Familial osteochondritis dissecans", "hp", params)
+#print flaskMapping.scoreTermLabel("Cavernous hemangioma", "doid", params)
 #print flaskMapping.scoreTermLabel("Osteochondritis dissecans and short stature", "hp", params)
 #print scoreTermList(["Stroke","disease", "heartattack"], "ordo", params)
 

@@ -112,7 +112,7 @@ def stringProcess(term):
 
 #Takes an input label and executes the fuzzyOLS call
 def olsFuzzyMatch(termLabel, targetOntology):
-    data={"q":termLabel, "ontology":targetOntology, "type":"class", "local":True}
+    data={"q":termLabel, "ontology":targetOntology, "type":"class", "local":True, "fieldList":"label,iri,synonym"}
     jsonReply=apiCall(searchURL, data)
     termLabel=termLabel.encode(encoding='UTF-8')
 
@@ -126,8 +126,20 @@ def olsFuzzyMatch(termLabel, targetOntology):
             try:
                 answerTerm=stringProcess(reply['label'].encode(encoding='UTF-8'))
                 lev=round(Levenshtein.ratio(termLabel, answerTerm), 5)
+
+                #Compare the inputLabel with all synonym Labels as well.
+                #If lev score is higher for a synonym, replace lev score --> boost synonym label hits
+                if "synonym" in reply.keys():
+                    for synonym in reply["synonym"]:
+                        answerTerm=stringProcess(synonym.encode(encoding='UTF-8'))
+                        tmpLev=round(Levenshtein.ratio(termLabel, answerTerm), 5)
+                        if tmpLev>lev:
+                            lev=tmpLev
+
                 levList.append({"SourceLabel": termLabel, "SourceIRI": termLabel , "TargetIRI": reply['iri'], "TargetLabel": reply['label'], "lev":lev})
-            except:
+
+            except Exception as e:
+                print e
                 print "ERROR WITH LEV Distance, score 0 for now for these two"
                 print reply
                 print termLabel
@@ -311,7 +323,9 @@ def scoreSimple(scoreMatrix, params):
     resultMatrix=[]
     for i,score in enumerate(scoreMatrix):
         fFactor=0
-        if score['fuzzyScore']>=fuzzyUpperLimit:
+        if score['fuzzyScore']==1:  #Exact match, we shall boost this by all means, so we take UpperFactor*2 for now
+            fFactor=fuzzyUpperFactor*2
+        elif score['fuzzyScore']>=fuzzyUpperLimit:
             fFactor=fuzzyUpperFactor
         elif score['fuzzyScore']<fuzzyUpperLimit and score['fuzzyScore']>=fuzzyLowerLimit:
             fFactor=fuzzyLowerFactor

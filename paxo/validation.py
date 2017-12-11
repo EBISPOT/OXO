@@ -18,6 +18,9 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
     for row in inputFile:
         inputList.append([row[0], row[1]])
         inputLongList.append(row)
+        #if row[2]=='':
+        #    print "Oh No, we found a empty value!"
+
 
     targetList=[]
     targetLongList=[]
@@ -32,10 +35,16 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
     missing=[]
     matches=[]
 
+    #print inputList
+
     #Now validate the computed mappings against the standard
     for counter, line in enumerate(targetList):
             #NoMatch from std to the created mapping file, so this goes to the missing List
             if line not in inputList:
+                #if line[0]=="http://purl.obolibrary.org/obo/HP_0009059" or line[0]=="http://purl.obolibrary.org/obo/HP_0025247":
+                    #print line
+                    #print targetLongList[counter]
+
                 missing.append([line[0], line[1], "NoScore", targetLongList[counter][counterPosition]])
 
             #Exact same Result for both, so this is a match. Is added to the matches List
@@ -71,6 +80,13 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
 
     result=matches+missing+alternatives#+discarted - we can also show the discarted terms or put them in an own file
 
+
+    #print "unrealMiss"
+    #print unrealMiss
+    #print "Real Miss"
+    #print realMiss
+    #print "Result"
+    #print result
 
     #If we write to disc, I get the labels of the parts that are NOT mapped to the standard
     if writeToDisc is True:
