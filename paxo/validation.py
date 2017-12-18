@@ -3,9 +3,10 @@ import logging
 import requests
 import time
 
-url="https://www.ebi.ac.uk/ols/api/search"
+#url="https://www.ebi.ac.uk/ols/api/search"
+url="http://snarf.ebi.ac.uk:8980/ols-beta/api/search"
 
-def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms):
+def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms):
     uri1Position=parseParms['uri1']
     uri2Position=parseParms['uri2']
     counterPosition=parseParms['scorePosition']
@@ -41,10 +42,6 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
     for counter, line in enumerate(targetList):
             #NoMatch from std to the created mapping file, so this goes to the missing List
             if line not in inputList:
-                #if line[0]=="http://purl.obolibrary.org/obo/HP_0009059" or line[0]=="http://purl.obolibrary.org/obo/HP_0025247":
-                    #print line
-                    #print targetLongList[counter]
-
                 missing.append([line[0], line[1], "NoScore", targetLongList[counter][counterPosition]])
 
             #Exact same Result for both, so this is a match. Is added to the matches List
@@ -70,7 +67,6 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
         for miss in missing:
             if sug[0]==miss[0] and sug[1]!=miss[1]:
                 alternativeCounter=alternativeCounter+1
-                #print sug[0] +" mapped to "+sug[1]+" and "+miss[1]
                 unrealMiss.append(sug)
                 unrealMiss.append(miss)
             #Real miss
@@ -80,23 +76,15 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
 
     result=matches+missing+alternatives#+discarted - we can also show the discarted terms or put them in an own file
 
-
-    #print "unrealMiss"
-    #print unrealMiss
-    #print "Real Miss"
-    #print realMiss
-    #print "Result"
-    #print result
-
     #If we write to disc, I get the labels of the parts that are NOT mapped to the standard
     if writeToDisc is True:
         print "Try to save the result"
         obsoleteScore=0
         for row in result:
             #if row[2]=='NoScore' or row[3]=='noScore':
-                print "Need to annotate "+row[0]+" and "+row[1]
+                #print "Need to annotate "+row[0]+" and "+row[1]
 
-                data={'q':row[0],'queryFields':'iri', 'fieldList': 'label'}
+                data={'q':row[0],'queryFields':'iri', 'fieldList': 'label', "ontology":onto1, "type":"class", "local":True}
 
                 try:
                     r = requests.get(url, data)
@@ -114,15 +102,16 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
                         logging.info(r.request.url)
                         #raise
 
-                jsonReply=r.json()
+
                 try:
+                    jsonReply=r.json()
                     row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
                 except:
                     row.append('NoLabel Found')
                     obsoleteScore=obsoleteScore+1
                     print "No Label found in the first row"
 
-                data={'q':row[1],'queryFields':'iri', 'fieldList': 'label'}
+                data={'q':row[1],'queryFields':'iri', 'fieldList': 'label', "ontology":onto2, "type":"class", "local":True}
                 try:
                     r = requests.get(url, data)
                 except:
@@ -138,8 +127,9 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
                         logging.info(r.status_code)
                         logging.info(r.request.url)
 
-                jsonReply=r.json()
+
                 try:
+                    jsonReply=r.json()
                     row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
                 except:
                     row.append('NoLabel Found')
@@ -147,31 +137,34 @@ def validateFinaleScore(combinedOntologyName, stdNamed, inputFile, TargetFile, w
                     print "No Label found in the second row"
 
 
-        with open('pipeline_output/'+combinedOntologyName+'_'+stdNamed+'_validate.csv', 'wb') as f:
+        with open('pipeline_output/'+onto1+"_"+onto2+'_'+stdNamed+'_validate.csv', 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(result)
             f.close()
 
         #Logging the stats of this validation
-        logging.info("ParameterSet for this validation run: ")
-        logging.info("threshold: "+str(params["threshold"]))
-        logging.info("fuzzyUpperLimit: "+str(params["fuzzyUpperLimit"]))
-        logging.info("fuzzyLowerLimit: "+str(params["fuzzyLowerLimit"]))
-        logging.info("fuzzyUpperFactor: "+str(params["fuzzyUpperFactor"]))
-        logging.info("fuzzyLowerFactor: "+str(params["fuzzyLowerFactor"]))
-        logging.info("oxoDistanceOne: "+str(params["oxoDistanceOne"]))
-        logging.info("oxoDistanceTwo: "+str(params["oxoDistanceTwo"]))
-        logging.info("oxoDistanceThree: "+str(params["oxoDistanceThree"]))
-        logging.info("synFuzzyFactor: "+str(params["synFuzzyFactor"]))
-        logging.info("synOxoFactor: "+str(params["synOxoFactor"]))
+        logging.info("ParameterSet for this validation run , ")
+        logging.info("threshold ,  "+str(params["threshold"]))
+        logging.info("fuzzyUpperLimit ,  "+str(params["fuzzyUpperLimit"]))
+        logging.info("fuzzyLowerLimit ,  "+str(params["fuzzyLowerLimit"]))
+        logging.info("fuzzyUpperFactor ,  "+str(params["fuzzyUpperFactor"]))
+        logging.info("fuzzyLowerFactor ,  "+str(params["fuzzyLowerFactor"]))
+        logging.info("oxoDistanceOne ,  "+str(params["oxoDistanceOne"]))
+        logging.info("oxoDistanceTwo ,  "+str(params["oxoDistanceTwo"]))
+        logging.info("oxoDistanceThree ,  "+str(params["oxoDistanceThree"]))
+        logging.info("synFuzzyFactor ,  "+str(params["synFuzzyFactor"]))
+        logging.info("synOxoFactor ,  "+str(params["synOxoFactor"]))
 
-        logging.info("Stats for "+combinedOntologyName+" validation "+stdNamed)
-        logging.info("Number of std mappings:"+str(len(targetList)))
-        logging.info("Total Matches: "+str(len(matches)))
-        logging.info("Algorithm missed compared to std: "+str(len(missing)))
-        logging.info("Suspected Obsoleted Terms: "+str(obsoleteScore))
-        logging.info("Total alternative terms suggested: "+str(len(alternatives)))
-        logging.info("AlternativeOverlappingWithMisses:"+str(alternativeCounter)+"\n")
+        logging.info("Stats for "+str(onto1)+"_"+str(onto2)+" validation "+stdNamed)
+        logging.info("Number of std mappings ,"+str(len(targetList)))
+        logging.info("Total Matches ,"+str(len(matches)))
+        logging.info("Algorithm missed compared to std ,"+str(len(missing)))
+        logging.info("Suspected Obsoleted Terms ,"+str(obsoleteScore))
+        logging.info("Algorithm missed compared to std MINUS obsoleted terms in std ,"+str(len(missing)-obsoleteScore))
+        logging.info("Total unique terms suggested ,"+str(len(alternatives)))
+        logging.info("UniqueOverlappingWithMisses ,"+str(alternativeCounter))
+        logging.info("Recall ,"+str((len(matches)/(len(targetList)-obsoleteScore*1.0))*100)+" in %\n")
+
         #logging.info("NotMapped: "+str(len(discarted))+"\n")
 
 

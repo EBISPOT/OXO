@@ -4,3 +4,4 @@ flask
 spotpy
 numpy
 matplotlib
+pandas
