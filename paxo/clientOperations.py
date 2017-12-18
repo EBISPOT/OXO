@@ -9,7 +9,7 @@ from ConfigParser import SafeConfigParser
 import ast
 
 url="https://www.ebi.ac.uk/ols/api/"
-#url="http://snarf.ebi.ac.uk:8980/ols-beta/api"
+
 
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
 def scoreOntologies(sourceOntology, targetOntology, scoreParams):

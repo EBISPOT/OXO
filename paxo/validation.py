@@ -4,7 +4,7 @@ import requests
 import time
 
 #url="https://www.ebi.ac.uk/ols/api/search"
-url="http://snarf.ebi.ac.uk:8980/ols-beta/api/search"
+
 
 def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms):
     uri1Position=parseParms['uri1']
