@@ -16,9 +16,9 @@ config.read("config.ini")
 
 searchURL=config.get("Basics","olsURL")
 oxoURL=config.get("Basics","oxoURL")
+logFile=config.get("Basics","logFile")
 
-logging.basicConfig(filename="flask.log", level=logging.INFO, format='%(asctime)s - %(message)s')
-
+logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
 
 
 @app.route("/")
@@ -401,12 +401,6 @@ def simplifyProcessedPscore(mapping):
 
 
     #print "made it to the end of simplifyProcessedPscore"
-    # Should do this bridgy thing here
-    #if mapping['bridgeEvidence']==None
-    #
-    #
-    #
-    #
     return scoreMatrix
 
 #Simple Score mechanism for all subscores, returns a sorted list. Is Called after simplifyProcessedPscore
@@ -427,6 +421,7 @@ def scoreSimple(scoreMatrix, params):
 
     synFuzzyFactor=params['synFuzzyFactor']
     synOxoFactor=params['synOxoFactor']
+    bridgeOxoFactor=params['bridgeOxoFactor']
 
     resultMatrix=[]
     for i,score in enumerate(scoreMatrix):
@@ -454,7 +449,7 @@ def scoreSimple(scoreMatrix, params):
             print scoreMatrix[i]
 
 
-        score['finaleScore']=score['fuzzyScore']*fFactor+score['oxoScore']+score['synFuzzy']*synFuzzyFactor+score['synOxo']*synOxoFactor+score['bridgeOxoScore']
+        score['finaleScore']=score['fuzzyScore']*fFactor+score['oxoScore']+score['synFuzzy']*synFuzzyFactor+score['synOxo']*synOxoFactor+score['bridgeOxoScore']*bridgeOxoFactor
 
         ### Do we want unknown to be printed
         if score['finaleScore']>threshold:          #This removes "unknow" from the results and weak results
@@ -471,8 +466,8 @@ def scoreSimple(scoreMatrix, params):
 #def scoreComplex(scoreMatrix):
 
 #Calls all necessary steps to get a result for a termLabel
-def scoreTermLabel(termLabel, targetOntology, params):
-    pscore=primaryScoreTerm('', termLabel, targetOntology, params)  #Executes the basic calls to OLS and OXO, delievers primary score
+def scoreTermLabel(termLabel, targetOntology, scoreParams, params):
+    pscore=primaryScoreTerm('', termLabel, targetOntology, scoreParams)  #Executes the basic calls to OLS and OXO, delievers primary score
     pscore['sourceIRI']="UNKNOWN"
     calculatedMappings=processPScore(pscore)    #Process the primaryScore, weighting the primary results
     calculatedMappings['sourceIRI']="UNKNOWN"

@@ -2,15 +2,27 @@ import csv
 import logging
 import requests
 import time
-
+from ConfigParser import SafeConfigParser
 #url="https://www.ebi.ac.uk/ols/api/search"
+#url="http://snarf.ebi.ac.uk:8980/ols-beta/api/search"
 
+config = SafeConfigParser()
+config.read("config.ini")
 
-def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms):
+def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms, validationTargetFolder):
     uri1Position=parseParms['uri1']
     uri2Position=parseParms['uri2']
     counterPosition=parseParms['scorePosition']
     delimiterChar=parseParms['delimiter']
+
+    url=config.get("Basics","olsURL")
+
+    print inputFile
+    print TargetFile
+    print validationTargetFolder
+    print uri1Position
+    print uri2Position
+
 
     logging.basicConfig(filename="flask.log", level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -65,7 +77,7 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
     realMiss=[]
     for sug in alternatives:
         for miss in missing:
-            if sug[0]==miss[0] and sug[1]!=miss[1]:
+            if (sug[0]==miss[0] and sug[1]!=miss[1]) or (sug[0]!=miss[0] and sug[1]==miss[1]):
                 alternativeCounter=alternativeCounter+1
                 unrealMiss.append(sug)
                 unrealMiss.append(miss)
@@ -137,33 +149,33 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
                     print "No Label found in the second row"
 
 
-        with open('pipeline_output/'+onto1+"_"+onto2+'_'+stdNamed+'_validate.csv', 'wb') as f:
+        with open(validationTargetFolder+onto1+"_"+onto2+'_'+stdNamed+'_validate.csv', 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(result)
             f.close()
 
         #Logging the stats of this validation
-        logging.info("ParameterSet for this validation run , ")
-        logging.info("threshold ,  "+str(params["threshold"]))
-        logging.info("fuzzyUpperLimit ,  "+str(params["fuzzyUpperLimit"]))
-        logging.info("fuzzyLowerLimit ,  "+str(params["fuzzyLowerLimit"]))
-        logging.info("fuzzyUpperFactor ,  "+str(params["fuzzyUpperFactor"]))
-        logging.info("fuzzyLowerFactor ,  "+str(params["fuzzyLowerFactor"]))
-        logging.info("oxoDistanceOne ,  "+str(params["oxoDistanceOne"]))
-        logging.info("oxoDistanceTwo ,  "+str(params["oxoDistanceTwo"]))
-        logging.info("oxoDistanceThree ,  "+str(params["oxoDistanceThree"]))
-        logging.info("synFuzzyFactor ,  "+str(params["synFuzzyFactor"]))
-        logging.info("synOxoFactor ,  "+str(params["synOxoFactor"]))
+        logging.info("ParameterSet for this validation run,  ")
+        logging.info("threshold,   "+str(params["threshold"]))
+        logging.info("fuzzyUpperLimit,   "+str(params["fuzzyUpperLimit"]))
+        logging.info("fuzzyLowerLimit,   "+str(params["fuzzyLowerLimit"]))
+        logging.info("fuzzyUpperFactor,   "+str(params["fuzzyUpperFactor"]))
+        logging.info("fuzzyLowerFactor,   "+str(params["fuzzyLowerFactor"]))
+        logging.info("oxoDistanceOne,   "+str(params["oxoDistanceOne"]))
+        logging.info("oxoDistanceTwo,   "+str(params["oxoDistanceTwo"]))
+        logging.info("oxoDistanceThree,   "+str(params["oxoDistanceThree"]))
+        logging.info("synFuzzyFactor,   "+str(params["synFuzzyFactor"]))
+        logging.info("synOxoFactor,   "+str(params["synOxoFactor"]))
 
         logging.info("Stats for "+str(onto1)+"_"+str(onto2)+" validation "+stdNamed)
-        logging.info("Number of std mappings ,"+str(len(targetList)))
-        logging.info("Total Matches ,"+str(len(matches)))
-        logging.info("Algorithm missed compared to std ,"+str(len(missing)))
-        logging.info("Suspected Obsoleted Terms ,"+str(obsoleteScore))
-        logging.info("Algorithm missed compared to std MINUS obsoleted terms in std ,"+str(len(missing)-obsoleteScore))
-        logging.info("Total unique terms suggested ,"+str(len(alternatives)))
-        logging.info("UniqueOverlappingWithMisses ,"+str(alternativeCounter))
-        logging.info("Recall ,"+str((len(matches)/(len(targetList)-obsoleteScore*1.0))*100)+" in %\n")
+        logging.info("Number of std mappings, "+str(len(targetList)))
+        logging.info("Total Matches, "+str(len(matches)))
+        logging.info("Algorithm missed compared to std, "+str(len(missing)))
+        logging.info("Suspected Obsoleted Terms, "+str(obsoleteScore))
+        logging.info("Algorithm missed compared to std MINUS obsoleted terms in std, "+str(len(missing)-obsoleteScore))
+        logging.info("Total unique terms suggested, "+str(len(alternatives)))
+        logging.info("UniqueOverlappingWithMisses, "+str(alternativeCounter))
+        logging.info("Recall, "+str((len(matches)/(len(targetList)-obsoleteScore*1.0))*100)+" in %\n")
 
         #logging.info("NotMapped: "+str(len(discarted))+"\n")
 
@@ -171,4 +183,4 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
     #return result
     return {"misses": len(missing), "alternatives": len(alternatives)}
     #Return the parameters and the result of the validation. This shall be useful in the future
-    #return {"misses": len(missing), "alternativeCounter": alternativeCounter ,"params":runParams}
+    #return {"misses": len(missing), "alternativeCounter": alternativeCounter, "params":runParams}
