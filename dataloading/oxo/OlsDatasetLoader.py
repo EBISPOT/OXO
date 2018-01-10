@@ -13,9 +13,13 @@ unprocessedIds = {}
 termToIri = {}
 termToLabel = {}
 
-#config.read(sys.argv[1])
-config = SafeConfigParser()
-config.read("../config/oxo_dataRelease_config.ini")
+#Parse the input parameters. A config file and a flag is expected
+if len(sys.argv)!=2:
+    print "\nNot enough arguments! Please pass a (path) of a config file!"
+    raise Exception("Not enough arguments! Please pass in a config file!")
+else:
+    config = SafeConfigParser()
+    config.read(sys.argv[1])
 
 OXO.oxoUrl = config.get("Basics","oxoUrl")
 OXO.apikey = config.get("Basics", "oxoAPIkey")
