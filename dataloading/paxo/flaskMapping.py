@@ -3,23 +3,12 @@ import logging
 
 import requests
 import Levenshtein
-from ConfigParser import SafeConfigParser
+#from ConfigParser import SafeConfigParser
 
 from flask import Flask
 from flask import request
 from flask import jsonify
 app = Flask(__name__)
-
-
-config = SafeConfigParser()
-config.read("config.ini")
-
-searchURL=config.get("Basics","olsURL")
-oxoURL=config.get("Basics","oxoURL")
-logFile=config.get("Basics","logFile")
-
-logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
-
 
 @app.route("/")
 def hello():
@@ -33,35 +22,41 @@ def jsonScoreTermLabel():
     scoredTerm=scoreTermLabel(label, targetOntology, {})
     return jsonify(scoredTerm[0])
 
-#GeneralFunction to do webservice calls via requests. Retries 3 times in case of failure before it fails for good
+#General function to do webservice calls via requests. Retries 3 times in case of failure before it fails for good
 def apiCall(url, data):
     try:
         r = requests.get(url, data)
     except:
-        time.sleep(5)
-        logging.info("API exception, try again after 5 second delay")
+        time.sleep(10)
+        logging.info("API exception, try again after 10 second delay")
         try:
-            r = requests.get(searchURL, data)
-            logging.info("Success")
+            r = requests.get(url, data)
+            logging.info("Success after 10 seconds")
         except:
-            time.sleep(45)
-            logging.info("API exception failed, again - last try, now after addtional 30 seconds delay!")
+            logging.info("API exception failed, again - try, now after addtional 120 seconds delay!")
+            time.sleep(120)
             try:
-                r = requests.get(searchURL, data)
-                logging.info("Success")
+                r = requests.get(url, data)
+                logging.info("Success after 120 seconds")
             except:
-                logging.info("Last try failed as well, abort. Total of 3 tries failed, so I let the whole process fail")
-                logging.info(url)
-                logging.info(data)
-                logging.info(r.status_code)
-                logging.info(r.request.url)
-                raise
+                logging.info("API exception failed, again - try, now after addtional 120 seconds delay!")
+                time.sleep(300)
+                try:
+                    r = requests.get(url, data)
+                    logging.info("Success after 120 seconds")
+                except:
+                    logging.info("Last try failed as well, abort. Total of 4 tries failed, so I let the whole process fail")
+                    logging.info(url)
+                    logging.info(data)
+                    logging.info(r.status_code)
+                    logging.info(r.request.url)
+                    raise
     return r
 
 #Takes an input label and executes the oxo call
-def oxoMatch(termLabel, targetOntology):
+def oxoMatch(termLabel, targetOntology, url):
     data={"ids":termLabel, "mappingTarget":targetOntology, "distance":3} #Maybe include also 'querySource=' parameters
-    jsonReply=apiCall(oxoURL, data)
+    jsonReply=apiCall(url+"search", data)
     try:
         jsonReply=jsonReply.json()['_embedded']['searchResults'][0]
         tmpList=[]
@@ -70,10 +65,10 @@ def oxoMatch(termLabel, targetOntology):
             for row in jsonReply['mappingResponseList']:
 
                 ##Additional webservice call to get the stupid long IRI out of oxo
-                oxoMapURL="https://www.ebi.ac.uk/spot/oxo/api/mappings"
+                #oxoMapURL="https://www.ebi.ac.uk/spot/oxo/api/mappings"
                 data={"fromId":row['curie']}
-                longId=apiCall(oxoMapURL, data)
-                longId=longId.json()['_embedded']['mappings'][0]['fromTerm']['uri']        ##
+                longId=apiCall(url+"mappings", data)
+                longId=longId.json()['_embedded']['mappings'][0]['fromTerm']['uri']
                 tmpList.append({"curie":longId, "distance":row['distance']})
                 #tmpList.append({"curie":row['curie'], "distance":row['distance']})
                 sortedCurie=sorted(tmpList, key=lambda tmpList: tmpList['distance'], reverse=False)
@@ -181,25 +176,23 @@ def stringMatcher(sourceTerm, targetTerm, replaceTermList, removeStopwordsList):
 
 
 
-
-
-
-
-
-
 #Takes an input label and executes the fuzzyOLS call
-def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsList):
+def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsList, url):
+    url=url+"search"
     data={"q":termLabel, "ontology":targetOntology, "type":"class", "local":True, "fieldList":"label,iri,synonym"}
-    jsonReply=apiCall(searchURL, data)
+    jsonReply=apiCall(url, data)
     termLabel=termLabel.encode(encoding='UTF-8')
-
-    #stringProcess(termLabel)
 
     #WE found at least 1 hit
     try:
         jsonReply=jsonReply.json()['response']
     except:
         print "Error with deoding jsonReply from OLS api call!"
+        logging.error("Error with deoding jsonReply from OLS api call!")
+        print data
+        print url
+        logging.error(data)
+        logging.error(jsonReply)
         print jsonReply
 
     if  jsonReply['numFound']>0:
@@ -241,12 +234,16 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
 
     ##Now let's relax The fuzzy search and aim for other (all) ontologies
     data={"q":termLabel, "type":"class", "local":True, "limit":30}
-    jsonReply=apiCall(searchURL, data)
+    jsonReply=apiCall(url, data)
     try:
         jsonReply=jsonReply.json()['response']
-    except:
+    except Exception as e:
         print "Error with decoding jsonReply from RELAXED OLS api call!"
         print jsonReply
+        print e
+        logging.error("Error with decoding jsonReply from RELAXED OLS api call!")
+        logging.error(jsonReply)
+        logging.error(e)
 
 
     #jsonReply=jsonReply.json()['response']
@@ -259,14 +256,14 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
     return {"fuzzyTerms": sortedLev, "bridgeTerms": oxoTargetList}
 
 #Executes the basic calls, delievers primary score (raw scoring)
-def primaryScoreTerm(termIRI, termLabel, targetOntology, scoreParams):
+def primaryScoreTerm(termIRI, termLabel, targetOntology, scoreParams, urls):
     replaceTermList=scoreParams["replaceTermList"]
     removeStopwordsList=scoreParams["removeStopwordsList"]
 
-    olsFuzzyResult=olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsList)
+    olsFuzzyResult=olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsList, urls["ols"])
 
     if termIRI!='':
-        oxoResults=oxoMatch(termIRI, targetOntology)
+        oxoResults=oxoMatch(termIRI, targetOntology, urls["oxo"])
     else:
         oxoResults=[{"curie":"UNKNOWN", "distance": 0}]
 
@@ -279,7 +276,7 @@ def primaryScoreTerm(termIRI, termLabel, targetOntology, scoreParams):
     bridgeOxo=[]
     if len(bridgeTerms)>0:
         for bridgeTerm in bridgeTerms:
-            tmp=oxoMatch(bridgeTerm['short_form'],targetOntology)
+            tmp=oxoMatch(bridgeTerm['short_form'],targetOntology, urls["oxo"])
             for line in tmp:
                 if line['curie']!='UNKNOWN':
                     bridgeOxo.append(tmp)
@@ -396,7 +393,9 @@ def simplifyProcessedPscore(mapping):
                  flag=True
 
          if flag==False:
-             obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['bridgeOxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
+             #obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['bridgeOxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
+             obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
+             #oxoCurie
              scoreMatrix.append(obj)
 
 
@@ -477,7 +476,7 @@ def scoreTermLabel(termLabel, targetOntology, scoreParams, params):
 
 
 # Synonymsearch for comparing Ontologies in OLS, should be called instead score Simple for these cases
-def scoreTermOLS(termIRI, termLabel, targetOntology, params):
-    pscore=primaryScoreTerm(termIRI, termLabel, targetOntology, params)
+def scoreTermOLS(termIRI, termLabel, targetOntology, params, urls):
+    pscore=primaryScoreTerm(termIRI, termLabel, targetOntology, params, urls)
     pscore['sourceIri']=termIRI
     return pscore

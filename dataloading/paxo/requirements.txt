@@ -1,6 +1,7 @@
 requests
 python-levenshtein
 flask
+neo4j-driver
 spotpy
 numpy
 matplotlib

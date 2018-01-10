@@ -2,29 +2,21 @@ import csv
 import logging
 import requests
 import time
-from ConfigParser import SafeConfigParser
-#url="https://www.ebi.ac.uk/ols/api/search"
-#url="http://snarf.ebi.ac.uk:8980/ols-beta/api/search"
+#from ConfigParser import SafeConfigParser
+#config = SafeConfigParser()
+#config.read("config.ini")
 
-config = SafeConfigParser()
-config.read("config.ini")
-
-def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms, validationTargetFolder):
+def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms, validationTargetFolder, url):
     uri1Position=parseParms['uri1']
     uri2Position=parseParms['uri2']
     counterPosition=parseParms['scorePosition']
     delimiterChar=parseParms['delimiter']
 
-    url=config.get("Basics","olsURL")
-
-    print inputFile
-    print TargetFile
-    print validationTargetFolder
-    print uri1Position
-    print uri2Position
+    #url=config.get("Basics","olsURL")
 
 
-    logging.basicConfig(filename="flask.log", level=logging.INFO, format='%(asctime)s - %(message)s')
+    print "Validate ... "
+    #logging.basicConfig(filename="flask.log", level=logging.INFO, format='%(asctime)s - %(message)s')
 
     inputList=[]
     inputLongList=[]
@@ -167,16 +159,16 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
         logging.info("synFuzzyFactor,   "+str(params["synFuzzyFactor"]))
         logging.info("synOxoFactor,   "+str(params["synOxoFactor"]))
 
-        logging.info("Stats for "+str(onto1)+"_"+str(onto2)+" validation "+stdNamed)
-        logging.info("Number of std mappings, "+str(len(targetList)))
-        logging.info("Total Matches, "+str(len(matches)))
-        logging.info("Algorithm missed compared to std, "+str(len(missing)))
-        logging.info("Suspected Obsoleted Terms, "+str(obsoleteScore))
-        logging.info("Algorithm missed compared to std MINUS obsoleted terms in std, "+str(len(missing)-obsoleteScore))
-        logging.info("Total unique terms suggested, "+str(len(alternatives)))
-        logging.info("UniqueOverlappingWithMisses, "+str(alternativeCounter))
-        logging.info("Recall, "+str((len(matches)/(len(targetList)-obsoleteScore*1.0))*100)+" in %\n")
-
+        msg="Stats for "+str(onto1)+"_"+str(onto2)+" validation "+stdNamed+"\n"
+        msg=msg+"Number of std mappings, "+str(len(targetList))+"\n"
+        msg=msg+"Total Matches, "+str(len(matches))+"\n"
+        msg=msg+"Algorithm missed compared to std, "+str(len(missing))+"\n"
+        msg=msg+"Suspected Obsoleted Terms, "+str(obsoleteScore)+"\n"
+        msg=msg+"Algorithm missed compared to std MINUS obsoleted terms in std, "+str(len(missing)-obsoleteScore)+"\n"
+        msg=msg+"Total unique terms suggested, "+str(len(alternatives))+"\n"
+        msg=msg+"UniqueOverlappingWithMisses, "+str(alternativeCounter)+"\n"
+        msg=msg+"Recall, "+str(round(((len(matches)/(len(targetList)-obsoleteScore*1.0))*100),2))
+        logging.info(msg)
         #logging.info("NotMapped: "+str(len(discarted))+"\n")
 
 
