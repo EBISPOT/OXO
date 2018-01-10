@@ -5,6 +5,7 @@ import yaml
 import OxoClient as OXO
 import csv
 from ConfigParser import SafeConfigParser
+import sys
 
 prefixToPreferred = {}
 idorgNamespace = {}
