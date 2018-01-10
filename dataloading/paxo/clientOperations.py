@@ -39,7 +39,7 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
         sourceOntology=targetOntology
         targetOntology=tmpOntology
 
-    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=10&fieldList=iri,label,synonym"
+    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=500&fieldList=iri,label,synonym"
     results=[]
 
     results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "synOxo", "bridgeTerms"])
