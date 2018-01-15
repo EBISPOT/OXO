@@ -3,8 +3,8 @@
   padding:2px;
   padding-right:4px;
   color: white;
-  /*font-size: larger;*/
-  border-radius: 3px;
+  /*font-size: larger;
+  border-radius: 3px;*/
   display: inline-block;
   margin-right: 4px;
   vertical-align: middle;
@@ -48,3 +48,17 @@
     cursor: pointer;
 }
 
+/* Here we introduce new css for the new version*/
+.alert-warning{
+    background-color: #faebcc;
+    margin-bottom: 10px;
+    padding: 10px 10px 10px 10px;
+    border-radius: 25px;
+}
+
+.grayBackground{
+background-color: #f2f2f2;
+/*border-radius: 25px;*/
+padding: 10px 10px 10px 10px;
+margin: 10px;
+}

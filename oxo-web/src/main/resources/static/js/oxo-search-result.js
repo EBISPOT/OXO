@@ -14,6 +14,7 @@ var hideFromCol = false;
 var apiPath = '';
 
 function initialisePage() {
+    console.log("In initialise Page")
 
     withProgress =  $("#example").data("with-progress") ? $("#example").data("with-progress") : true;
     hideTableInfo =  $("#example").data("hide-table-info") ?  $("#example").data("hide-table-info"): false;
@@ -302,6 +303,8 @@ function getApiPath(element) {
 }
 
 function progressComplete() {
+    $("#searching_bar").hide();
+    $("#searching_bar").hide();
     if (withProgress) {
         $( ".progress-label" ).text( "Complete!" );
     }
@@ -309,8 +312,15 @@ function progressComplete() {
 
 function addProgressBar() {
 
+    console.log("In add Progress Bar, but nothing happens here anymore?")
+
+/*
+
     var progressbar = $( "#progressbar" ),
         progressLabel = $( ".progress-label" );
+    var progressbar = $( "#progressbar" ),
+        progressLabel = $( ".aria-valuetext" );
+
 
     progressbar.progressbar({
         value: false,
@@ -319,13 +329,16 @@ function addProgressBar() {
         },
         complete: function() {
             progressLabel.text( "Complete!" );
+
+            $("#searching_bar").hide();
         }
-    });
+    });*/
 
 }
 
 function updateProgress(value) {
-    if (withProgress) {
-        $("#progressbar").progressbar( "value", value)
-    }
+    console.log("In Add progress bar, but that is useless now isn't it? ")
+
+    //if (withProgress) {    $("#progressbar").progressbar( "value", value)   }
+
 }
