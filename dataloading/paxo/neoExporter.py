@@ -84,7 +84,13 @@ def createNode(iri, ontology, olsURL):
             print "Try to replace the obo_id with short form!"
             try:
                 #Add Ontology prefix before the short form (e.g. for MESH)
+
                 ontoPrefix=jsonReply['response']['docs'][0]['ontology_prefix']
+
+                #Hack for Orphanet 
+                if ontoPrefix=='ordo':
+                    ontoPrefix='Orphanet'
+
                 obo_id=ontoPrefix+":"+jsonReply['response']['docs'][0]['short_form']
             except:
                 print "Did not work to retrieve the obo_id nor the short_form from OLS. So I use UNKOWN:UNKNOWN instead"

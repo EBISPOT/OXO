@@ -137,5 +137,5 @@ sourceType="DATABASE"
 urlSyntax=None
 altPrefixes=["paxo"]
 licence=None
-versionInfo=0.1
+versionInfo=1
 OXO.saveDatasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
