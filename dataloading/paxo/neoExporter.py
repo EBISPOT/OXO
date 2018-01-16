@@ -87,7 +87,7 @@ def createNode(iri, ontology, olsURL):
 
                 ontoPrefix=jsonReply['response']['docs'][0]['ontology_prefix']
 
-                #Hack for Orphanet 
+                #Hack for Orphanet
                 if ontoPrefix=='ordo':
                     ontoPrefix='Orphanet'
 
@@ -100,8 +100,12 @@ def createNode(iri, ontology, olsURL):
 
         identifier=obo_id.split(':')[1]
 
-        line=list([identifier, obo_id, label, iri,ontology_prefix])
-        return line
+        #if we couldn't retrieve doc from OLS we return empty line so it's not added to the csv
+        if obo_id=="UNKNOWN":
+            return []
+        else:
+            line=list([identifier, obo_id, label, iri,ontology_prefix])
+            return line
     else:
         print "Did not get a doc form OLS for"
         print data
