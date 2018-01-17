@@ -18,6 +18,8 @@ function drawGraph () {
     $.getJSON(relativePath+"api/terms/"+curie+"/graph?distance="+distance, function(json) {})
         .success(function(json){
             var container = document.getElementById('mynetwork');
+            console.log(json)
+
             for(var i=0;i<json.nodes.length;i++){
                 json.nodes[i]["label"]=json.nodes[i]["id"]
                 json.nodes[i]["color"]=colorMap[json.nodes[i]["group"]]
@@ -27,8 +29,13 @@ function drawGraph () {
             for(var i=0;i<json.links.length; i++){
                 json.links[i]["arrows"]='to'
                 json.links[i]["color"]=colorMap[json.links[i]["mappingSource"]]
-                json.links[i]["to"]=   json.links[i]["target"]
-                json.links[i]["from"]=   json.links[i]["source"]
+                json.links[i]["to"]=json.links[i]["target"]
+                json.links[i]["from"]=json.links[i]["source"]
+
+                if (json.links[i]["scope"]==='PREDICTED') {
+                    json.links[i]["dashes"]=true
+                }
+
 
                 // console.log(json.links[i]["color"])
                 // if (json.links[i]["color"]===undefined){
