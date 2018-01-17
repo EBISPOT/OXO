@@ -78,6 +78,10 @@ def createNode(iri, ontology, olsURL):
         label=jsonReply['response']['docs'][0]['label'].encode('utf-8').strip()
         ontology_prefix=jsonReply['response']['docs'][0]['ontology_prefix']
 
+        #Hack for Orphanet
+        if ontology_prefix=='ORDO':
+            ontology_prefix='Orphanet'
+
         try:
             obo_id=jsonReply['response']['docs'][0]['obo_id']
         except:
@@ -85,13 +89,12 @@ def createNode(iri, ontology, olsURL):
             try:
                 #Add Ontology prefix before the short form (e.g. for MESH)
 
-                ontoPrefix=jsonReply['response']['docs'][0]['ontology_prefix']
-
+                ontology_prefix=jsonReply['response']['docs'][0]['ontology_prefix']
                 #Hack for Orphanet
-                if ontoPrefix=='ordo':
-                    ontoPrefix='Orphanet'
+                if ontology_prefix=='ORDO':
+                    ontology_prefix='Orphanet'
 
-                obo_id=ontoPrefix+":"+jsonReply['response']['docs'][0]['short_form']
+                obo_id=ontology_prefix+":"+jsonReply['response']['docs'][0]['short_form']
             except:
                 print "Did not work to retrieve the obo_id nor the short_form from OLS. So I use UNKOWN:UNKNOWN instead"
                 print data
@@ -100,8 +103,10 @@ def createNode(iri, ontology, olsURL):
 
         identifier=obo_id.split(':')[1]
 
+
+
         #if we couldn't retrieve doc from OLS we return empty line so it's not added to the csv
-        if obo_id=="UNKNOWN":
+        if obo_id=='UNKNOWN:UNKNOWN':
             return []
         else:
             line=list([identifier, obo_id, label, iri,ontology_prefix])
