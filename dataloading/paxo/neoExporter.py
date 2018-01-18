@@ -41,7 +41,7 @@ def writeTermsToNeo(termsFile, session):
     loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+termsFile+"""' AS line
                 MATCH (d:Datasource {prefix : line.prefix})
                 WITH d, line
-                MERGE (t:Term { id: line.identifier, curie: line.curie, label: line.label, uri: line.uri})
+                MERGE (t:Term { curie: line.curie})
                 with t,d
                 CREATE (t)-[:HAS_SOURCE]->(d)"""
 
@@ -118,7 +118,7 @@ def createNode(iri, ontology, olsURL):
         return []
 
 def createMap(curie1, curie2, score):
-    line=list([curie1, curie2, 'paxo', 'oxo', 'ALGORITHM', 'PREDICTED', date, score])
+    line=list([curie1, curie2, 'paxo', 'paxo', 'ALGORITHM', 'PREDICTED', date, score])
     return line
 
 def exportInNeo(onto1, onto2, predictedFolder, targetFolder, olsURL, neoURL, neoUser, neoPW):

@@ -131,7 +131,7 @@ for database in yamlData:
 print "Save paxo as datasource"
 prefPrefix="paxo"
 namespace=None
-title="Paxo"
+title="paxo"
 desc=None
 sourceType="DATABASE"
 urlSyntax=None
