@@ -21,7 +21,7 @@ function drawGraph () {
             console.log(json)
 
             for(var i=0;i<json.nodes.length;i++){
-                json.nodes[i]["label"]=json.nodes[i]["id"]
+                json.nodes[i]["label"]=json.nodes[i]["id"]+"\n("+json.nodes[i]["text"]+")"
                 json.nodes[i]["color"]=colorMap[json.nodes[i]["group"]]
                 json.nodes[i]["shape"]="box"
             }
@@ -33,6 +33,7 @@ function drawGraph () {
                 json.links[i]["from"]=json.links[i]["source"]
 
                 if (json.links[i]["scope"]==='PREDICTED') {
+                    console.log("I assigne dashes")
                     json.links[i]["dashes"]=true
                 }
 

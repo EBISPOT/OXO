@@ -220,7 +220,7 @@ public class CypherQueryService implements MappingQueryService {
                     "UNWIND rels(path) as r\n" +
                     "WITH n, r\n" +
                     "MATCH (n)-[HAS_SOURCE]-(d:Datasource)\n" +
-                    "RETURN {nodes: collect( distinct {id: n.curie, group : d.prefix}), links: collect (distinct {source: startNode(r).curie, target: endNode(r).curie, scope: r.scope}  )} as result";
+                    "RETURN {nodes: collect( distinct {id: n.curie, text: n.label, group : d.prefix}), links: collect (distinct {source: startNode(r).curie, target: endNode(r).curie, scope: r.scope}  )} as result";
     @Override
     public Object getMappingSummaryGraph(String curie, int distance) {
         HashMap params = new HashMap();
