@@ -6,44 +6,25 @@ from datetime import datetime
 
 from neo4j.v1 import GraphDatabase, basic_auth
 
-
-#Load to neo
-#uri = "bolt://localhost:7687"
-
-#uri = "bolt://localhost:7687"
-#encrypted=False
-#driver = GraphDatabase.driver(uri, auth=basic_auth("neo4j", "dba"))
-#driver = GraphDatabase.driver(uri, auth=basic_auth(user, password))
-#session = driver.session()
-#print "Loading terms.csv..."
-#loadTermsCypher = """USING PERIODIC COMMIT 10000
-#                LOAD CSV WITH HEADERS FROM 'file:///Users/tliener/onto_map/oxo/oxo-loading/testspace/terms.csv' AS line
-#                MATCH (d:Datasource {prefix : line.prefix})
-#                WITH d, line
-#                MERGE (t:Term { id: line.identifier, curie: line.curie, label: line.label, uri: line.uri})
-#                with t,d
-#                CREATE (t)-[:HAS_SOURCE]->(d)"""
-#result = session.run(loadTermsCypher)
-#print result.summary()
-#print "Loading mappings.csv..."
-#loadMappingsCypher = """USING PERIODIC COMMIT 10000
-#                    LOAD CSV WITH HEADERS FROM 'file:///Users/tliener/onto_map/oxo/oxo-loading/test/spacemappings.csv' AS line
-#                    MATCH (f:Term { curie: line.fromCurie}),(t:Term { curie: line.toCurie})
-#                    WITH f,t,line
-#                    CREATE (f)-[m:MAPPING { sourcePrefix: line.datasourcePrefix, datasource: line.datasource, sourceType: line.sourceType, scope: line.scope, date: line.date}]->(t)"""
-#result = session.run(loadMappingsCypher)
-#print result.summary()
-
 #Global:
 date=datetime.now().strftime('%Y-%m-%d')
 
 def writeTermsToNeo(termsFile, session):
+    #loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+termsFile+"""' AS line
+    #            MATCH (d:Datasource {prefix : line.prefix})
+    #            WITH d, line
+    #            MERGE (t:Term { curie: line.curie})
+    #            with t,d
+    #            CREATE (t)-[:HAS_SOURCE]->(d)"""
+
     loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+termsFile+"""' AS line
                 MATCH (d:Datasource {prefix : line.prefix})
                 WITH d, line
-                MERGE (t:Term { curie: line.curie})
-                with t,d
+                MERGE (t:Term { id: line.identifier, curie: line.curie})
+                ON CREATE SET t.label = line.label, t.uri = line.uri
+                WITH t,d
                 CREATE (t)-[:HAS_SOURCE]->(d)"""
+
 
     print "Try to load terms from "+termsFile+" to database"
     print loadMappingsCypher
@@ -156,8 +137,9 @@ def exportInNeo(onto1, onto2, predictedFolder, targetFolder, olsURL, neoURL, neo
 
             #This is just for Testing, don't take more than 10
             #counter=counter+1
-            #if counter>10:
-            #    break
+            #if counter%500:
+            #   print "Processed "+str(counter)+" entries"
+                #break  #This is just for Testing
 
         #print paxo_term
         with open(targetFolder+onto1+"_"+onto2+'_termsNeo.csv', 'wb') as f:
