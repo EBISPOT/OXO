@@ -241,15 +241,31 @@ processSolrDocs(olsDbxerfSolrQuery)
 print "done processing OLS"
 
 
-# url = "http://www.ebi.ac.uk/ols/api/search?q=*&fieldList=iri,short_form,obo_id,database_cross_reference_annotation"
-# print "Updating term labels"
-# # update URIs and labels for any terms we have seen
-# for id in termToIri:
-#     if id not in termToIri and id not in termToLabel:
-#         print "Can't determine iri or label for "+id
-#     else:
-#         print "hello"
-#         OXO.updateTerm(id, termToIri[id], termToLabel[id])
+print "Looking for OLS terms with no labels..."
+for key, term in terms.iteritems():
+
+    if key == "VO:0000740":
+        print "aha"
+    if term["label"] is None:
+        prefix = OXO.getPrefixFromCui(key)
+        if prefixToDatasource[prefixToPreferred[prefix]]["source"] == "ONTOLOGY":
+            object = OXO.getIriAndLabelFromOls(term["curie"], olsurl)
+            if object is not None:
+                if term["uri"]:
+                    terms[key]["uri"] = object["uri"]
+                if term["label"]:
+                    terms[key]["label"] = object["label"]
+
+
+url = "http://www.ebi.ac.uk/ols/api/search?q=*&fieldList=iri,short_form,obo_id,database_cross_reference_annotation"
+print "Updating term labels"
+# update URIs and labels for any terms we have seen
+for id in termToIri:
+    if id not in termToIri and id not in termToLabel:
+         print "Can't determine iri or label for "+id
+    else:
+         print "hello"
+         OXO.updateTerm(id, termToIri[id], termToLabel[id])
 
 
 # dump out the list of unkonw sources
@@ -259,13 +275,6 @@ for key, value in unknownSource.iteritems() :
     # see if we can match prefix to db
     print key.encode('utf-8', 'ignore')
 
-# umls loader
-
-
-cur = db.cursor()
-
-# Use all the SQL you like
-cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and ts = 'P' and sab != 'src'")
 
 # print all the first cell of all the rows
 idToLabel = {}
@@ -327,7 +336,24 @@ def getUMLSMappingFromRow(row):
     return mapping
 
 
-for row in cur.fetchall():
+
+# umls loader
+
+
+cur = db.cursor()
+# Use all the SQL you like
+cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and ts = 'P' and sab != 'src'")
+fetched=cur.fetchall()
+
+# Previously, 'old sql query'
+#cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
+#fetched=cur.fetchall()
+
+if len(fetched)==0:
+     cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
+     fetched=cur.fetchall()
+
+for row in fetched:
     try:
         mappingRow = getUMLSMappingFromRow(row)
         if mappingRow is not None:
@@ -342,20 +368,7 @@ db.close()
 
 
 
-print "Looking for OLS terms with no labels..."
-for key, term in terms.iteritems():
 
-    if key == "VO:0000740":
-        print "aha"
-    if term["label"] is None:
-        prefix = OXO.getPrefixFromCui(key)
-        if prefixToDatasource[prefixToPreferred[prefix]]["source"] == "ONTOLOGY":
-            object = OXO.getIriAndLabelFromOls(term["curie"], olsurl)
-            if object is not None:
-                if term["uri"]:
-                    terms[key]["uri"] = object["uri"]
-                if term["label"]:
-                    terms[key]["label"] = object["label"]
 
 
 
@@ -395,7 +408,7 @@ print "Generating CSV files for neo loading done, now loading them..."
 # CREATE CONSTRAINT ON (i:Term) ASSERT i.curie IS UNIQUE
 # CREATE CONSTRAINT ON (i:Datasource) ASSERT i.prefix IS UNIQUE
 
-
+#
 def deleteMappings():
     result = session.run("match (t)-[m:MAPPING]->() WITH m LIMIT 50000 DETACH DELETE m RETURN count(*) as count")
     for record in result:
@@ -423,10 +436,8 @@ while deleteTerms() > 0:
     print "Still deleting..."
 print "Terms deleted!"
 
+
 print "Loading terms.csv..."
-
-
-
 loadTermsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+exportFileTerms+"""' AS line
                 MATCH (d:Datasource {prefix : line.prefix})
                 WITH d, line

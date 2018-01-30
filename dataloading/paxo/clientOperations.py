@@ -217,7 +217,6 @@ def writeOutPutScore(scoredMatrix, name, predictedTargetFolder, saveToDisc):
 def curationOntologyFinalScore(scoredMatrix):
     endmap=[]
     unified=[]
-    #print scoredMatrix
     doubleEntryCounter=0
     replacedList=[]
     for counter, line in enumerate(scoredMatrix):
@@ -231,10 +230,11 @@ def curationOntologyFinalScore(scoredMatrix):
             index=endmap.index(line[1])
             #print unified[index]
             #print scoredMatrix[counter]
+
             if unified[index][2]<scoredMatrix[counter][2]:
                 print "Found higher score, so will replace now! "
                 #replacedList.append(unified[index])
-                unified[index]=scoredMatrix[counter] #Replace that line with the higher score!
+                unified[index]=scoredMatrix[counter] #Replace that line with the higher scored line!
 
 
     print "A total of "+str(doubleEntryCounter)+" processed!"
