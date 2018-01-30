@@ -264,7 +264,6 @@ for id in termToIri:
     if id not in termToIri and id not in termToLabel:
          print "Can't determine iri or label for "+id
     else:
-         print "hello"
          OXO.updateTerm(id, termToIri[id], termToLabel[id])
 
 
