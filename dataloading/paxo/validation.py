@@ -31,6 +31,7 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
     targetLongList=[]
     with open(TargetFile) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=str(delimiterChar))
+
         next(readCSV)
         try:
             for row in readCSV:
@@ -39,8 +40,7 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
         except Exception as e:
             print "Error while reading in target file"
             print row
-            print e
-            raise e 
+            raise e
 
     missing=[]
     matches=[]

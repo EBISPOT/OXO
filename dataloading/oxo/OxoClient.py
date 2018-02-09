@@ -1,7 +1,7 @@
 import urllib
 import requests
 import json
-from ConfigParser import SafeConfigParser
+#from ConfigParser import SafeConfigParser
 
 def saveDatasource (prefix, idorgNamespace, title, description, sourceType, baseUri, alternatePrefixes, licence, versionInfo):
     #print "saving new datasource: {},{},{},{},{},{}".format(prefix, idorgNamespace, title, sourceType, baseUri, alternatePrefixes)

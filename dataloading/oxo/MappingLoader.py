@@ -88,12 +88,13 @@ print "Reading datasources from OxO done"
 
 response = urllib.urlopen(getEfoAnnotationsUrl)
 cr = csv.reader(response)
-
 for row in cr:
     for p in row:
         if 'definition_citation' in p:
             knownAnnotations.append(p)
 
+print "\n knownAnnotations"
+print knownAnnotations
 
 
 unknownSource = {}
@@ -235,10 +236,9 @@ def processSolrDocs(url):
 # do the query to get docs from solr and process
 
 processSolrDocs(efoSolrQueryUrl)
-
-print "done processing EFO, starting to query OLS"
+print "Done processing EFO, starting to query OLS"
 processSolrDocs(olsDbxerfSolrQuery)
-print "done processing OLS"
+print "Done processing OLS"
 
 
 print "Looking for OLS terms with no labels..."
@@ -257,20 +257,19 @@ for key, term in terms.iteritems():
                     terms[key]["label"] = object["label"]
 
 
-url = "http://www.ebi.ac.uk/ols/api/search?q=*&fieldList=iri,short_form,obo_id,database_cross_reference_annotation"
-print "Updating term labels"
+#url = "http://www.ebi.ac.uk/ols/api/search?q=*&fieldList=iri,short_form,obo_id,database_cross_reference_annotation"
+#print "Updating term labels"
 # update URIs and labels for any terms we have seen
-for id in termToIri:
-    if id not in termToIri and id not in termToLabel:
-         print "Can't determine iri or label for "+id
-    else:
-         OXO.updateTerm(id, termToIri[id], termToLabel[id])
+#for id in termToIri:
+#    if id not in termToIri and id not in termToLabel:
+#         print "Can't determine iri or label for "+id
+#    else:
+#         OXO.updateTerm(id, termToIri[id], termToLabel[id])
 
 
-# dump out the list of unkonw sources
+# dump out the list of unkonwn sources
 print "Finished, here are all the unknown sources"
 for key, value in unknownSource.iteritems() :
-
     # see if we can match prefix to db
     print key.encode('utf-8', 'ignore')
 
@@ -299,6 +298,9 @@ def getUMLSMappingFromRow(row):
     fromCurie = "UMLS:" + cui
 
     toCurie = prefixToPreferred[source] + ":" + toid
+
+
+#### Do the if-else things here prevent empty labels??
     if fromCurie not in terms:
         terms[fromCurie] = {
             "prefix": "UMLS",
@@ -308,7 +310,11 @@ def getUMLSMappingFromRow(row):
             "label": label
         }
     else:
-        terms[fromCurie]["label"] = label
+        if label!="":
+            terms[fromCurie]["label"] = label
+        else:
+            print "FROM UMLS label is none for "
+            print fromCurie
 
     if toCurie not in terms:
         terms[toCurie] = {
@@ -319,7 +325,12 @@ def getUMLSMappingFromRow(row):
             "uri": None
         }
     else:
-        terms[toCurie]["label"] = label
+        if label!="":
+            terms[toCurie]["label"] = label
+        else:
+            print "FROM UMLS - label is NONE! for"
+            print toCurie
+#### End empty labels
 
     if idorgNamespace[source.lower()]:
         terms[toCurie]["uri"] = "http://identifiers.org/"+idorgNamespace[source.lower()]+"/"+toid
@@ -337,8 +348,6 @@ def getUMLSMappingFromRow(row):
 
 
 # umls loader
-
-
 cur = db.cursor()
 # Use all the SQL you like
 cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and ts = 'P' and sab != 'src'")
@@ -367,13 +376,8 @@ db.close()
 
 
 
-
-
-
-
-
+print
 print "Generating CSV files for neo loading..."
-
 
 with open(exportFileTerms, 'w') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',
@@ -434,7 +438,6 @@ def deleteTerms():
 while deleteTerms() > 0:
     print "Still deleting..."
 print "Terms deleted!"
-
 
 print "Loading terms.csv..."
 loadTermsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+exportFileTerms+"""' AS line

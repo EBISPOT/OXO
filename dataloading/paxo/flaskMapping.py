@@ -1,6 +1,5 @@
 import time
 import logging
-
 import requests
 import Levenshtein
 #from ConfigParser import SafeConfigParser
@@ -55,8 +54,9 @@ def apiCall(url, data):
 
 #Takes an input label and executes the oxo call
 def oxoMatch(termLabel, targetOntology, url):
-    data={"ids":termLabel, "mappingTarget":targetOntology, "distance":3} #Maybe include also 'querySource=' parameters
-    jsonReply=apiCall(url+"search", data)
+    data={"ids":termLabel, "mappingTarget":targetOntology, "distance":3} #Maybe include also 'querySource='parameters
+    oxoUrl=url+"search"
+    jsonReply=apiCall(oxoUrl, data)
     try:
         jsonReply=jsonReply.json()['_embedded']['searchResults'][0]
         tmpList=[]
@@ -76,10 +76,12 @@ def oxoMatch(termLabel, targetOntology, url):
             sortedCurie=[{"curie":"UNKNOWN", "distance": 0}]
         return sortedCurie
     except Exception as e:
-        print "Problem with oxo:"
-        print e
-        print "Termlabel: "+termLabel
-        print "TargetOntolgy: "+targetOntology
+        #In case there is NO oxo result, we find outselfs in this loop
+        #print "Problem with oxo:"
+        #print e
+        #print "Termlabel: "+termLabel
+        #print "TargetOntolgy: "+targetOntology
+        #print "Tried to reach "+oxoUrl+" with parameters "+str(data)
         return [{"curie":"UNKNOWN", "distance": 0}]
 
 
@@ -314,7 +316,6 @@ def processPScore(pScore):
 
         mapping['oxoScore'].append({'oxoCurie':tmpCurie, "distance": oxo['distance'] ,"oxoScore":oxoScore})
 
-    #Is here there right place to do it? Unsure at the moment
     for oxo in pScore['bridgeEvidence']:
         tmpCurie=oxo['curie']
         bridgeOxoScore=int(oxo['distance'])
@@ -323,7 +324,6 @@ def processPScore(pScore):
             tmpCurie="UNKNOWN"
 
         mapping['bridgeEvidence'].append({'oxoCurie':tmpCurie, "distance": oxo['distance'], "oxoScore":bridgeOxoScore})
-
 
     return mapping
 
@@ -351,7 +351,6 @@ def simplifyProcessedPscore(mapping):
              scoreMatrix.append(obj)
 
     # Starting here we try to take care of synonyms!
-#    if mapping['synFuzzy']!=None and mapping['synOxo']!=None:
     if 'synFuzzy' in mapping and 'synOxo' in mapping:
     # Fuzzy Synonyms Score
         flag=False
@@ -379,8 +378,8 @@ def simplifyProcessedPscore(mapping):
                 obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": line['oxoScore'], "bridgeOxoScore":0}
                 scoreMatrix.append(obj)
 
-    else:
-        print "No Synonyms here"
+    #else:
+    #    print "No Synonyms here"
 
 
 
@@ -399,7 +398,7 @@ def simplifyProcessedPscore(mapping):
              scoreMatrix.append(obj)
 
 
-    #print "made it to the end of simplifyProcessedPscore"
+    #print "made it to the end of simplifyProcessedPscore"1
     return scoreMatrix
 
 #Simple Score mechanism for all subscores, returns a sorted list. Is Called after simplifyProcessedPscore
@@ -466,7 +465,7 @@ def scoreSimple(scoreMatrix, params):
 
 #Calls all necessary steps to get a result for a termLabel
 def scoreTermLabel(termLabel, targetOntology, scoreParams, params):
-    pscore=primaryScoreTerm('', termLabel, targetOntology, scoreParams)  #Executes the basic calls to OLS and OXO, delievers primary score
+    pscore=primaryScoreTerm('', termLabel, targetOntology, scoreParams, params)  #Executes the basic calls to OLS and OXO, delievers primary score
     pscore['sourceIRI']="UNKNOWN"
     calculatedMappings=processPScore(pscore)    #Process the primaryScore, weighting the primary results
     calculatedMappings['sourceIRI']="UNKNOWN"

@@ -406,9 +406,6 @@ else:
     logFile=config.get("Basics","logFile")
     logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
 
-    #writeToDiscFlag=config.get("Basics", ...)
-    #writeToDiscFlag=True    #Also out of config file?
-    #uniqueMaps=True         #Also out of config file
     writeToDiscFlag=config.getboolean("Params","writeToDiscFlag")
     uniqueMaps=config.getboolean("Params","uniqueMaps")
 
@@ -499,5 +496,7 @@ else:
 
 
         ###Execute functions for terms
-        #scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
-        #print flaskMapping.scoreTermLabel("Nuclear cataract", "doid", scoreParams, params)
+        scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
+        params={"fuzzyUpperLimit": 0.6, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.6, "ols":"https://www.ebi.ac.uk/ols/api/", "oxo":"https://www.ebi.ac.uk/ols/api/"}
+        print flaskMapping.scoreTermLabel("Nuclear cataract", "doid", scoreParams, params)
+        #print scoreTermList(["Asthma", "Dermatitis atopic"], "doid", scoreParams, params)
