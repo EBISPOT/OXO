@@ -1,4 +1,4 @@
-import flaskMapping
+import paxo_internals
 import logging
 import validation
 import csv
@@ -9,6 +9,7 @@ from ConfigParser import SafeConfigParser
 import ast
 import neoExporter
 import sys
+import listprocessing
 
 
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
@@ -61,9 +62,9 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
 
             #Check if the term is actually defined in that ontology
             if term['is_defining_ontology'] is True:
-                    pscore=flaskMapping.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
+                    pscore=paxo_internals.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
                     try:
-                        calculatedMappings=flaskMapping.processPScore(pscore)
+                        calculatedMappings=paxo_internals.processPScore(pscore)
                     except Exception as e:
                         print "Exception in primary Scoring"
                         print e
@@ -79,8 +80,8 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
                     if synonyms!=None:
                         for synonym in synonyms:
                             try:
-                                synPscore=flaskMapping.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
-                                synCalculatedMappings=flaskMapping.processPScore(synPscore)         #Process the primaryScore for synonyms
+                                synPscore=paxo_internals.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
+                                synCalculatedMappings=paxo_internals.processPScore(synPscore)         #Process the primaryScore for synonyms
                                 synCalculatedMappings['sourceIRI']=term["iri"]
                             except Exception as e:
                                 print "Exception in Synonym processPScore Term"
@@ -163,7 +164,7 @@ def scoreOntologyPrimaryScore(name, scorefolder):
         simplerMatrix=[]
         #Calls simplifyProcessedPscore for ever line in scoreMatrix that we just read in
         for line in scoreMatrix:
-            pScore=flaskMapping.simplifyProcessedPscore(line)
+            pScore=paxo_internals.simplifyProcessedPscore(line)
             if pScore not in simplerMatrix:
                 simplerMatrix.append(pScore)
 
@@ -173,7 +174,7 @@ def scoreOntologyPrimaryScore(name, scorefolder):
 def processOntologyPrimaryScore(pScore, params):
     result=[]
     for line in pScore:
-        singleLineResult=flaskMapping.scoreSimple(line, params)
+        singleLineResult=paxo_internals.scoreSimple(line, params)
         result.append(singleLineResult)
 
     #Take the highest scored mappings
@@ -192,7 +193,7 @@ def processOntologyPrimaryScore(pScore, params):
 def scoreTermList(termList, targetOntology, scoreParams, params):
     result=[]
     for term in termList:
-        result.append(flaskMapping.scoreTermLabel(term, targetOntology, scoreParams, params))
+        result.append(paxo_internals.scoreTermLabel(term, targetOntology, scoreParams, params))
     return result
 
 # Process an IRI list via OLS instead of a termList
@@ -369,11 +370,48 @@ def exportNeoList(sections):
     print "Completed neo4J export"
 
 
+def runListAnnotation():
+    print "In list processing, let's get config"
+    inputFile=config.get("Basics","inputFile")
+    resultFile=config.get("Basics","resultFile")
+    targetOntology=config.get("Basics", 'targetOntology')
+    delimiter=config.get("Basics", 'delimiter')
+    olsURL=config.get("Basics","olsAPIURL")
+    oxoURL=config.get("Basics","oxoURL")
+    detailLevel=int(config.get("Basics","detailLevel"))
 
 
-#Here main starts
+    if delimiter=='t':
+        print "Change delimiter to \t!"
+        delimiter=str('\t')
 
-##First definition of two global variables
+
+    fuzzyUpperLimit=float(config.get("Basics",'fuzzyUpperLimit'))
+    fuzzyLowerLimit=float(config.get("Basics",'fuzzyLowerLimit'))
+    fuzzyUpperFactor=float(config.get("Basics",'fuzzyUpperFactor'))
+    fuzzyLowerFactor=float(config.get("Basics",'fuzzyLowerFactor'))
+    oxoDistanceOne=float(config.get("Basics",'oxoDistanceOne'))
+    oxoDistanceTwo=float(config.get("Basics",'oxoDistanceTwo'))
+    oxoDistanceThree=float(config.get("Basics",'oxoDistanceThree'))
+    synFuzzyFactor=float(config.get("Basics",'synFuzzyFactor'))
+    synOxoFactor=float(config.get("Basics",'synOxoFactor'))
+    bridgeOxoFactor=float(config.get("Basics",'bridgeOxoFactor'))
+    threshold=float(config.get("Basics",'threshold'))
+    stopwordList=config.get("Params","StopwordsList").split(',')
+
+    params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
+    options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel}
+    #ScoreParameters define stopwords
+    scoreParams={"removeStopwordsList": stopwordList, "replaceTermList" : replacementTerms}
+
+    listprocessing.runListProcessing(options, params, scoreParams)
+
+
+
+
+## Here main starts ##
+
+####First definition of two global variables
 replacementTerms={
 "ordo_hp" : [('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('tumor', 'neoplasm'), ('tumor','cancer'), ('abnormality', 'disease'), ('decreased', 'reduced'), ('morphology', '')],
 "doid_mp" : [],
@@ -384,12 +422,13 @@ replacementTerms={
 }
 
 helptext="""Start the client with exactly two input parameters: The path to the config file and one of the following flags:
-            -s: Score a list of ontology mappings. This creates a primary raw score
+            -l: Create mappings for a list of terms with an ontology
+            -s: Create the primary raw score for two ontologies or a set of two ontologies.
             -c: Calculate from the primary raw score a predicted score
             -cv: Calculate a predicted score but also validate it against given standard files.
             -n: Reads in a predicted score file and exports it to a neo4j compatible format
 
-            example: python clientOperations.py config.ini -s
+            example: python paxo.py config.ini -s
             """
 #Parse the input parameters. A config file and a flag is expected
 if len(sys.argv)<3:
@@ -402,7 +441,6 @@ else:
 
     config = SafeConfigParser()
     config.read(sys.argv[1])
-
     logFile=config.get("Basics","logFile")
     logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -411,8 +449,9 @@ else:
 
     #Throw away the first 2 sections and take only the actual mapping part of the config into account
     sections=config.sections()[2:]
-
-    if sys.argv[2]=="-s":
+    if sys.argv[2]=="-l":
+        runListAnnotation()
+    elif sys.argv[2]=="-s":
         scoreListOntologies(sections)
     elif sys.argv[2]=="-c":
         calculateListOntologies(sections, writeToDiscFlag, uniqueMaps)
@@ -498,5 +537,5 @@ else:
         ###Execute functions for terms
         scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
         params={"fuzzyUpperLimit": 0.6, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.6, "ols":"https://www.ebi.ac.uk/ols/api/", "oxo":"https://www.ebi.ac.uk/ols/api/"}
-        print flaskMapping.scoreTermLabel("Nuclear cataract", "doid", scoreParams, params)
+        print paxo_internals.scoreTermLabel("Nuclear cataract", "doid", scoreParams, params)
         #print scoreTermList(["Asthma", "Dermatitis atopic"], "doid", scoreParams, params)
