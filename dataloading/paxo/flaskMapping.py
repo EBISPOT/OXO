@@ -42,7 +42,7 @@ def apiCall(url, data):
                 time.sleep(300)
                 try:
                     r = requests.get(url, data)
-                    logging.info("Success after 120 seconds")
+                    logging.info("Success after 300 seconds")
                 except:
                     logging.info("Last try failed as well, abort. Total of 4 tries failed, so I let the whole process fail")
                     logging.info(url)
@@ -235,7 +235,7 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
 
 
     ##Now let's relax The fuzzy search and aim for other (all) ontologies
-    data={"q":termLabel, "type":"class", "local":True, "limit":30}
+    data={"q":termLabel, "type":"class", "local":True, "limit":5}
     jsonReply=apiCall(url, data)
     try:
         jsonReply=jsonReply.json()['response']
@@ -245,17 +245,26 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
         print e
         logging.error("Error with decoding jsonReply from RELAXED OLS api call!")
         logging.error(jsonReply)
+        logging.error(data)
         logging.error(e)
 
 
     #jsonReply=jsonReply.json()['response']
-    oxoTargetList=[]
-    if  jsonReply['numFound']>0:
-        for reply in jsonReply['docs']:
-            if reply['ontology_name']!=targetOntology:
-                oxoTargetList.append({"short_form": reply['short_form'],"bridgeOntology":reply['ontology_name']})
+    try:
+        oxoTargetList=[]
+        if  jsonReply['numFound']>0:
+            for reply in jsonReply['docs']:
+                if reply['ontology_name']!=targetOntology:
+                    oxoTargetList.append({"short_form": reply['short_form'],"bridgeOntology":reply['ontology_name']})
 
-    return {"fuzzyTerms": sortedLev, "bridgeTerms": oxoTargetList}
+        return {"fuzzyTerms": sortedLev, "bridgeTerms": oxoTargetList}
+    except Exception as e:
+        print "Error processing jsonsReply"
+        print jsonReply
+        print e
+        logging.error(e)
+        logging.error(jsonReply)
+        return {"fuzzyTerms": sortedLev, "bridgeTerms": oxoTargetList}
 
 #Executes the basic calls, delievers primary score (raw scoring)
 def primaryScoreTerm(termIRI, termLabel, targetOntology, scoreParams, urls):
