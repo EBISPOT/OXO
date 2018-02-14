@@ -27,7 +27,6 @@ def runListProcessing(options, params, scoreParams):
             #totalLength=len(list(tmpReadCSV))
             print "Enumerate over csv now"
             for index,row in enumerate(readCSV):
-                #print "Processed "+str(index)
                 potentialReply=[]
                 #Execute label in the first row
                 prefLabel=row[1].encode(encoding='UTF-8')
