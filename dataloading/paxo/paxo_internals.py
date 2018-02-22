@@ -2,7 +2,6 @@ import time
 import logging
 import requests
 import Levenshtein
-#from ConfigParser import SafeConfigParser
 
 from flask import Flask
 from flask import request
@@ -123,54 +122,34 @@ def sortWords(term):
 def stringMatcher(sourceTerm, targetTerm, replaceTermList, removeStopwordsList):
     #First calculate Lev without changes
     lev=round(Levenshtein.ratio(sourceTerm, targetTerm), 5)
-    #print "Straight Lev: "+sourceTerm+" - "+targetTerm+" --> "+str(lev)
 
     sourceTerm=sortWords(sourceTerm)
     targetTerm=sortWords(targetTerm)
 
-
     replacementLev=round(Levenshtein.ratio(sourceTerm, targetTerm), 5)
-    #print "Sorted Lev: "+sourceTerm+" - "+targetTerm+" --> "+str(replacementLev)
     if replacementLev>lev:
         lev=replacementLev
-        #print " Score Higher, so replaced"
 
     #Remove stop words
     for stop in removeStopwordsList:
         sourceTerm=sourceTerm.replace(stop,'').strip().replace('  ', ' ')
         targetTerm=targetTerm.replace(stop, '').strip().replace('  ', ' ')
 
-    #print "Removed Stopwords Lev: "+sourceTerm+" - "+targetTerm+" --> "+str(round(Levenshtein.ratio(sourceTerm, targetTerm), 5))
-
-    #print "SourceReplacements:"
     #Replace terms in source to trying to find higher score
     for replacement in replaceTermList:
         tmpSource=sourceTerm.replace(replacement[0], replacement[1])
         tmpSource=sortWords(tmpSource)
         replacementLev=round(Levenshtein.ratio(tmpSource, targetTerm), 5)
-        #print "  Replacements: "+tmpSource+" - "+targetTerm+" --> "+str(replacementLev)
         if replacementLev>lev:
             lev=replacementLev
-            #print " Score Higher, so replaced"
 
-#        tmpSource=tmpSource.split(' ')
-#        tmpSource.sort()
-#        tmpSource=' '.join(tmpSource)
-#        replacementLev=round(Levenshtein.ratio(tmpSource, targetTerm), 5)
-#        print "  Replacements Source: "+tmpSource+" - "+targetTerm+" --> "+str(replacementLev)
-#        if replacementLev>lev:
-#            lev=replacementLev
-
-    #print "TargetReplacements:"
     #Replace terms in target to trying to find higher score
     for replacement in replaceTermList:
         tmpTarget=targetTerm.replace(replacement[0], replacement[1])
         tmpTarget=sortWords(tmpTarget)
         replacementLev=round(Levenshtein.ratio(sourceTerm, tmpTarget), 5)
-        #print "  Replacements: "+sourceTerm+" - "+tmpTarget+" --> "+str(replacementLev)
         if replacementLev>lev:
             lev=replacementLev
-            #print " Score Higher, so replaced"
 
     return lev
 ############################################################
@@ -201,19 +180,14 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
         levList=[]
         for reply in jsonReply['docs']:
             try:
-                #answerTerm=stringProcess(reply['label'].encode(encoding='UTF-8'))
                 answerTerm=reply['label'].encode(encoding='UTF-8')
-
-                #lev=round(Levenshtein.ratio(termLabel, answerTerm), 5)
                 lev=stringMatcher(termLabel, answerTerm, replaceTermList, removeStopwordsList)
 
                 #Compare the inputLabel with all synonym Labels as well.
                 #If lev score is higher for a synonym, replace lev score --> boost synonym label hits
                 if "synonym" in reply.keys():
                     for synonym in reply["synonym"]:
-                        #answerTerm=stringProcess(synonym.encode(encoding='UTF-8'))
                         answerTerm=synonym.encode(encoding='UTF-8')
-                        #tmpLev=round(Levenshtein.ratio(termLabel, answerTerm), 5)
                         tmpLev=stringMatcher(termLabel, answerTerm, replaceTermList, removeStopwordsList)
                         if tmpLev>lev:
                             lev=tmpLev
@@ -230,7 +204,6 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
         sortedLev=sorted(levList, key=lambda levList:levList['lev'], reverse=True)
 
     else:
-        #print "No hits, therefore Add empty placeholder"
         sortedLev=[{"SourceLabel": termLabel, "SourceIRI": termLabel , "TargetIRI": "UNKNOWN", "TargetLabel": "UNKNOWN", "lev": 0}]
 
 
@@ -248,8 +221,6 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
         logging.error(data)
         logging.error(e)
 
-
-    #jsonReply=jsonReply.json()['response']
     try:
         oxoTargetList=[]
         if  jsonReply['numFound']>0:
@@ -280,9 +251,6 @@ def primaryScoreTerm(termIRI, termLabel, targetOntology, scoreParams, urls):
 
     bridgeTerms=olsFuzzyResult['bridgeTerms']
     olsFuzzyResult=olsFuzzyResult['fuzzyTerms']
-
-    #if bridgeTerms!=[]:
-        #print "Found bridge terms, it is incredible!"
 
     bridgeOxo=[]
     if len(bridgeTerms)>0:
@@ -366,7 +334,6 @@ def simplifyProcessedPscore(mapping):
         for line in mapping['synFuzzy']:
             for s in scoreMatrix:
                 if line["fuzzyIri"]==s["iri"]:
-                    #s['fuzzyScore']=line['fuzzyScore']
                     s['synFuzzy']=line['fuzzyScore']
                     flag=True
 
@@ -379,18 +346,12 @@ def simplifyProcessedPscore(mapping):
         for line in mapping['synOxo']:
             for s in scoreMatrix:
                 if line["oxoCurie"]==s["iri"]:
-                    #s['oxoScore']=line['oxoScore']
                     s['synOxo']=line['oxoScore']
                     flag=True
 
             if flag==False:
                 obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": line['oxoScore'], "bridgeOxoScore":0}
                 scoreMatrix.append(obj)
-
-    #else:
-    #    print "No Synonyms here"
-
-
 
     #Getting into bridge evidence
     flag=False
@@ -401,9 +362,7 @@ def simplifyProcessedPscore(mapping):
                  flag=True
 
          if flag==False:
-             #obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['bridgeOxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
              obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
-             #oxoCurie
              scoreMatrix.append(obj)
 
 
@@ -442,7 +401,6 @@ def scoreSimple(scoreMatrix, params):
         elif score['fuzzyScore']<fuzzyLowerLimit:
             fFactor=0
 
-
         if score['oxoScore']==1:
             score['oxoScore']=oxoDistanceOne
         if score['oxoScore']==2:
@@ -450,27 +408,15 @@ def scoreSimple(scoreMatrix, params):
         if score['oxoScore']==3:
             score['oxoScore']=oxoDistanceThree
 
-
-        if score['bridgeOxoScore']>0:
-            print "FOUND an incredible bridge Term, uhauha!"
-            print scoreMatrix[i]
-
-
         score['finaleScore']=score['fuzzyScore']*fFactor+score['oxoScore']+score['synFuzzy']*synFuzzyFactor+score['synOxo']*synOxoFactor+score['bridgeOxoScore']*bridgeOxoFactor
 
         ### Do we want unknown to be printed
         if score['finaleScore']>threshold:          #This removes "unknow" from the results and weak results
             resultMatrix.append(scoreMatrix[i])
-#        else:
-            #print "Failed to pass the threshold unfortunatley!"
-            #print score['finaleScore']
 
     #Sort the thing so the best score is top
     resultMatrix=sorted(resultMatrix, key=lambda resultMatrix:resultMatrix['finaleScore'], reverse=True)
     return resultMatrix
-
-#Simple Score mechanism for all subscores, returns a sorted list. Is Called after simplifyProcessedPscore
-#def scoreComplex(scoreMatrix):
 
 #Calls all necessary steps to get a result for a termLabel
 def scoreTermLabel(termLabel, targetOntology, scoreParams, params):

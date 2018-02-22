@@ -27,10 +27,16 @@ def runListProcessing(options, params, scoreParams):
             #totalLength=len(list(tmpReadCSV))
             print "Enumerate over csv now"
             for index,row in enumerate(readCSV):
+                print row
                 potentialReply=[]
                 #Execute label in the first row
                 prefLabel=row[1].encode(encoding='UTF-8')
-                synList=row[2].split("|")
+
+                if len(row)>2:
+                    synList=row[2].split("|")
+                else:
+                    synList=[]
+
                 #print prefLabel
                 tmpReply=paxo_internals.scoreTermLabel(prefLabel, targetOntology, scoreParams, params)
 
