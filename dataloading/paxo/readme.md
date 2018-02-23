@@ -6,19 +6,19 @@
 ### Usage (short)
 
 1. First create a raw score with  
-> python paxo.py ../config/config.ini -s
+> python paxo.py paxo_config.ini -s
 
 2. Calculate a score with:
-> python paxo.py ../config/config.ini -c
+> python paxo.py paxo_config.ini -c
 
 3. Calculate and Validated a primary score:
-> python paxo.py ../config/config.ini -cv
+> python paxo.py paxo_config.ini -cv
 
-4. Create a neo4j compatible csv file and lod it into neo4j based on a previously calculated score
-> python paxo.py ../config/config.ini -n
+4. Create a csv file that is compatible with oxo. Based on a previously calculated score
+> python paxo.py paxo_config.ini -n
 
 5. Create a mapping file, given not a "real" ontology but a list of terms
-> python paxo.py ../config/listprocessing_config.ini -l
+> python paxo.py listprocessing_config.ini -l
 
 ### More about usage
 **About 1:** The primary, 'raw' score is the base for the calculation of the mapping score. This has to execute many calls to the OLS and Oxo API and can take a long time. The files created by this step thus are somewhat of a 'checkpoint'.
@@ -27,7 +27,7 @@
 
 **About 3:** If validation files (a 'standard') is available, the calculated result can be evaluated against this standard by using the -cv flag (first a score is calculated, then validated)
 
-**About 4:** The option -n creates a csv file that can be loaded into neo4j. This option reads in file create by the -c option.
+**About 4:** The option -n creates a csv file that can be loaded into OxO. This option reads in file create by the -c option.
 
 **About 5:** To create a mapping file between a list of terms and an ontology, start paxo with -l
 
