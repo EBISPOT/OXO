@@ -30,3 +30,28 @@
 **About 4:** The option -n creates a csv file that can be loaded into neo4j. This option reads in file create by the -c option.
 
 **About 5:** To create a mapping file between a list of terms and an ontology, start paxo with -l
+
+### Parameter explanation
+To run paxo it is mandatory to provide a config file with context. The dummy config files in the config folder should provide an easy start into creating your own config file. The structure of the config file for the mapping of ontologies (flag:-s,-c, -cv) and the listprocessing (flag:-l) are slightly different, most parameters are the same. Most parameters should be self-explanatory, others are described here in a few words.
+
+#### Shared values for all configs
+StopwordsList: Words that are cut out before string compare. Candidates for this are e.g. 'the' or 'of' but could also be words you don't want to consider e.g. 'abnormality'
+fuzzyUpperLimit: Upper limit of a fuzzy label score. A score above this limit is multiplied with the fuzzyUpperFactor. A fuzzy score of 1 is the highest, so equivalent labels (exact match)
+fuzzyUpperFactor: Factor for a fuzzy label score above the fuzzy upper limit
+fuzzyLowerLimit: A fuzzy label score between the upper and lower limit is multiplied by the fuzzyLowerFactor for the final score. A score below thus limit is discarded and leads to a fuzzy score of 0.
+fuzzyLowerFactor: Factor for a fuzzy label score between the upper and the lower limit
+oxoDistanceOne: Score for a connection of distance 1 in Oxo
+oxoDistanceTwo: Score for a connection of distance 2 in Oxo
+oxoDistanceThree: Score for a connection of distance 3 in Oxo
+synFuzzyFactor: Factor to weight a fuzzy label matching of a synonym
+synOxoFactor: Weight for a link that was found in Oxo but via a synonym and not the preferred label
+bridgeOxoFactor: Weight for a bridge term
+threshold: Threshold for the mappings. Only the final score above this threshold is considered as a mapping and printed to the file
+
+
+#### Config for listprocessing
+**inputFile** Path to the input file, consisting of 3 rows  (ids, labels, optional synonyms)
+**resultFile** /path/output-file.csv
+**detailLevel** Value can be 0,1 or 2 depending on how much detail should be printed to the final file. Value 2 is the verbose mode, where one could spot alternatives to the suggested map
+**delimiter** delimiter of the input file, in most cases e.g. *,*
+**synonymSplitChar** delimiter of the synonyms that are located in the 3 row, could be e.g. *|* or *;* ...
