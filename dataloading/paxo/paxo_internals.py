@@ -76,41 +76,8 @@ def oxoMatch(termLabel, targetOntology, url):
         return sortedCurie
     except Exception as e:
         #In case there is NO oxo result, we find outselfs in this loop
-        #print "Problem with oxo:"
-        #print e
-        #print "Termlabel: "+termLabel
-        #print "TargetOntolgy: "+targetOntology
-        #print "Tried to reach "+oxoUrl+" with parameters "+str(data)
         return [{"curie":"UNKNOWN", "distance": 0}]
 
-
-
-############################################################
-##List of terms that should be cut out of label before fuzzy match # Shall come from config file later
-#cutList=["abnormalityof", "syndrome", "disease", "cancer", "tumor", "abnormal"]
-
-# def stringProcess(term):
-#     processedTerm=term.lower()                      #Make sting lower case
-#     processedTerm=processedTerm.replace(" ", "")    #Remove all spaces
-#
-#     #Simply cut some things from the label before calculating the levenstein distance
-#     for cut in cutList:
-#         tmpArray=term.split(cut)                    #Remove problematic terms
-#         if len(tmpArray[0])!=0:
-#             processedTerm=tmpArray[0]
-#             break
-#         elif len(tmpArray[1])!=0:
-#             processedTerm=tmpArray[1]
-#             break
-#         else:
-#             print "Something is wrong"
-#             break
-#
-#     return processedTerm
-
-############################################################
-#removeStopwordsList=['of', 'the']
-#replaceTermList=[('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('abnormality','disease')]
 
 def sortWords(term):
     term=term.lower()
@@ -152,10 +119,6 @@ def stringMatcher(sourceTerm, targetTerm, replaceTermList, removeStopwordsList):
             lev=replacementLev
 
     return lev
-############################################################
-
-
-
 
 #Takes an input label and executes the fuzzyOLS call
 def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsList, url):
@@ -365,8 +328,6 @@ def simplifyProcessedPscore(mapping):
              obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
              scoreMatrix.append(obj)
 
-
-    #print "made it to the end of simplifyProcessedPscore"1
     return scoreMatrix
 
 #Simple Score mechanism for all subscores, returns a sorted list. Is Called after simplifyProcessedPscore

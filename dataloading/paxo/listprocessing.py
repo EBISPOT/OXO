@@ -3,6 +3,7 @@ import paxo_internals
 import csv
 import requests
 import time
+import logging
 
 def runListProcessing(options, params, scoreParams):
 
@@ -11,6 +12,7 @@ def runListProcessing(options, params, scoreParams):
     delimiter=options["delimiter"]
     targetOntology=options["targetOntology"]
     detailLevel=options["detailLevel"]
+    synonymSplitChar="|"
 
     #Open the input file
     with open(inputFile) as csvfile:
@@ -25,15 +27,14 @@ def runListProcessing(options, params, scoreParams):
             counter=0
             #tmpReadCSV=readCSV
             #totalLength=len(list(tmpReadCSV))
-            print "Enumerate over csv now"
+            logging.info("Start going through input csv")
             for index,row in enumerate(readCSV):
-                print row
                 potentialReply=[]
                 #Execute label in the first row
                 prefLabel=row[1].encode(encoding='UTF-8')
 
                 if len(row)>2:
-                    synList=row[2].split("|")
+                    synList=row[2].split(synonymSplitChar)
                 else:
                     synList=[]
 
@@ -69,13 +70,15 @@ def runListProcessing(options, params, scoreParams):
                     else:
                         print e
                         print "Problem getting results for "+prefLabel+" - the reply was "+potentialReply
-                        print potentialReply
+                        logging.error("Problem getting results for "+prefLabel+" - the reply was "+potentialReply)
+                        logging.error(e)
                         raise
 
                 #This is just to print feedback - if we work on a large list
                 counter=counter+1
                 if counter%20==0:
                     print "Processed "+str(counter)+" entries"
+                    logging.info("Processed "+str(counter)+" entries")
 
     ### annotating file
             print "Done processing input list, now annotate the result"
@@ -90,12 +93,13 @@ def runListProcessing(options, params, scoreParams):
                     try:
                         row[3]=jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8')
                     except Exception as e:
-                        print "No label found"
                         row[3]="no label found"
-                        print e
+                        logging.error("No label found for "+row[2])
+                        logging.error(e)
 
     ### write to file
             print "Done annotating file, now write result to file"
+            logging.info("Done annotating file, now write result to file")
             #Writing result to output file
             with open(resultFile, 'wb') as f:
                 writer = csv.writer(f)
@@ -106,3 +110,5 @@ def runListProcessing(options, params, scoreParams):
         except Exception as e:
             print "Error while processing file"
             print e
+            logging.error("Error while processing file")
+            logging.error(e)

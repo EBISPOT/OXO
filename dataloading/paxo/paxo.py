@@ -5,6 +5,7 @@ import csv
 import time
 import requests
 import json
+import os
 from ConfigParser import SafeConfigParser
 import ast
 import neoExporter
@@ -254,6 +255,10 @@ def calculateAndValidateOntologyPrimaryScore(onto1, onto2, stdName, stdFile, par
 #Goes through the sections and calls scoreOntologies for every section
 def scoreListOntologies(sections):
     scoringtargetFolder=config.get('Params', 'scoringTargetFolder')
+    if os.path.exists(scoringtargetFolder)==False:
+        print "Could not find "+scoringtargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
@@ -267,6 +272,18 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
     validationTargetFolder=config.get('Params', 'validationTargetFolder')
     scoringtargetFolder=config.get('Params', 'scoringTargetFolder')
     predictedTargetFolder=config.get('Params', 'predictedTargetFolder')
+
+    if os.path.exists(scoringtargetFolder)==False:
+        print "Could not find "+scoringtargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+    if os.path.exists(predictedTargetFolder)==False:
+        print "Could not find "+predictedTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+    if os.path.exists(validationTargetFolder)==False:
+        print "Could not find "+validationTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
+
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
@@ -306,6 +323,14 @@ def calculateListOntologies(sections, writeToDisc, curationOfDoubleEntries):
     scoringTargetFolder=config.get('Params','scoringTargetFolder')
     predictedTargetFolder=config.get('Params','predictedTargetFolder')
 
+    if os.path.exists(scoringTargetFolder)==False and writeToDisc==True:
+        print "Could not find "+scoringTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
+    if os.path.exists(predictedTargetFolder)==False and writeToDisc==True:
+        print "Could not find "+predictedTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
@@ -334,6 +359,13 @@ def exportNeoList(sections):
         predictedFolder=config.get('Params','predictedTargetFolder')
         targetFolder=config.get('Params','neoFolder')
 
+        if os.path.exists(predictedFolder)==False:
+            print "Could not find "+predictedFolder+" - please make sure input file exists!\n"
+            raise Exception("File does not exists")
+        if os.path.exists(targetFolder)==False:
+            print "Could not find "+targetFolder+" - please make sure input file exists!\n"
+            raise Exception("File does not exists")
+
         olsURL=config.get('Basics', 'olsAPIURL')
         neoURL=config.get('Basics','neoURL')
         neoUser=config.get('Basics','neoUser')
@@ -345,9 +377,12 @@ def exportNeoList(sections):
 
 
 def runListAnnotation():
-    print "In list processing, let's get config"
     inputFile=config.get("Basics","inputFile")
     resultFile=config.get("Basics","resultFile")
+    if os.path.exists(inputFile)==False:
+        print "Could not find "+inputFile+" - please make sure input file exists!\n"
+        raise Exception("File does not exists")
+
     targetOntology=config.get("Basics", 'targetOntology')
     delimiter=config.get("Basics", 'delimiter')
     olsURL=config.get("Basics","olsAPIURL")
@@ -372,9 +407,10 @@ def runListAnnotation():
     bridgeOxoFactor=float(config.get("Basics",'bridgeOxoFactor'))
     threshold=float(config.get("Basics",'threshold'))
     stopwordList=config.get("Params","StopwordsList").split(',')
+    synonymSplitChar=config.get("Basics","synonymSplitChar")
 
     params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
-    options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel}
+    options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel, "synonymSplitChar":synonymSplitChar}
     #ScoreParameters define stopwords
     scoreParams={"removeStopwordsList": stopwordList, "replaceTermList" : replacementTerms}
 
@@ -417,7 +453,6 @@ else:
     config.read(sys.argv[1])
     logFile=config.get("Basics","logFile")
     logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
-
     writeToDiscFlag=config.getboolean("Params","writeToDiscFlag")
     uniqueMaps=config.getboolean("Params","uniqueMaps")
 
