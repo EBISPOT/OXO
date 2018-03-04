@@ -166,7 +166,7 @@ import OxoCsvBuilder
 builder = OxoCsvBuilder.Builder()
 
 builder.exportTermsToCsv(exportFileTerms, terms)
-builder.exportMappingsTpCsv(exportFileTerms, terms, prefixToDatasource)
+builder.exportMappingsToCsv(exportFileTerms, terms, prefixToDatasource)
 
 
 print "Finished process!"
