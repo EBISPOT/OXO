@@ -1,6 +1,7 @@
 oxo-*
 .git
 .idea
+dataloading
 neo4jimport/*.csv
 db
 solr-config/data
