@@ -1,0 +1,11 @@
+oxo-*
+.git
+.idea
+neo4jimport/*.csv
+db
+solr-config/data
+*.rtf
+*.iml
+*.xml
+*.md
+!oxo-web/target/oxo-web.war

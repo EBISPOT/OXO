@@ -4,10 +4,12 @@ import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
@@ -33,10 +35,10 @@ public class TermService {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private DatasourceService datasourceService;
+    DatasourceService datasourceService;
 
     @Autowired
-    private TermGraphRepository termGraphRepository;
+    TermGraphRepository termGraphRepository;
 
     @Autowired
     DocumentRepository documentRepository;
@@ -226,8 +228,6 @@ public class TermService {
     }
 
     public void rebuildIndexes(String source) {
-
-
 
         documentRepository.deleteAll();
 

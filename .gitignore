@@ -1,0 +1,15 @@
+target/
+*.iml
+*.DS_store
+.idea
+*~
+data
+properties
+sorl-config/data
+db
+application.properties
+dataloading/venv/
+dataloading/oxo/config_localdev.ini
+*.pyc
+.mvn
+oxo-web/src/main/resources/templates/search-orig.html

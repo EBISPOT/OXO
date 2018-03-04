@@ -19,19 +19,21 @@ services:
         ports:
         - 7474:7474
         - 7687:7687
+        volumes:
+          - ./neo4jimport:/var/lib/neo4j/import
     oxo:
         image: oxo:latest
         depends_on:
-        - neo4j
-        - solr
+          - neo4j
+          - solr
         links:
-            - neo4j
-            - solr
+          - neo4j
+          - solr
         environment:
-        - spring.datasource.url=jdbc:hsqldb:file:/home/hsqldb
-        - oxo.neo.driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
-        - oxo.neo.uri=http://neo4j:dba@neo4j:7474
-        - spring.data.solr.host:http://solr:8993/solr
+          - spring.datasource.url=jdbc:hsqldb:file:/home/hsqldb
+          - oxo.neo.driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
+          - oxo.neo.uri=http://neo4j:dba@neo4j:7474
+          - spring.data.solr.host=http://solr:8983/solr
         command:
             - java
             - -jar
