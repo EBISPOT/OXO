@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 """
 This script pulls mappings from OLS and creates a
