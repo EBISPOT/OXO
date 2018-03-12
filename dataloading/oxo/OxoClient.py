@@ -28,7 +28,7 @@ class Datasource:
 #     def __init__(self):
 
 class OXO:
-    def __init__(self):
+    def __init__(self, ):
         self.oxoUrl = ""
         self.apikey = ""
         self.olsUrl = ""
@@ -194,7 +194,6 @@ class OXO:
                         for xref in term["obo_xref"]:
                             if "description" in xref:
                                 if xref["description"]:
-                                    print "."
                                     scope = "RELATED"
                                     if "MONDO:equivalentTo" in xref["description"]:
                                         scope = "EXACT"
@@ -210,6 +209,7 @@ class OXO:
 
     def getOxODatasets(self):
         url = self.oxoUrl + "/api/datasources?size=4000"
+        print "querying " + url
         reply = urllib.urlopen(url)
         answer = json.load(reply)
         if "_embedded" not in answer:

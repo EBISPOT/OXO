@@ -95,7 +95,7 @@ class Neo4jOxOLoader:
                         MATCH (d:Datasource {prefix : line.prefix})
                         WITH d, line
                         MERGE (t:Term { curie: line.curie})
-                        ON CREATE SET t.id = line.identifier, t.label = line.label, t.uri = line.uri
+                        SET t.id = line.identifier, t.label = line.label, t.uri = line.uri
                         with t,d
                         CREATE (t)-[:HAS_SOURCE]->(d)"""
         result = self.session.run(loadTermsCypher)

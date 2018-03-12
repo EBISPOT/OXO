@@ -13,6 +13,7 @@ services:
     neo4j:
         image: neo4j:3.1.1
         environment:
+        - NEO4J_HEAP_MEMORY=2048 # configure the heap memory
         - NEO4J_AUTH=neo4j/dba
         cap_add:
          - SYS_RESOURCE
@@ -37,6 +38,6 @@ services:
         command:
             - java
             - -jar
-            - /home/oxo.jar
+            - /home/oxo.war
         ports:
         - 8080:8080

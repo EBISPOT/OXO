@@ -266,7 +266,7 @@ for key, term in terms.iteritems():
                 if term["label"] is None:
                     terms[key]["label"] = object["label"]
             else:
-                print "No label found for" + terms[key]
+                print "No label found for" + str(terms[key])
 
 # dump out the list of unkonwn sources
 print "Finished, here are all the unknown sources"

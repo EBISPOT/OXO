@@ -41,6 +41,9 @@ db = MySQLdb.connect(user=user, passwd=password,
                      db=sqldb, port=port)
 
 OXO = OxoClient.OXO()
+OXO.oxoUrl=config.get("Basics","oxoUrl")
+OXO.olsurl=config.get("Basics","olsurl")
+
 
 # OLS loader
 # get prefix data from OLS
@@ -63,18 +66,25 @@ for data in OXO.getOxODatasets():
             idorgNamespace[altPrefix.lower()] = data["idorgNamespace"]
             idorgNamespace[prefix.lower()] = data["idorgNamespace"]
 
+print "Reading datasources from OxO done!"
+
 terms = {}
+umlsMapping = {}
 mappings = {}
 postMappings = []
 
 # print all the first cell of all the rows
 idToLabel = {}
-def getUMLSMappingFromRow(row):
-    cui =  row[0]
+def getUMLSMappingFromRow(row, terms, umlsMapping):
+    cui = row[0]
     source = row[1]
     toid = row[2]
-    descId =  row[3]
+    descId = row[3]
     label = row[4]
+    sourcePreferred = row[5]
+    ts = row[6]
+    stt = row[7]
+    isPref = row[8]
 
     if descId is not None:
         toid = descId
@@ -82,83 +92,95 @@ def getUMLSMappingFromRow(row):
     if toid is None:
         return None
 
+
     if source == "HPO":
         source = OXO.getPrefixFromCui(toid)
         toid = OXO.getIdFromCui(toid)
 
     fromCurie = "UMLS:" + cui
-
     toCurie = prefixToPreferred[source] + ":" + toid
 
-
-#### Do the if-else things here prevent empty labels??
     if fromCurie not in terms:
         terms[fromCurie] = {
             "prefix": "UMLS",
             "id": cui,
             "curie": fromCurie,
-            "uri": "http://identifiers.org/umls/"+cui,
-            "label": label
+            "uri": "http://identifiers.org/" + fromCurie,
         }
-    else:
-        if label!="":
-            terms[fromCurie]["label"] = label
-        else:
-            print "FROM UMLS label is none for "+fromCurie
+
+    if ts == 'P' and stt == 'PF' and isPref == "Y":
+        terms[fromCurie]["label"] = label
+
+    if fromCurie not in umlsMapping:
+        umlsMapping[fromCurie] = {}
+    umlsMapping[fromCurie][toCurie] = 1
+
+    toUri = "http://identifiers.org/" + toCurie
+    if source == "HP":
+        toUri = "http://purl.obolibrary.org/obo/HP_" + toid
 
     if toCurie not in terms:
         terms[toCurie] = {
             "prefix": prefixToPreferred[source],
             "id": toid,
             "curie": toCurie,
-            "label": label,
-            "uri": None
+            "uri": toUri
         }
-    else:
-        if label!="":
-            terms[toCurie]["label"] = label
-        else:
-            print "FROM UMLS - label is NONE! for"
-            print toCurie
+
+    if sourcePreferred == 'PT':
+        terms[toCurie]["label"] = label
+
 
 # umls loader
 cur = db.cursor()
-# Use all the SQL you like
 
-#cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and (ts = 'P' or tty='PT') and sab != 'src'")
-# --> missing Snomed labels 6613 (down from )
+print "Fetching all mappings from UMLS..."
 
-# https://www.ncbi.nlm.nih.gov/books/NBK9685/
-# STT	String type
-# TS	Term status
-# SAB	Abbreviated source name (SAB).
-
-cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and (ts = 'P' or ts='S') and sab != 'src'")
-
+# get all pref labels for UMLS concepts
+getUmlsLabelsSqlQuery = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where ts ='P' and stt = 'PF' and ispref = 'Y' and sab != 'src'"
+cur.execute(getUmlsLabelsSqlQuery)
 fetched=cur.fetchall()
 
-# Previously, 'old sql query'
-#cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
-#fetched=cur.fetchall()
-
-#if len(fetched)==0:
-#     cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
-#     fetched=cur.fetchall()
-
+# first get all the UMLS concepts
 for row in fetched:
     try:
-        mappingRow = getUMLSMappingFromRow(row)
-        if mappingRow is not None:
-            postMappings.append(mappingRow)
+        getUMLSMappingFromRow(row, terms, umlsMapping)
     except Exception as e:
         print e
         print "Experienced a problem with "
         print row
         print "Catched it and try to move on"
-        #Experienced a problem with  ('C1180021', 'NCI', 'C33333', None, 'Plus End of the Microtubule')
-        #('C0796501', 'NCI', 'C11519', None, 'Asparaginase/Dexamethasone/Prednisone/Vincristine')
+
+print "Fetching all source terms info from from UMLS..."
+
+# now get source term labels
+getPreferredLabelFromSource = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where tty = 'PT' and  sab != 'src'"
+cur.execute(getPreferredLabelFromSource)
+fetched=cur.fetchall()
+
+for row in fetched:
+    try:
+        getUMLSMappingFromRow(row, terms, umlsMapping)
+    except Exception as e:
+        print e
+        print "Experienced a problem with "
+        print row
+        print "Catched it and try to move on"
+
+for formIdKey, toIdValues in umlsMapping.iteritems():
+    for toIdKey in toIdValues:
+        postMappings.append({
+        "fromId": formIdKey,
+        "toId": toIdKey,
+        "datasourcePrefix": "UMLS",
+        "sourceType": "DATABASE",
+        "scope": "RELATED"
+        }
+        )
+
 
 db.close()
+print "Fetching all mappings from UMLS done!"
 
 print "Generating CSV files for neo loading..."
 
@@ -166,7 +188,7 @@ import OxoCsvBuilder
 builder = OxoCsvBuilder.Builder()
 
 builder.exportTermsToCsv(exportFileTerms, terms)
-builder.exportMappingsToCsv(exportFileTerms, terms, prefixToDatasource)
+builder.exportMappingsToCsv(exportFileMappings, postMappings, prefixToDatasource)
 
 
 print "Finished process!"

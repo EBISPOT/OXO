@@ -6036,7 +6036,7 @@ Note: Currently, direct access to RNA products is restricted. This is expected t
 
 	<datatype id="MIR:00000139" pattern="^C\d+$">
 		<name>NCIt</name>
-		<preferredPrefix>NCIt</preferredPrefix>
+		<preferredPrefix>NCIT</preferredPrefix>
 		<alternatePrefixes>
 			<alternatePrefix>NCI_Thesaurus</alternatePrefix>
 			<alternatePrefix>NCI</alternatePrefix>

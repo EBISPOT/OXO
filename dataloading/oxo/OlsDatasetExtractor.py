@@ -69,6 +69,9 @@ for ontology in ontologies:
         altPrefixes = [namespace, "hpo"]
         prefixToPreferred["HPO"] = prefPrefix
         prefixToPreferred["hpo"] = prefPrefix
+    elif namespace == "ncit":
+        prefPrefix = "NCIT"
+        altPrefixes = [namespace, "NCI_Thesaurus", "NCI", "ncithesaurus", "NCI2009_04D"]
     else:
         prefPrefix = ontology["config"]["preferredPrefix"]
 
@@ -93,7 +96,6 @@ rootElem = tree.getroot()
 for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
     namespace =  datatype.find('{http://www.biomodels.net/MIRIAM/}namespace').text
     prefPrefix = namespace
-
 
     title =  datatype.find('{http://www.biomodels.net/MIRIAM/}name').text
     desc =  datatype.find('{http://www.biomodels.net/MIRIAM/}definition').text
