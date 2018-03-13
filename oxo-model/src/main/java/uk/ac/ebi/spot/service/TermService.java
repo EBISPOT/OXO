@@ -4,6 +4,7 @@ import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,9 @@ public class TermService {
     @Autowired
     Session session;
     private Object summaryGraphJson;
+
+    @Value("${oxo.indexer.chunks}")
+    int chunks = 10000;
 
     /**
      *
@@ -234,17 +238,22 @@ public class TermService {
         int termCount = termGraphRepository.getIndexableTermCount();
         log.info("Total terms to index " + termCount);
 
-        HashSet<String> curies = new HashSet<String>();
+        List<Document> chunk = new ArrayList<Document>();
 
-        for (int x = 0; x <= termCount; x +=10000) {
-            List<Document> chunk = new ArrayList<Document>(10000);
-            for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms(x, 10000)) {
-                if (curies.contains(t.getCurie())) {
-                    log.error("Saving twice "+ t.getCurie());
-                }
+        for (int x = 0; x <= termCount; x +=chunks) {
+            log.info("Reading " +x + " terms from term repository...");
+            for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms(x, chunks)) {
                 chunk.add(DocumentBuilder.getDocumentFromTerm(t));
-                curies.add(t.getCurie());
+                // save solr in chuncks of 10000
+                if (chunk.size() == 10000) {
+                    log.info("Saving " +chunk.size() + " documents...");
+                    documentRepository.save(chunk);
+                    chunk.clear();
+                }
             }
+        }
+
+        if (!chunk.isEmpty())  {
             log.info("Saving " +chunk.size() + " documents...");
             documentRepository.save(chunk);
         }
