@@ -231,23 +231,23 @@ public class TermService {
 
         documentRepository.deleteAll();
 
-        List<Document> chunk = new ArrayList<Document>();
+        int termCount = termGraphRepository.getIndexableTermCount();
+        log.info("Total terms to index " + termCount);
 
-        for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms()) {
-            if (t != null) {
-                chunk.add(DocumentBuilder.getDocumentFromTerm(t));
-                if (chunk.size() == 10000) {
-                    log.info("Saving 10000 documents...");
-                    documentRepository.save(chunk);
-                    chunk =  new ArrayList<Document>();
+        HashSet<String> curies = new HashSet<String>();
+
+        for (int x = 0; x <= termCount; x +=10000) {
+            List<Document> chunk = new ArrayList<Document>(10000);
+            for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms(x, 10000)) {
+                if (curies.contains(t.getCurie())) {
+                    log.error("Saving twice "+ t.getCurie());
                 }
+                chunk.add(DocumentBuilder.getDocumentFromTerm(t));
+                curies.add(t.getCurie());
             }
-        }
-
-        if (!chunk.isEmpty()) {
+            log.info("Saving " +chunk.size() + " documents...");
             documentRepository.save(chunk);
         }
-
     }
 
     public void rebuildIndexes() {
