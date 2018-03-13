@@ -236,7 +236,7 @@ def processSolrDocs(url):
 
                             # if to id is idorg, then mint the Uri
                             if toPrefix.lower() in idorgNamespace:
-                                idorgUri = "http://identifiers.org/" + idorgNamespace[toPrefix.lower()] + "/" + toId
+                                idorgUri = "http://identifiers.org/" + toCurie
                                 terms[toCurie]["uri"] = idorgUri
 
         print str(x)
