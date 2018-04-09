@@ -141,7 +141,7 @@
                                 <img src="../img/infinity.gif"/>
                             </div>
                         </div>
-                        <div id="mynetwork" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
+                        <div id="network"  th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
                     </div>
                 </div>
 
@@ -154,17 +154,24 @@
         <div class="row">
             <div class="small-12 columns grayBackground">
             <div th:if="${term}" class="panel">
-                <div class="panel-heading">
+               <!-- <div class="panel-heading">
                     <h5 class="panel-title">Mappings</h5>
-                </div>
+                </div> -->
 
                 <div class="panel-body">
 
                             <form>
                                 <span>Mapping Distance: </span>
-                                <div style="margin-left: 15px;display: inline;">
+                                <select id="distanceDropDown" name="distance">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+
+                        <!--        <div style="margin-left: 15px;display: inline;">
                                     <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
-                                </div>
+                                </div>-->
+                                <input type="hidden" name="distance" th:value="1"/>
                                 <input type="hidden" name="inputSource" th:value="${inputSource}"/>
                                 <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
                                 <input type="hidden" name="ids" th:value="${id}"/>
@@ -220,10 +227,19 @@
         }};
         instance.start(options) */
 
-
         reinitialiseTable()
         drawGraph()
- /*
+
+        //If there is a change in the drop down box, the table and the graph are redrawn
+        $("#distanceDropDown").on('change', function() {
+            $("input[name=distance]").val(this.value)
+            reinitialiseTable()
+            drawGraph()
+        })
+
+
+
+        /*
         $('#distance-slider').bootstrapSlider({
             step: 1, min: 1, max: 3,
             ticks: [1, 2, 3],
@@ -233,6 +249,7 @@
             reinitialiseTable()
             drawGraph()
         });*/
+
     });
 </script>
 
