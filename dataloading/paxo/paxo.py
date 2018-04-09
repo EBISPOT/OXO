@@ -12,7 +12,6 @@ import neoExporter
 import sys
 import listprocessing
 
-
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
 def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder):
     logging.info("Start scoring "+sourceOntology+" and "+targetOntology)
@@ -24,8 +23,20 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
     try:
         r = requests.get(olsURL+"ontologies/"+sourceOntology)
         numberOfTerms=r.json()['numberOfTerms']
+        #Logging some meta data
+        logging.info("MetaData for "+sourceOntology+": ")
+        logging.info(" OLS update date: "+str(r.json()["updated"]))
+        logging.info(" OLS version field: "+str(r.json()["config"]["version"]))
+        logging.info(" OLS versionIRI field: "+str(r.json()["config"]["versionIri"]))
+
         r = requests.get(olsURL+"ontologies/"+targetOntology)
         numberOfTerms2 = r.json()['numberOfTerms']
+        #Logging some meta data
+        logging.info("MetaData for "+targetOntology+": ")
+        logging.info(" OLS update date: "+str(r.json()["updated"]))
+        logging.info(" OLS version field: "+str(r.json()["config"]["version"]))
+        logging.info(" OLS versionIRI field: "+str(r.json()["config"]["versionIri"]))
+
     except:
         logging.error("Error getting number of terms throw webservice call!")
         logging.error(olsURL+"ontologies/"+sourceOntology)
@@ -39,10 +50,11 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
         sourceOntology=targetOntology
         targetOntology=tmpOntology
 
-    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=500&fieldList=iri,label,synonym"
+    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=10&fieldList=iri,label,synonym"
     results=[]
 
-    results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "synOxo", "bridgeTerms"])
+    #results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "synOxo", "bridgeTerms"])
+    results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "bridgeTerms"])
     counter=0
     while True:
         try:
@@ -96,9 +108,8 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
                         synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
                         synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
 
-                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
-
-
+#                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
+                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], calculatedMappings['bridgeEvidence']])
         try:
             termsUrl=r.json()['_links']['next']['href']
             counter=counter+1
@@ -135,28 +146,23 @@ def scoreOntologyPrimaryScore(name, scorefolder):
             tmp=row[4]
             synFuzzy=ast.literal_eval(tmp)
             tmp=row[5]
-            synOxo=ast.literal_eval(tmp)
-            tmp=row[6]
             bridgeEvidence=ast.literal_eval(tmp)
 
             for i in fuzzy:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                #obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in oxo:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy,  "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in synFuzzy:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
-                scoreMatrix.append(obj)
-
-            for i in synOxo:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in bridgeEvidence:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
 
@@ -198,13 +204,15 @@ def writeOutPutScore(scoredMatrix, name, predictedTargetFolder, saveToDisc):
     result=[]
 
     for line in scoredMatrix:
-        result.append([line[0]['sourceIRI'], line[0]['iri'], line[0]['finaleScore'], line[0]['sourceTerm']])
+        result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']),line[0]['sourceTerm'], line[0]['label'], float(line[0]['normalizedScore'])])
 
     if saveToDisc==True:
+        result.insert(0,['sourceIRI','mappedIRI','score','sourceLabel', 'mappedLabel', 'NormalizedScore'])
         with open(predictedTargetFolder+'calculated_output_'+name+'.csv', 'w') as f:
             writer = csv.writer(f)
             writer.writerows(result)
             f.close()
+        result.pop(0)
 
     return result
 
@@ -226,10 +234,10 @@ def curationOntologyFinalScore(scoredMatrix):
             if unified[index][2]<scoredMatrix[counter][2]:
                 unified[index]=scoredMatrix[counter] #Replace that line with the higher scored line!
 
-    print "A total of "+str(doubleEntryCounter)+" processed!"
-    if len(replacedList)!=0:
-        print "Write file of replaced terms now"
-        print "Total length of replaced is "+str(len(replacedList))
+    #print "A total of "+str(doubleEntryCounter)+" processed!"
+    #if len(replacedList)!=0:
+        #print "Write file of replaced terms now"
+        #print "Total length of replaced is "+str(len(replacedList))
     return unified
 
 
@@ -237,6 +245,12 @@ def curationOntologyFinalScore(scoredMatrix):
 def calculatePrimaryScore(combinedOntologyName, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries):
     simplerMatrix=scoreOntologyPrimaryScore(combinedOntologyName, scoringTargetFolder)
     scoredMatrix=processOntologyPrimaryScore(simplerMatrix, params)
+
+    #Maximum would be caluclated like that, anyway, who knows if we really want that
+    #maximum=(4*params["fuzzyUpperFactor"]+params["oxoDistanceOne"]+params["oxoDistanceOne"]*params["bridgeOxoFactor"])/4.0
+    for row in scoredMatrix:
+        row[0]['normalizedScore']=row[0]['finaleScore']/4.0
+
     preparedScoredMatrix=writeOutPutScore(scoredMatrix, combinedOntologyName, predictedTargetFolder, writeToDisc)
 
     #Make mappings unique if the Flag is set to true, if not - we get way more mappings, miss less from the standard but are not unique
@@ -265,6 +279,7 @@ def scoreListOntologies(sections):
         stopwordList=config.get("Params","StopwordsList").split(',')
         scoreParams={"removeStopwordsList":stopwordList, "replaceTermList" : []}
         print "Score "+sourceOntology+" "+targetOntology
+        logging.info("Score "+sourceOntology+" "+targetOntology)
         scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder)
 
 #Goes through the sections and calls calculateAndValidateOntologyPrimaryScore for every section
@@ -283,7 +298,7 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
         print "Could not find "+validationTargetFolder+" - please make sure the folder exists!\n"
         raise Exception("Folder does not exists")
 
-
+    returnValue=[]
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
@@ -296,7 +311,7 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
             scorePosition=int(config.get(section, 'scorePosition'+name))
             delimiter=config.get(section, 'delimiter'+name)
             if delimiter=='t':
-                print "Have to change delimiter!"
+                #print "Have to change delimiter!"
                 delimiter=str('\t')
 
             parseParms={'uri1':uri1, 'uri2':uri2, 'scorePosition':scorePosition, 'delimiter':delimiter}
@@ -309,14 +324,18 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
             oxoDistanceTwo=float(config.get(section,'oxoDistanceTwo'))
             oxoDistanceThree=float(config.get(section,'oxoDistanceThree'))
             synFuzzyFactor=float(config.get(section,'synFuzzyFactor'))
-            synOxoFactor=float(config.get(section,'synOxoFactor'))
             bridgeOxoFactor=float(config.get(section,'bridgeOxoFactor'))
             threshold=float(config.get(section,'threshold'))
-            params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+            #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+            params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
 
-            print "Validate "+sourceOntology+" "+targetOntology+" "+name
-            calculateAndValidateOntologyPrimaryScore(sourceOntology, targetOntology, name, stdFile, params, scoringtargetFolder, writeToDiscFlag, predictedTargetFolder, parseParms, curationOfDoubleEntries,validationTargetFolder,config.get('Basics','olsAPIURL')+"search")
+            #print "Validate "+sourceOntology+" "+targetOntology+" "+name
+            returnCV=calculateAndValidateOntologyPrimaryScore(sourceOntology, targetOntology, name, stdFile, params, scoringtargetFolder, writeToDiscFlag, predictedTargetFolder, parseParms, curationOfDoubleEntries,validationTargetFolder,config.get('Basics','olsAPIURL')+"search")
+            #returnCV=[{"source":sourceOntology,"target": targetOntology}, returnCV]
+            returnValue.append({"source":sourceOntology,"target": targetOntology, "misses":returnCV['misses'], "alternatives":returnCV['alternatives']})
+            #returnValue={"source":sourceOntology,"target": targetOntology, "misses":returnCV['misses'], "alternatives":returnCV['alternatives']}
 
+    return returnValue
 
 #Goes through the sections and calls calculateOntologyPrimaryScore for every section
 def calculateListOntologies(sections, writeToDisc, curationOfDoubleEntries):
@@ -343,13 +362,14 @@ def calculateListOntologies(sections, writeToDisc, curationOfDoubleEntries):
         oxoDistanceTwo=float(config.get(section,'oxoDistanceTwo'))
         oxoDistanceThree=float(config.get(section,'oxoDistanceThree'))
         synFuzzyFactor=float(config.get(section,'synFuzzyFactor'))
-        synOxoFactor=float(config.get(section,'synOxoFactor'))
+        #synOxoFactor=float(config.get(section,'synOxoFactor'))
         bridgeOxoFactor=float(config.get(section,'bridgeOxoFactor'))
         threshold=float(config.get(section,'threshold'))
-        params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
-
+        #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+        params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
         print "Calculate "+sourceOntology+" "+targetOntology
-        print calculatePrimaryScore(sourceOntology+"_"+targetOntology, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries)
+        logging.info("Calculate "+sourceOntology+" "+targetOntology)
+        calculatePrimaryScore(sourceOntology+"_"+targetOntology, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries)
 
 
 def exportNeoList(sections):
@@ -403,13 +423,14 @@ def runListAnnotation():
     oxoDistanceTwo=float(config.get("Basics",'oxoDistanceTwo'))
     oxoDistanceThree=float(config.get("Basics",'oxoDistanceThree'))
     synFuzzyFactor=float(config.get("Basics",'synFuzzyFactor'))
-    synOxoFactor=float(config.get("Basics",'synOxoFactor'))
+    #synOxoFactor=float(config.get("Basics",'synOxoFactor'))
     bridgeOxoFactor=float(config.get("Basics",'bridgeOxoFactor'))
     threshold=float(config.get("Basics",'threshold'))
     stopwordList=config.get("Params","StopwordsList").split(',')
     synonymSplitChar=config.get("Basics","synonymSplitChar")
 
-    params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
+    #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
+    params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
     options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel, "synonymSplitChar":synonymSplitChar}
     #ScoreParameters define stopwords
     scoreParams={"removeStopwordsList": stopwordList, "replaceTermList" : replacementTerms}
@@ -444,11 +465,12 @@ helptext="""Start the client with exactly two input parameters: The path to the 
 if len(sys.argv)<3:
     print helptext
     print "\nNot enough arguments! Take exactly two, "+str(len(sys.argv)-1)+" given!"
+    #raise
 elif len(sys.argv)>3:
     print helptext
     print "\nToo many arguments! Take exactly two, "+str(len(sys.argv)-1)+" given!"
-else:
-
+    raise
+elif len(sys.argv)==3:
     config = SafeConfigParser()
     config.read(sys.argv[1])
     logFile=config.get("Basics","logFile")
@@ -465,7 +487,7 @@ else:
     elif sys.argv[2]=="-c":
         calculateListOntologies(sections, writeToDiscFlag, uniqueMaps)
     elif sys.argv[2]=="-cv":
-        calculateAndValidateListOntologies(sections, writeToDiscFlag, uniqueMaps)
+        print calculateAndValidateListOntologies(sections, writeToDiscFlag, uniqueMaps)
     elif sys.argv[2]=="-n":
         exportNeoList(sections)
     else:

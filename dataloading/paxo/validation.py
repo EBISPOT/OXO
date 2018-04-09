@@ -2,9 +2,6 @@ import csv
 import logging
 import requests
 import time
-#from ConfigParser import SafeConfigParser
-#config = SafeConfigParser()
-#config.read("config.ini")
 
 def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDisc, params, parseParms, validationTargetFolder, url):
     uri1Position=parseParms['uri1']
@@ -12,20 +9,11 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
     counterPosition=parseParms['scorePosition']
     delimiterChar=parseParms['delimiter']
 
-    #url=config.get("Basics","olsURL")
-
-
-    print "Validate ... "
-    #logging.basicConfig(filename="flask.log", level=logging.INFO, format='%(asctime)s - %(message)s')
-
     inputList=[]
     inputLongList=[]
     for row in inputFile:
         inputList.append([row[0], row[1]])
         inputLongList.append(row)
-        #if row[2]=='':
-        #    print "Oh No, we found a empty value!"
-
 
     targetList=[]
     targetLongList=[]
@@ -45,13 +33,11 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
     missing=[]
     matches=[]
 
-    #print inputList
-
     #Now validate the computed mappings against the standard
     for counter, line in enumerate(targetList):
-            #NoMatch from std to the created mapping file, so this goes to the missing List
+
             if line not in inputList:
-                missing.append([line[0], line[1], "NoScore", targetLongList[counter][counterPosition]])
+                missing.append([line[0], line[1], "NoScore", targetLongList[counter][counterPosition], targetLongList[counter][1], targetLongList[counter][3]])
 
             #Exact same Result for both, so this is a match. Is added to the matches List
             else:
@@ -59,13 +45,13 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
                     if c[0]==line[0] and c[1]==line[1] or c[1]==line[0] and c[1]==line[1]:
                         score=c[2]
 
-                matches.append([line[0], line[1], score, targetLongList[counter][counterPosition]])
+                matches.append([line[0], line[1], score, targetLongList[counter][counterPosition],targetLongList[counter][1], targetLongList[counter][3]])
             #Add those mappings that where no in the standard but calculated to the alternatives List
 
     alternatives=[]
     for counter, line in enumerate(inputList):
         if line not in targetList and line[1]!="UNKNOWN":
-            alternatives.append([line[0], line[1], inputLongList[counter][2], "noScore"])
+            alternatives.append([line[0], line[1], inputLongList[counter][2], "noScore", inputLongList[counter][3], inputLongList[counter][4]])
 
 
     #Alternative Counter
@@ -85,65 +71,66 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
 
     result=matches+missing+alternatives#+discarted - we can also show the discarted terms or put them in an own file
 
+    #print result
     #If we write to disc, I get the labels of the parts that are NOT mapped to the standard
     if writeToDisc is True:
-        print "Try to save the result"
+        #print "Try to save the result"
         obsoleteScore=0
-        for row in result:
-            #if row[2]=='NoScore' or row[3]=='noScore':
-                #print "Need to annotate "+row[0]+" and "+row[1]
-
-                data={'q':row[0],'queryFields':'iri', 'fieldList': 'label', "ontology":onto1, "type":"class", "local":True}
-
-                try:
-                    r = requests.get(url, data)
-                except:
-                    time.sleep(60)
-                    logging.info("API exception, try again after 5 second delay")
-                    print "API exception, try again after 5 second delay"
-                    try:
-                        r = requests.get(url, data)
-                        logging.info("Success")
-                        print "Success!"
-                    except:
-                        logging.info("Error with second try")
-                        logging.info(r.status_code)
-                        logging.info(r.request.url)
-                        #raise
-
-
-                try:
-                    jsonReply=r.json()
-                    row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
-                except:
-                    row.append('NoLabel Found')
-                    obsoleteScore=obsoleteScore+1
-                    print "No Label found in the first row"
-
-                data={'q':row[1],'queryFields':'iri', 'fieldList': 'label', "ontology":onto2, "type":"class", "local":True}
-                try:
-                    r = requests.get(url, data)
-                except:
-                    time.sleep(60)
-                    logging.info("API exception, try again after 5 second delay")
-                    print "API exception, try again after 5 second delay"
-                    try:
-                        r = requests.get(url, data)
-                        logging.info("Success")
-                        print "Success"
-                    except:
-                        logging.info("Error with second try")
-                        logging.info(r.status_code)
-                        logging.info(r.request.url)
-
-
-                try:
-                    jsonReply=r.json()
-                    row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
-                except:
-                    row.append('NoLabel Found')
-                    obsoleteScore=obsoleteScore+1
-                    print "No Label found in the second row"
+        # for row in result:
+        #     #if row[2]=='NoScore' or row[3]=='noScore':
+        #         #print "Need to annotate "+row[0]+" and "+row[1]
+        #
+        #         data={'q':row[0],'queryFields':'iri', 'fieldList': 'label', "ontology":onto1, "type":"class", "local":True}
+        #
+        #         try:
+        #             r = requests.get(url, data)
+        #         except:
+        #             time.sleep(60)
+        #             logging.info("API exception, try again after 5 second delay")
+        #             print "API exception, try again after 5 second delay"
+        #             try:
+        #                 r = requests.get(url, data)
+        #                 logging.info("Success")
+        #                 print "Success!"
+        #             except:
+        #                 logging.info("Error with second try")
+        #                 logging.info(r.status_code)
+        #                 logging.info(r.request.url)
+        #                 #raise
+        #
+        #
+        #         try:
+        #             jsonReply=r.json()
+        #             row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
+        #         except:
+        #             row.append('NoLabel Found')
+        #             obsoleteScore=obsoleteScore+1
+        #             print "No Label found in the first row"
+        #
+        #         data={'q':row[1],'queryFields':'iri', 'fieldList': 'label', "ontology":onto2, "type":"class", "local":True}
+        #         try:
+        #             r = requests.get(url, data)
+        #         except:
+        #             time.sleep(60)
+        #             logging.info("API exception, try again after 5 second delay")
+        #             print "API exception, try again after 5 second delay"
+        #             try:
+        #                 r = requests.get(url, data)
+        #                 logging.info("Success")
+        #                 print "Success"
+        #             except:
+        #                 logging.info("Error with second try")
+        #                 logging.info(r.status_code)
+        #                 logging.info(r.request.url)
+        #
+        #
+        #         try:
+        #             jsonReply=r.json()
+        #             row.append(jsonReply['response']['docs'][0]['label'].encode(encoding='UTF-8'))
+        #         except:
+        #             row.append('NoLabel Found')
+        #             obsoleteScore=obsoleteScore+1
+        #             print "No Label found in the second row"
 
 
         with open(validationTargetFolder+onto1+"_"+onto2+'_'+stdNamed+'_validate.csv', 'wb') as f:
@@ -162,7 +149,7 @@ def validateFinaleScore(onto1, onto2, stdNamed, inputFile, TargetFile, writeToDi
         logging.info("oxoDistanceTwo,   "+str(params["oxoDistanceTwo"]))
         logging.info("oxoDistanceThree,   "+str(params["oxoDistanceThree"]))
         logging.info("synFuzzyFactor,   "+str(params["synFuzzyFactor"]))
-        logging.info("synOxoFactor,   "+str(params["synOxoFactor"]))
+        #logging.info("synOxoFactor,   "+str(params["synOxoFactor"]))
 
         msg="Stats for "+str(onto1)+"_"+str(onto2)+" validation "+stdNamed+"\n"
         msg=msg+"Number of std mappings, "+str(len(targetList))+"\n"

@@ -12,7 +12,7 @@ def runListProcessing(options, params, scoreParams):
     delimiter=options["delimiter"]
     targetOntology=options["targetOntology"]
     detailLevel=options["detailLevel"]
-    synonymSplitChar="|"
+    synonymSplitChar=options["synonymSplitChar"]
 
     #Open the input file
     with open(inputFile) as csvfile:
