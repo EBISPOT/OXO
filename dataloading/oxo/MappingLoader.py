@@ -240,21 +240,31 @@ print "Done processing EFO, starting to query OLS"
 processSolrDocs(olsDbxerfSolrQuery)
 print "Done processing OLS"
 
+#terms={ "DOID:0080184" :{"prefix": "DOID",
+#        "id": "0080184",
+#        "curie": "DOID:0080184",
+#        "uri": None,
+#        "label":None}
+#    }
+
 
 print "Looking for OLS terms with no labels..."
 for key, term in terms.iteritems():
-
-    if key == "VO:0000740":
-        print "aha"
     if term["label"] is None:
         prefix = OXO.getPrefixFromCui(key)
         if prefixToDatasource[prefixToPreferred[prefix]]["source"] == "ONTOLOGY":
             object = OXO.getIriAndLabelFromOls(term["curie"], olsurl)
             if object is not None:
-                if term["uri"]:
+                if term["uri"] is None:
                     terms[key]["uri"] = object["uri"]
-                if term["label"]:
+                if term["label"] is None:
                     terms[key]["label"] = object["label"]
+            else:
+                print "Object None!"
+                print object
+                print terms[key]
+
+
 
 
 #url = "http://www.ebi.ac.uk/ols/api/search?q=*&fieldList=iri,short_form,obo_id,database_cross_reference_annotation"
@@ -279,12 +289,10 @@ idToLabel = {}
 def getUMLSMappingFromRow(row):
     cui =  row[0]
     source = row[1]
-    targetUi = row[2]
+    toid = row[2]
     descId =  row[3]
     label = row[4]
 
-
-    toid = targetUi
     if descId is not None:
         toid = descId
 
@@ -350,16 +358,26 @@ def getUMLSMappingFromRow(row):
 # umls loader
 cur = db.cursor()
 # Use all the SQL you like
-cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and ts = 'P' and sab != 'src'")
+
+#cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and (ts = 'P' or tty='PT') and sab != 'src'")
+# --> missing Snomed labels 6613 (down from )
+
+# https://www.ncbi.nlm.nih.gov/books/NBK9685/
+# STT	String type
+# TS	Term status
+# SAB	Abbreviated source name (SAB).
+
+cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and (ts = 'P' or ts='S') and sab != 'src'")
+
 fetched=cur.fetchall()
 
 # Previously, 'old sql query'
 #cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
 #fetched=cur.fetchall()
 
-if len(fetched)==0:
-     cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
-     fetched=cur.fetchall()
+#if len(fetched)==0:
+#     cur.execute("select distinct cui,sab, scui, sdui, str from MRCONSO where stt = 'PF' and tty = 'PT' and sab != 'src'")
+#     fetched=cur.fetchall()
 
 for row in fetched:
     try:
@@ -371,6 +389,8 @@ for row in fetched:
         print "Experienced a problem with "
         print row
         print "Catched it and try to move on"
+        #Experienced a problem with  ('C1180021', 'NCI', 'C33333', None, 'Plus End of the Microtubule')
+        #('C0796501', 'NCI', 'C11519', None, 'Asparaginase/Dexamethasone/Prednisone/Vincristine')
 
 db.close()
 

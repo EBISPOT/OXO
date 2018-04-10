@@ -59,8 +59,9 @@ margin-top: 1.1em;
 .alert-warning{
     background-color: #faebcc;
     margin-bottom: 10px;
+    margin-top: 5px;
     padding: 10px 10px 10px 10px;
-    border-radius: 25px;
+    border-radius: 0px;
 }
 
 .grayBackground{
@@ -69,3 +70,11 @@ background-color: #f2f2f2;
 padding: 10px 10px 10px 10px;
 margin: 10px;
 }
+
+
+#network{
+    height:500px;
+    width: 100%;
+    border: 2px black solid;
+}
+
