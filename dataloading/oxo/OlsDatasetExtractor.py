@@ -158,6 +158,8 @@ for database in yamlData:
         prefixToPreferred[namespace.lower()] = prefPrefix
 
         if prefPrefix not in datasources:
+            print "New datasource " + namespace + " from GO db-xrefs file"
+
             datasources[prefPrefix] = OxoClient.Datasource (prefPrefix, None, title, None, "DATABASE",urlSyntax, altPrefixes, None, None)
 
 
