@@ -69,7 +69,7 @@ public class TermService {
         }
         return termGraphRepository.findByCurie(document.getId());
     }
-              git
+
     /**
      * This method saves a term. The term must have a valid datasource that we know about. If the datasource is valid, but the prefix
      * isn't we will change the prefix to match the datasource.
