@@ -1,0 +1,11 @@
+pyyaml
+requests
+python-levenshtein
+flask
+neo4j-driver
+pyyaml
+mysql-python
+spotpy
+numpy
+matplotlib
+pandas

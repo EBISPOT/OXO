@@ -32,10 +32,10 @@ import java.util.stream.Collectors;
 public class DatasourceService {
 
     @Autowired
-    private DatasourceRepository datasourceRepository;
+    public DatasourceRepository datasourceRepository;
 
     @Autowired
-    DocumentRepository documentRepository;
+    public DocumentRepository documentRepository;
 
     @Autowired
     private TermGraphRepository termGraphRepository;

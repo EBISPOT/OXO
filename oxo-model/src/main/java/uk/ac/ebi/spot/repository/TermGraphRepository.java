@@ -26,7 +26,12 @@ public interface TermGraphRepository extends GraphRepository<Term> {
     @Query(value = "MATCH (n:Term)-[HAS_SOURCE]->(d:Datasource) WHERE d.prefix = {0} RETURN count(n)")
     int getTermCountBySource(String prefix);
 
-    @Query(value = "Match (t:Term)-[:HAS_SOURCE]->(d:Datasource) RETURN t.curie as curie, t.id as id, t.uri as uri, d.alternatePrefix as alternatePrefixes")
+    @Query(value = "MATCH (n:Term)-[HAS_SOURCE]->(d:Datasource) RETURN count(DISTINCT n)")
+    int getIndexableTermCount();
+
+    @Query(value = "Match (t:Term)-[:HAS_SOURCE]->(d:Datasource) RETURN DISTINCT t.curie as curie, t.id as id, t.uri as uri, d.alternatePrefix as alternatePrefixes")
     Iterable<IndexableTermInfo> getAllIndexableTerms();
 
+    @Query(value = "Match (t:Term)-[:HAS_SOURCE]->(d:Datasource) RETURN DISTINCT t.curie as curie, t.id as id, t.uri as uri, d.alternatePrefix as alternatePrefixes ORDER BY curie SKIP {0} LIMIT {1}")
+    Iterable<IndexableTermInfo> getAllIndexableTerms(long skip, long limit);
 }

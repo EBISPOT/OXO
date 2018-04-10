@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>oxo</artifactId>
+        <groupId>uk.ac.ebi.spot</groupId>
+        <version>0.0.17-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.ac.ebi.spot.oxo</groupId>
+    <artifactId>oxo-indexer</artifactId>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.spot</groupId>
+            <artifactId>oxo-model</artifactId>
+            <version>0.0.17-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+    <packaging>jar</packaging>
+
+    <build>
+        <finalName>
+            oxo-indexer
+         </finalName>
+   		<plugins>
+   			<plugin>
+   				<groupId>org.springframework.boot</groupId>
+   				<artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                </configuration>
+   			</plugin>
+   		</plugins>
+   	</build>
+
+</project>

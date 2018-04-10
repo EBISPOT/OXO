@@ -1,7 +1,9 @@
 package uk.ac.ebi.spot.index;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.solr.repository.SolrCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Simon Jupp

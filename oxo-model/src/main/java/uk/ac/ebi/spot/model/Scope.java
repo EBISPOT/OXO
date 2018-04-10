@@ -6,9 +6,10 @@ package uk.ac.ebi.spot.model;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public enum Scope {
+
     EXACT,
-    NARROW,
-    BROAD,
+    NARROWER,
+    BROADER,
     RELATED,
     PREDICTED
 }

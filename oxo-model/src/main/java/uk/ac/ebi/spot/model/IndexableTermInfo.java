@@ -7,7 +7,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * @since 27/03/2017
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  *
- * This is a ocnvinnence object that is a stripped down version of a term, with only the information needed to create the Document for saving in the Document repository
+ * This is a convenience object that is a stripped down version of a term, with only the information needed to create the Document for saving in the Document repository
  *
  */
 @QueryResult

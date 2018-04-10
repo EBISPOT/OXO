@@ -8,7 +8,8 @@
 	<modules>
 		<module>oxo-web</module>
 		<module>oxo-model</module>
-	</modules>
+        <module>oxo-indexer</module>
+    </modules>
 	<packaging>pom</packaging>
 
 	<name>EMBL-EBI ontology cross-reference service (OxO)</name>
