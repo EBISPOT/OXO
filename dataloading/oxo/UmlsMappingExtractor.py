@@ -127,7 +127,7 @@ def getUMLSMappingFromRow(row, terms, umlsMapping):
             "uri": toUri
         }
 
-    if sourcePreferred == 'PT' or sourcePreferred == 'MH' or sourcePreferred == 'OAP':
+    if sourcePreferred in ['PT' ,'MH', 'OAP', "NM"]:
         terms[toCurie]["label"] = label
 
 
@@ -154,7 +154,7 @@ for row in fetched:
 print "Fetching all source terms info from from UMLS..."
 
 # now get source term labels
-getPreferredLabelFromSource = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where  (tty = 'PT' or tty = 'MH' or tty = 'OAP') and  sab != 'src'"
+getPreferredLabelFromSource = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where  (tty = 'PT' or tty = 'MH' or tty = 'OAP' or tty = 'NM') and  sab != 'src'"
 cur.execute(getPreferredLabelFromSource)
 fetched=cur.fetchall()
 

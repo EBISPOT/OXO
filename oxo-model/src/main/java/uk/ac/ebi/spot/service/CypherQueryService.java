@@ -264,7 +264,7 @@ public class CypherQueryService implements MappingQueryService {
     // todo remove fixing to lower case
     private static Function<String,String> sourcePrefixWrap = new Function<String,String>() {
         @Override public String apply(String s) {
-            return new StringBuilder().append("'").append(s.toLowerCase()).append("'").append(" in source").toString();
+            return new StringBuilder().append("'").append(s).append("'").append(" in edges").toString();
         }
     };
 

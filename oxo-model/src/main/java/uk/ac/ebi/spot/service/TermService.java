@@ -244,7 +244,7 @@ public class TermService {
             log.info("Reading " +x + " terms from term repository...");
             for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms(x, chunks)) {
                 chunk.add(DocumentBuilder.getDocumentFromTerm(t));
-                // save solr in chuncks of 10000
+                // save solr in chunks of 10000
                 if (chunk.size() == 10000) {
                     log.info("Saving " +chunk.size() + " documents...");
                     documentRepository.save(chunk);
