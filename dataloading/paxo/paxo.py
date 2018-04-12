@@ -13,7 +13,7 @@ import sys
 import listprocessing
 
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
-def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder):
+def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder, mapSmallest, useLocalOnly):
     logging.info("Start scoring "+sourceOntology+" and "+targetOntology)
     #Check for the smaller ontology
     olsURL=config.get("Basics","olsAPIURL")
@@ -44,16 +44,17 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
         logging.error(r)
         raise
 
-    #In case the targetOntology is smaller than the source Ontology, switch the output
-    if (numberOfTerms>numberOfTerms2):
-        tmpOntology=sourceOntology
-        sourceOntology=targetOntology
-        targetOntology=tmpOntology
 
-    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=500&fieldList=iri,label,synonym"
+    if mapSmallest==True:
+        #In case the targetOntology is smaller than the source Ontology, switch the output
+        if (numberOfTerms>numberOfTerms2):
+            tmpOntology=sourceOntology
+            sourceOntology=targetOntology
+            targetOntology=tmpOntology
+
+    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=10&fieldList=iri,label,synonym"
     results=[]
 
-    #results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "synOxo", "bridgeTerms"])
     results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "bridgeTerms"])
     counter=0
     while True:
@@ -71,52 +72,52 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
             originalLabel=term["label"]
             synonyms=term["synonyms"]
 
-            #Check if the term is actually defined in that ontology
-            if term['is_defining_ontology'] is True:
-                    pscore=paxo_internals.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
-                    try:
-                        calculatedMappings=paxo_internals.processPScore(pscore)
-                    except Exception as e:
-                        print "Exception in primary Scoring"
-                        print e
-                        print term["iri"]
-                        print originalLabel
-                        print targetOntology
-                        logging.info("Exception in primary Scoring")
-                        logging.info(term["iri"]+" "+originalLabel)
-                        calculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
+            #Check if the term is actually defined in that ontology. Via flag it can be changed to process all terms
+            if term['is_defining_ontology'] is True or term['is_defining_ontology'] is useLocalOnly:
+                pscore=paxo_internals.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
+                try:
+                    calculatedMappings=paxo_internals.processPScore(pscore)
+                except Exception as e:
+                    print "Exception in primary Scoring"
+                    print e
+                    print term["iri"]
+                    print originalLabel
+                    print targetOntology
+                    logging.info("Exception in primary Scoring")
+                    logging.info(term["iri"]+" "+originalLabel)
+                    calculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
 
-                    #If synonyms are available, run through the same steps with synonyms to score an ontology
-                    synCalculatedMappings={}
-                    if synonyms!=None:
-                        for synonym in synonyms:
-                            try:
-                                synPscore=paxo_internals.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
-                                synCalculatedMappings=paxo_internals.processPScore(synPscore)         #Process the primaryScore for synonyms
-                                synCalculatedMappings['sourceIRI']=term["iri"]
-                            except Exception as e:
-                                print "Exception in Synonym processPScore Term"
-                                print e
-                                synCalculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
-                                logging.info("Exception in  Synonym processPScore Term")
-                                logging.info(term["iri"]+" "+synonym+" "+targetOntology)
-                                synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN - ERROR', 'fuzzyIri': 'UNKNOWN - ERROR'}]
-                                synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
-                                synCalculatedMappings['sourceIRI']=term["iri"]
+                #If synonyms are available, run through the same steps with synonyms to score an ontology
+                synCalculatedMappings={}
+                if synonyms!=None:
+                    for synonym in synonyms:
+                        try:
+                            synPscore=paxo_internals.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
+                            synCalculatedMappings=paxo_internals.processPScore(synPscore)         #Process the primaryScore for synonyms
+                            synCalculatedMappings['sourceIRI']=term["iri"]
+                        except Exception as e:
+                            print "Exception in Synonym processPScore Term"
+                            print e
+                            synCalculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
+                            logging.info("Exception in  Synonym processPScore Term")
+                            logging.info(term["iri"]+" "+synonym+" "+targetOntology)
+                            synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN - ERROR', 'fuzzyIri': 'UNKNOWN - ERROR'}]
+                            synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
+                            synCalculatedMappings['sourceIRI']=term["iri"]
 
-                    else:
-                        synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
-                        synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
+                else:
+                    synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
+                    synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
 
-#                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
-                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], calculatedMappings['bridgeEvidence']])
+#               results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
+                results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], calculatedMappings['bridgeEvidence']])
         try:
             termsUrl=r.json()['_links']['next']['href']
             counter=counter+1
             if counter%2==0:
                 print "Processed "+str(counter)+" pages"
                 logging.info("Processed "+str(counter)+" pages")
-                #break  #Uncomment this for testing the -s flag (so not the whole ontology is parsed but 2 pages)
+                break  #Uncomment this for testing the -s flag (so not the whole ontology is parsed but 2 pages)
         except:
             logging.info("Reached last page I recon")
             print "Reached last page I recon"
@@ -277,10 +278,14 @@ def scoreListOntologies(sections):
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
         stopwordList=config.get("Params","StopwordsList").split(',')
+
+        mapSmallest=config.getboolean("Params", 'mapSmallest')
+        useLocalOnly=config.getboolean("Params", 'useLocalOnly')
+
         scoreParams={"removeStopwordsList":stopwordList, "replaceTermList" : []}
         print "Score "+sourceOntology+" "+targetOntology
         logging.info("Score "+sourceOntology+" "+targetOntology)
-        scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder)
+        scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder, mapSmallest, useLocalOnly)
 
 #Goes through the sections and calls calculateAndValidateOntologyPrimaryScore for every section
 def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoubleEntries):
