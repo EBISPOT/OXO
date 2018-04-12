@@ -65,23 +65,16 @@ def oxoMatch(termLabel, targetOntology, url):
                 data={"fromId":row['curie']}
                 longId=apiCall(url+"mappings", data)
                 longId=longId.json()['_embedded']['mappings'][0]['fromTerm']['uri']
-<<<<<<< HEAD
-                tmpList.append({"curie":longId, "distance":row['distance']})
-=======
                 tmpList.append({"curie":longId, "distance":row['distance'], "oxoLabel":row['label']})
-                #tmpList.append({"curie":row['curie'], "distance":row['distance']})
->>>>>>> dev-1.0.0
                 sortedCurie=sorted(tmpList, key=lambda tmpList: tmpList['distance'], reverse=False)
         else:
             sortedCurie=[{"curie":"UNKNOWN", "distance": 0, "oxoLabel":"UNKNOWN"}]
+
         return sortedCurie
     except Exception as e:
-<<<<<<< HEAD
-        return [{"curie":"UNKNOWN", "distance": 0}]
-=======
         #In case there is NO oxo result, we find outselfs in this loop
         return [{"curie":"UNKNOWN", "distance": 0, "oxoLabel":"UNKNOWN"}]
->>>>>>> dev-1.0.0
+
 
 
 def sortWords(term):
@@ -112,10 +105,6 @@ def stringMatcher(sourceTerm, targetTerm, replaceTermList, removeStopwordsList):
         tmpSource=sourceTerm.replace(replacement[0], replacement[1])
         tmpSource=sortWords(tmpSource)
         replacementLev=round(Levenshtein.ratio(tmpSource, targetTerm), 5)
-<<<<<<< HEAD
-
-=======
->>>>>>> dev-1.0.0
         if replacementLev>lev:
             lev=replacementLev
 
@@ -153,10 +142,6 @@ def olsFuzzyMatch(termLabel, targetOntology, replaceTermList, removeStopwordsLis
         for reply in jsonReply['docs']:
             try:
                 answerTerm=reply['label'].encode(encoding='UTF-8')
-<<<<<<< HEAD
-
-=======
->>>>>>> dev-1.0.0
                 lev=stringMatcher(termLabel, answerTerm, replaceTermList, removeStopwordsList)
 
                 #Compare the inputLabel with all synonym Labels as well.
@@ -330,27 +315,6 @@ def simplifyProcessedPscore(mapping):
                 obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI,"iri":line['fuzzyIri'], "label":line['fuzzyMapping'], "fuzzyScore":0, "oxoScore": 0, "synFuzzy": line['fuzzyScore'], "synOxo":0, "bridgeOxoScore":0}
                 scoreMatrix.append(obj)
 
-<<<<<<< HEAD
-=======
-    # # Oxo Synonyms Score
-    #     flag=False
-    #     for line in mapping['synOxo']:
-    #         for s in scoreMatrix:
-    #             if line["oxoCurie"]==s["iri"]:
-    #                 s['synOxo']=line['oxoScore']
-    #                 flag=True
-    #
-    #         if flag==False:
-    #             #This is ugly, just temporary until input is fixed#
-    #             try:
-    #                 x=line['oxoLabel']
-    #             except:
-    #                 line['oxoLabel']="UNKNOWN"
-    #
-    #             obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "label":line['oxoLabel'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": line['oxoScore'], "bridgeOxoScore":0}
-    #             scoreMatrix.append(obj)
->>>>>>> dev-1.0.0
-
     #Getting into bridge evidence
     flag=False
     for line in mapping['bridgeEvidence']:
@@ -360,21 +324,8 @@ def simplifyProcessedPscore(mapping):
                  flag=True
 
          if flag==False:
-<<<<<<< HEAD
              obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
              scoreMatrix.append(obj)
-=======
-                #This is ugly, just temporary until input is fixed#
-                try:
-                    x=line['oxoLabel']
-                except:
-                    #print "Unknown til new data arrives "
-                    #print sourceIRI
-                    line['oxoLabel']="UNKNOWN"
->>>>>>> dev-1.0.0
-
-                #obj={"sourceTerm":mapping['sourceTerm'], "sourceIRI":sourceIRI, "iri":line['oxoCurie'], "label":line['oxoLabel'], "fuzzyScore": 0, "oxoScore": 0, "synFuzzy":0, "synOxo": 0, "bridgeOxoScore": line['oxoScore']}
-                scoreMatrix.append(obj)
 
     return scoreMatrix
 
@@ -427,26 +378,12 @@ def scoreSimple(scoreMatrix, params):
         if score['oxoScore']==3:
             score['oxoScore']=oxoDistanceThree
 
-        #if score['synOxo']==1:
-        #    score['synOxo']=oxoDistanceOne
-        #if score['synOxo']==2:
-        #    score['synOxo']=oxoDistanceTwo
-        #if score['synOxo']==3:
-        #    score['synOxo']=oxoDistanceThree
-
-<<<<<<< HEAD
-    #    if score['bridgeOxoScore']>0:
-    #        print "FOUND an incredible bridge Term, uhauha!"
-    #        print scoreMatrix[i]
-
-=======
         if score['bridgeOxoScore']==1:
             score['bridgeOxoScore']=oxoDistanceOne
         if score['bridgeOxoScore']==2:
             score['bridgeOxoScore']=oxoDistanceTwo
         if score['bridgeOxoScore']==3:
             score['bridgeOxoScore']=oxoDistanceThree
->>>>>>> dev-1.0.0
 
         #score['finaleScore']=score['fuzzyScore']*fFactor+score['oxoScore']+score['synFuzzy']*synFuzzyFactor+score['synOxo']*synOxoFactor+score['bridgeOxoScore']*bridgeOxoFactor
         score['finaleScore']=score['fuzzyScore']*fFactor+score['oxoScore']+score['synFuzzy']*synFuzzyFactor+score['bridgeOxoScore']*bridgeOxoFactor
