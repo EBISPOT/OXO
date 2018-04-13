@@ -3,8 +3,3 @@ requests
 python-levenshtein
 flask
 neo4j-driver
-pyyaml
-spotpy
-numpy
-matplotlib
-pandas
