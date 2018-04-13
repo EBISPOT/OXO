@@ -2,7 +2,7 @@
 
 - In order to install dependencies, first ensure that you have Python 2.7 and a corresponding version of pip.
 - With pip 2.7, you need to install the prerequisite python modules listed specifically in this directory, thus:
-> `pip install requirements.txt`
+> `pip install -r requirements.txt`
 - Paxo tries to predict mappings between two ontologies, that are present in the Ontology Lookup Service (OLS). It's also possible to try to map a list of terms with one target ontology in OLS.
 
 ### Usage (short)
