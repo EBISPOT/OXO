@@ -52,7 +52,7 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
             sourceOntology=targetOntology
             targetOntology=tmpOntology
 
-    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=10&fieldList=iri,label,synonym"
+    termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=500&fieldList=iri,label,synonym"
     results=[]
 
     results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "bridgeTerms"])
@@ -117,7 +117,7 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
             if counter%2==0:
                 print "Processed "+str(counter)+" pages"
                 logging.info("Processed "+str(counter)+" pages")
-                break  #Uncomment this for testing the -s flag (so not the whole ontology is parsed but 2 pages)
+                #break  #Uncomment this for testing the -s flag (so not the whole ontology is parsed but 2 pages)
         except:
             logging.info("Reached last page I recon")
             print "Reached last page I recon"
