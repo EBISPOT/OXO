@@ -109,7 +109,6 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
                     synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
                     synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
 
-#               results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
                 results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], calculatedMappings['bridgeEvidence']])
         try:
             termsUrl=r.json()['_links']['next']['href']
@@ -203,9 +202,10 @@ def scoreTermList(termList, targetOntology, scoreParams, params):
 #Process scoredMatrix to prepare for validation or save to disc
 def writeOutPutScore(scoredMatrix, name, predictedTargetFolder, saveToDisc):
     result=[]
-
     for line in scoredMatrix:
-        result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']),line[0]['sourceTerm'], line[0]['label'], float(line[0]['normalizedScore'])])
+        sourceTerm=line[0]['sourceTerm']
+        targetLabel=str(line[0]['label'].encode('ascii','ignore'))
+        result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
 
     if saveToDisc==True:
         result.insert(0,['sourceIRI','mappedIRI','score','sourceLabel', 'mappedLabel', 'NormalizedScore'])
@@ -497,7 +497,6 @@ elif len(sys.argv)==3:
         exportNeoList(sections)
     else:
         print "Could not recognize option. So I execute what's uncommented in the else branch. This should just be during development"
-
         #Could/Should be changed so parameters come from the config file
         params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.6}
 

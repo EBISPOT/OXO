@@ -343,10 +343,8 @@ def scoreSimple(scoreMatrix, params):
     fuzzyLowerFactor=params['fuzzyLowerFactor']
 
     synFuzzyFactor=params['synFuzzyFactor']
-    #synOxoFactor=params['synOxoFactor']
 
     synFuzzyFactor=params['synFuzzyFactor']
-    #synOxoFactor=params['synOxoFactor']
     bridgeOxoFactor=params['bridgeOxoFactor']
 
     resultMatrix=[]
@@ -363,7 +361,7 @@ def scoreSimple(scoreMatrix, params):
 
         synFuzzyFactor=0
         if score['synFuzzy']==1:  #Exact match, we shall boost this by all means, so we take UpperFactor*2 for now
-            synFuzzyFactor=3*fuzzyUpperFactor
+            synFuzzyFactor=2*fuzzyUpperFactor
         elif score['synFuzzy']>=fuzzyUpperLimit:
             synFuzzyFactor=fuzzyUpperFactor
         elif score['synFuzzy']<fuzzyUpperLimit and score['fuzzyScore']>=fuzzyLowerLimit:
