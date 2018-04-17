@@ -80,12 +80,7 @@
 
 
 
-
-
-
-
 <body class="level2">
-
 <th:block th:include="fragments/header :: header"></th:block>
 
 <div id="wrapper" class="container_24">
@@ -96,13 +91,7 @@
 
             <div class="grid_24 alpha">
 
-                <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
-                </div>
-
-
                 <div class="row">
-
 
                     <section class="grid_10 alpha">
                         <!--
@@ -120,47 +109,19 @@
                     </section>
 
                     <section class="grid_8 alpha">
-                        <h2>Mapping results</h2>
-
-                    </section>
-
-
-
-                    <section class="grid_6">
-                        <div style="padding-top:5px; float:right;">
-                            <!-- Single button - ->
-
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Download <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a style="border-bottom: none" onclick="exportData('csv')">CSV</a></li>
-                                    <li><a style="border-bottom: none" onclick="exportData('tsv')">TSV</a></li>
-                                    <li><a style="border-bottom: none" onclick="exportData('json')">JSON</a></li>
-                                </ul>
-
-
-
-
-                            <!- -
-                            <button href="#" data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="button dropdown">Dropdown Button</button><br>
-                            <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                                <li><a href="#">This is a link</a></li>
-                                <li><a href="#">This is another</a></li>
-                                <li><a href="#">Yet another</a></li>
+                        <div class="small-6 columns"><h2>Mapping results</h2></div>
+                        <div class="small-4 columns">
+                            <ul class="dropdown menu" data-dropdown-menu="true" style="padding-top:5px; float:right;">
+                                <li>
+                                    <!-- <button class="button secondary clickable">Download as</button> -->
+                                    <button class="dropdown button secondary small">Download as</button>
+                                    <ul class="menu">
+                                        <li><a href="#" onclick="exportData('csv')">CSV</a></li>
+                                        <li><a href="#" onclick="exportData('tsv')">TSV</a></li>
+                                        <li><a href="#" onclick="exportData('json')">JSON</a></li>
+                                    </ul>
+                                </li>
                             </ul>
-
-
-                            </div>-->
-
-                            <ul class="menu simple">
-                                <li>Download as </li>
-                                <li><a href="#" onclick="exportData('csv')">CSV</a></li>
-                                <li><a href="#" onclick="exportData('tsv')">TSV</a></li>
-                                <li><a href="#" onclick="exportData('json')">JSON</a></li>
-                            </ul>
-
                         </div>
                     </section>
                 </div>
@@ -183,11 +144,9 @@
                             <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
                             <!--<br/>-->
                             <span>Could not map: <span id="unmapped"></span></span>
-
                         </div>
 
                         <div id="filter">
-
 
                             <form id="filter-form"  method="post" action="search">
                                 <input type="hidden" name="inputSource" th:value="${inputSource}"/>
@@ -213,7 +172,6 @@
                             <img id="searching_bar" style="margin-left: 50%;" src="img/infinity.gif"/>
 
                             <table id="example" style="border-collapse: collapse;">
-
                             </table>
 
                         </div>

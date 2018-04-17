@@ -30,11 +30,6 @@
 
 <section id="main-content-area" class="row" role="main">
 
-
-        <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-            <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
-        </div>
-
         <!--@thymesVar id="message" type="String"-->
         <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
             <strong th:text="${message}">Success message goes here</strong>.
@@ -82,7 +77,7 @@
                         <!--</div>-->
 
                         <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
-                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/terms(iri=${term.getUri()})} + '\''"  class="btn btn-default">View in OLS</button>
+                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/terms(iri=${term.getUri()})} + '\''"  class="button secondary clickable">View in OLS</button>
                         </div>
 
 
@@ -160,7 +155,7 @@
 
                 <div class="panel-body">
 
-                            <form>
+                             <form>
                                 <span>Mapping Distance: </span>
                                 <select id="distanceDropDown" name="distance">
                                     <option value="1">1</option>
@@ -171,6 +166,9 @@
                         <!--        <div style="margin-left: 15px;display: inline;">
                                     <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
                                 </div>-->
+
+
+
                                 <input type="hidden" name="distance" th:value="1"/>
                                 <input type="hidden" name="inputSource" th:value="${inputSource}"/>
                                 <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
@@ -203,15 +201,9 @@
 
 
 <script type="text/javascript" src="../static/js/vis.js" th:src="@{../js/vis.js}"></script>
-<script type="text/javascript" src="/js/oxo-flare.js" th:src="@{/js/oxo-search-result.js}"></script>
-
-
+<script type="text/javascript" src="/js/oxo-flare.js" th:src="@{/js/oxo-search-result.js}"></script> <!-- Flare, here?-->
 <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo-graph.js}"></script>
 <script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-
-
-
-
 
 
 
@@ -236,20 +228,6 @@
             reinitialiseTable()
             drawGraph()
         })
-
-
-
-        /*
-        $('#distance-slider').bootstrapSlider({
-            step: 1, min: 1, max: 3,
-            ticks: [1, 2, 3],
-            ticks_labels: ['1', '2', '3'],
-            ticks_snap_bounds: 50
-        }).on('slideStop', function () {
-            reinitialiseTable()
-            drawGraph()
-        });*/
-
     });
 </script>
 

@@ -30,10 +30,6 @@
     <div class="row">
 
 
-        <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-            <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
-        </div>
-
         <!--@thymesVar id="message" type="String"-->
         <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
             <strong th:text="${message}">Success message goes here</strong>.
@@ -51,49 +47,67 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Datasource</h3>
+                    <!--<h4 class="panel-title">Datasource</h4>-->
+                    <h4 class="panel-title"><span th:text="${datasource.getName()}">id...</span></h4>
                 </div>
                 <div class="panel-body">
-                    <div  style="font-size: large">
-                        <span th:text="${datasource.getName()}">id...</span>
-                    </div>
                     <div th:if="${datasource.getDescription()}">
                         <span th:text="${datasource.getDescription()}">id...</span>
                     </div>
                     <div th:if="${datasource.getVersionInfo()}">
-                        <span>Version info: </span><span th:text="${datasource.getVersionInfo()}">id...</span>
+                        <span><b>Version info:</b> </span><span th:text="${datasource.getVersionInfo()}">id...</span>
                     </div>
                     <div th:if="${datasource.getLicence()}">
-                        <span>Licence info: </span><a th:href="${datasource.getLicence()}" th:text="${datasource.getLicence()}">id...</a>
+                        <span><b>Licence info:</b> </span><a th:href="${datasource.getLicence()}" th:text="${datasource.getLicence()}">id...</a>
                     </div>
                     <div>
-                        <span>Prefix: </span><span class="ontology-source" th:text="${datasource.getPrefix()}">id...</span>
+                        <span><b>Prefix:</b> </span><span class="ontology-source" th:text="${datasource.getPrefix()}">id...</span>
                     </div>
                     <div>
-
                             <span>
-
-                                <span>Type: </span><span th:text="${datasource.getSource()}">id...</span>
-
+                                <span><b>Type:</b> </span><span th:text="${datasource.getSource()}">id...</span>
+                            </span>
+                    </div>
+                    <div>
+                            <span>
                                  <button th:if="${datasource.getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}"
                                          style="display: inline-block;"
                                          th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"
-                                         class="btn btn-default">View in OLS</button>
+                                         class="button secondary clickable">View in OLS</button>
                             </span>
                     </div>
-
-
                 </div>
             </div>
         </div>
 
-        <div class="panel panel-default">
+        <div class="panel panel-default" style="margin-top:40px;">
             <div class="panel-heading">
-                <h3 class="panel-title">Mappings</h3>
+                <h4 class="panel-title">Mappings</h4>
             </div>
+
             <div class="panel-body">
 
+                <form id="mapping-count-form" method="post" action="../search">
+                    <span>Mapping Distance: </span>
+                    <select id="distanceDropDown">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
 
+                    <!--        <div style="margin-left: 15px;display: inline;">
+                                <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
+                            </div>-->
+                    <input type="hidden" name="distance" th:value="1"/>
+                    <input type="hidden" id="inputSource" name="inputSource" th:value="${datasource.getPrefix()}"/>
+                    <input type="hidden" th:each="target : ${mappingTarget}" th:value="${target}"/>
+                    <input type="hidden" name="ids" th:value="${id}"/>
+                    <input id="mappingTarget" name="mappingTarget" type="hidden"/>
+                    <input id="distance-slider" name="distance" type="hidden"/>
+                </form>
+
+
+                <!--
                 <form id="mapping-count-form" method="post" action="../search">
                     <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
                     <input id="mappingTarget" type="hidden" name="mappingTarget"/>
@@ -104,13 +118,10 @@
 
 
                     <div class="ui-slider-range ui-corner-all ui-widget-header" style="left: 16%; width: 51%;"></div><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 16%;"></span><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 67%;"></span>
-
-
-
                 </form>
+                -->
+
                 <div id="graphic" th:attr="data-prefix=${datasource.getPrefix()},data-distance=${distance}" style="min-width: 310px; min-height:400px; max-width: 100%; margin: 0 auto">
-
-
                 </div>
 
                 <div id="mapping-vis">
@@ -141,17 +152,26 @@
 
 <th:block th:include="fragments/footer :: footer"></th:block>
 
+
+<script type="text/javascript" src="/oxo-hchart.js" th:src="@{/js/oxo-hchart.js}"></script>
+<script src="//code.highcharts.com/highcharts.js"></script>
+
 <script>
+    console.log("From datasource.html")
+
+    /*
     $(document).ready(function() {
-        /*$('#distance-slider').slider({
+        refreshChartData()
+
+        $('#distance-slider').slider({
             step: 1, min: 1, max: 3,
             ticks: [1, 2, 3],
             ticks_labels: ['1', '2', '3'],
             ticks_snap_bounds: 50
         }).on('slideStop', function () {
             refreshChartData()
-        });*/
-    });
+        });
+    });*/
 </script>
 
 

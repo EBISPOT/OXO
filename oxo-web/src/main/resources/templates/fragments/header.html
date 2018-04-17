@@ -8,75 +8,25 @@
 <!-- Here we could find the bootstrap integration: https://github.com/ebiwd/EBI-Style-lab/blob/master/content/pages/websites/sample-site-v1.3/integrations/bootstrap.html-->
 
 <div th:fragment="header" >
-    <div data-sticky-container="true">
-        <div id="local-masthead" data-sticky="true" data-sticky-on="large"
-             data-top-anchor="180" data-btm-anchor="300000">
-            <header>
+    <div id="skip-to">
+        <a href="#content">Skip to main content</a>
+    </div>
 
-                <div id="global-masthead" class="clearfix">
-                    <!--This has to be one line and no newline characters-->
-                    <a href="//www.ebi.ac.uk/" title="Go to the EMBL-EBI homepage"><span
-                            class="ebi-logo"></span></a>
-
-                    <nav>
-                        <div class="row">
-                            <ul id="global-nav" class="menu">
-                                <!-- set active class as appropriate -->
-                                <li id="home-mobile" class=""><a href="//www.ebi.ac.uk"></a></li>
-                                <li id="home" class="active"><a href="//www.ebi.ac.uk"><i
-                                        class="icon icon-generic" data-icon="H"></i> EMBL-EBI</a></li>
-                                <li id="services"><a href="//www.ebi.ac.uk/services"><i
-                                        class="icon icon-generic" data-icon="("></i> Services</a></li>
-                                <li id="research"><a href="//www.ebi.ac.uk/research"><i
-                                        class="icon icon-generic" data-icon=")"></i> Research</a></li>
-                                <li id="training"><a href="//www.ebi.ac.uk/training"><i
-                                        class="icon icon-generic" data-icon="t"></i> Training</a></li>
-                                <li id="about"><a href="//www.ebi.ac.uk/about"><i
-                                        class="icon icon-generic" data-icon="i"></i> About us</a></li>
-                                <!-- That search gives me problems with the new css so I deactivate it for now
-                                <li id="search"><a href="#"
-                                                   data-toggle="search-global-dropdown"><i
-                                        class="icon icon-functional" data-icon="1"></i> <span
-                                        class="show-for-small-only">Search</span></a>
-                                    <div id="search-global-dropdown" class="dropdown-pane"
-                                         data-dropdown="true" data-options="closeOnClick:true;">
-                                        <form id="global-search" name="global-search"
-                                              action="/ebisearch/search.ebi" method="GET">
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input type="text" name="query" id="global-searchbox"
-                                                           class="input-group-field"
-                                                           placeholder="Search all of EMBL-EBI" />
-                                                    <div class="input-group-button">
-                                                        <input type="submit" name="submit" value="Search" class="button" />
-                                                        <input type="hidden" name="db" value="allebi" checked="checked" />
-                                                        <input type="hidden" name="requestFrom" value="global-masthead"	checked="checked" />
-                                                    </div>
-                                                </div>
-                                            </fieldset>
-                                        </form>
-                                    </div></li>-->
-                                <li class="float-right show-for-medium embl-selector">
-                                    <!-- The dropdown menu will be programatically added by script.js -->
-                                    <button class="button float-right" type="button" data-toggle="embl-dropdown">Hinxton</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-
-                </div>
-
-                <div class="masthead row">
-
+    <header id="masthead-black-bar" class="clearfix masthead-black-bar">
+    </header>
+    <div id="content">
+        <div data-sticky-container="true">
+            <header id="masthead" class="masthead" data-sticky="true" data-sticky-on="large" data-top-anchor="content:top" data-btm-anchor="content:bottom">
+                <div class="masthead-inner row">
                     <!-- local-title -->
-                    <div class="columns medium-7" id="local-title">
-                        <h1>
-                            <!--<img th:src="@{/images/logo_biosamples.png}" alt="Oxo logo" /> -->
-                            Ontology Xref Service
-                            <a th:href="@{/}" title="to Oxo home"></a>
-                        </h1>
+                    <div class="columns medium-12" id="local-title">
+                        <!--<h1><a href="../../" title="Back to Oxo homepage">Ontology Xref Service</a></h1>-->
+                        <a href="../../" title="Back to Oxo homepage">
+                        <img src="img/OXO_logo_2017_colour_background.png" style="height:100px;"/>
+                        </a>
                     </div>
 
+                    <!-- /local-title -->
                     <!-- local-nav -->
                     <nav>
                         <ul class="dropdown menu float-left"
@@ -99,17 +49,13 @@
                             </li>
 
                         </ul>
-
                     </nav>
                     <!-- /local-nav -->
-
                 </div>
-
             </header>
         </div>
-    </div>
+
+   </div>
 </div>
-
-
 </body>
 </html>

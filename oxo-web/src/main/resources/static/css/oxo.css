@@ -42,6 +42,7 @@ margin-top: 1.1em;
     color: inherit;
 }
 
+
 .context-help-label:after {
     font-family: 'EBI-Generic';
     font-size: 70%;
@@ -75,6 +76,45 @@ margin: 10px;
 #network{
     height:500px;
     width: 100%;
-    border: 2px black solid;
+    border: 0px black solid;
 }
 
+
+
+/*Migrated fomr fomrs.lens.css*/
+label {
+    display: inline-block !important;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+
+}
+
+
+/* Migrated from OLS css (used previously by OxO) to the oxo.css*/
+.term-source {
+    background-color: #ffac1b;
+    padding: 2px;
+    padding-right: 2px;
+    padding-right: 4px;
+    color: white;
+    font-size: larger;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+a .ontology-source {
+    background-color: #5FBDCE;
+    padding: 2px;
+    padding-right: 2px;
+    padding-right: 4px;
+    color: white;
+    font-size: larger;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+    border-bottom: none;
+}

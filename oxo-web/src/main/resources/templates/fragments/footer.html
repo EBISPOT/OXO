@@ -4,31 +4,36 @@
 <head>
 </head>
 <body>
-<div th:fragment="footer" >
-    <footer>
-        <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
-        <!--
-              <div id="local-footer">
-                <div class="row">
-                  <span class="reference">How to reference this page: ...</span>
-                </div>
-              </div>
-         -->
-        <!-- End optional local footer -->
+<div th:fragment="footer">
 
-        <div id="global-footer">
+    <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
+    <!--
+    <footer id="local-footer" class="local-footer" role="local-footer">
+      <div class="row">
+        <span class="reference">How to reference this page: ...</span>
+      </div>
+    </footer>
+    -->
+    <!-- End optional local footer -->
 
-            <nav id="global-nav-expanded" class="row">
+
+<footer>
+    <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html
+    <div id="elixir-banner" data-color="none" data-name="This service" data-description="I am a super cool service" data-more-information-link="https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi" data-use-basic-styles="true"></div>
+    -->
+        <div id="global-footer" class="global-footer">
+            <nav id="global-nav-expanded" class="global-nav-expanded row">
                 <!-- Footer will be automatically inserted by footer.js -->
             </nav>
-
-            <section id="ebi-footer-meta" class="row">
+            <section id="ebi-footer-meta" class="ebi-footer-meta row">
                 <!-- Footer meta will be automatically inserted by footer.js -->
             </section>
-
         </div>
+</footer>
 
-    </footer>
+
+    <script defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
+
 
 
     <!-- JavaScript -->
@@ -38,10 +43,10 @@
     <script>window.jQuery || document.write('<script src="../js/libs/jquery-1.10.2.min.js"><\/script>')</script>
 
 
-    We include Jquery from war below, then we'd don't need this line  ....
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>  -->
+    We include Jquery from war below, then we'd don't need this line  .... -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
-    <script type="text/javascript" th:src="@{/webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>-->
 
 
     <!-- Your custom JavaScript file scan go here... change names accordingly -->
@@ -78,27 +83,12 @@
 
     </script>
 
-
-
-    <!---->
-    <script defer="defer" src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/js/cookiebanner.js"></script>
-    <script defer="defer" src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/js/foot.js"></script>
-    <script defer="defer" src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/js/script.js"></script>
-    <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/foundation-6/js/foundation.js"></script>
-    <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/js/foundationExtendEBI.js"></script>
-
-
-    <!--
-       <script defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/js/foot.js"></script>
-       <script defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/js/script.js"></script>
-       <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/js/foundation.js"></script>
-       <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.2/js/foundationExtendEBI.js"></script>
-   -->
-
-
+    <!-- Using other URL for v1.3 does not change anything -->
+    <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/script.js"></script>
+    <script src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+    <script src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script>
     <script type="text/JavaScript">$(document).foundation();</script>
     <script type="text/JavaScript">$(document).foundationExtendEBI();</script>
-
 
     <script type="text/javascript" th:src="@{/webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
     <script type="text/javascript" th:src="@{/webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
