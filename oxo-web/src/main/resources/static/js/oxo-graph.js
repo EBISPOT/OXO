@@ -7,6 +7,7 @@ $(document).ready(function() {
 
 function drawGraph () {
     $("#mapping-vis-spinner").show();
+
     var curie = $("div[data-get-mapping-vis]").data('get-mapping-vis');
     var relativePath = $("div[data-get-mapping-vis]").data("api-path") ? $("div[data-get-mapping-vis]").data("api-path") : '';
     var distance = $("input[name=distance]").val() ? $("input[name=distance]").val() : 1;
@@ -62,8 +63,26 @@ function drawGraph () {
 
             var network = new vis.Network(container, data, options);
 
-            $("#mapping-vis-spinner").hide();
 
+            /*
+            network.on("startStabilizing", function(params) {
+                //If the status of the vis is calling for loading bar, show it (e.g. changing from dynamic to hierarchical layout)
+                    $("#network").hide();
+                    $("#mapping-vis-spinner").show();
+            })
+
+            network.on('stabilized', function(params){
+                //Network is stable and the animation is running, so hide the spinner and show the network
+                $("#mapping-vis-spinner").hide();
+                $("#network").show();
+                network.fit();  //Make the network fit after it is stabilize
+            })*/
+
+
+
+
+
+            $("#mapping-vis-spinner").hide();
         })
         .fail(function(e){console.log(e);console.log("Webservice call did not work!")})
     ;

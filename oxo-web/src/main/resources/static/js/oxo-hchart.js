@@ -5,10 +5,22 @@
 $(document).ready(function() {
     console.log("Document ready, let's refresh data")
     refreshChartData()
+
+    /*
     $("#distanceDropDown").on('change', function() {
         $("input[name=distance]").val(this.value)
         refreshChartData()
-    })
+    }) */
+
+
+    $('.slider').on('moved.zf.slider', function(){
+        console.log("Slider action dedected")
+        if ($("input[name=distance]").val()!==$(".slider input").val()){    //Check if there was a change, if there is, update stuff
+            $("input[name=distance]").val($(".slider input").val())
+            refreshChartData()
+        }
+    });
+
 });
 
 

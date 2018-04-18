@@ -22,11 +22,9 @@
 
 
 
-
 <body class="level2">
 
 <th:block th:include="fragments/header :: header"></th:block>
-
 
 <section id="main-content-area" class="row" role="main">
 
@@ -80,9 +78,6 @@
                             <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/terms(iri=${term.getUri()})} + '\''"  class="button secondary clickable">View in OLS</button>
                         </div>
 
-
-
-
                     </div>
                 </div>
 
@@ -119,7 +114,6 @@
 
             </div>
 
-
             <div class="small-7 columns grayBackground">
 
                 <div th:if="${term}" class="panel">
@@ -127,22 +121,16 @@
                         <h5 class="panel-title">Network</h5>
                     </div>
                     <div class="panel-body">
-                        <div id="mapping-vis">
-                            <div style="   position:absolute;
-                                       top:50%;
-                                       left:50%;
-                                       margin-top:-25px;
-                                       margin-left:-25px;"  id="mapping-vis-spinner">
+                        <div id="mapping-vis" style="width:100%; text-align:center;">
+                            <div style="position: absolute; display:inline-block; margin-left:350px; margin-top:250px;" id="mapping-vis-spinner">
                                 <img src="../img/infinity.gif"/>
                             </div>
                         </div>
-                        <div id="network"  th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
+                        <div id="network" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
                     </div>
                 </div>
 
-
             </div>
-
         </div>
 
 
@@ -153,20 +141,38 @@
                     <h5 class="panel-title">Mappings</h5>
                 </div> -->
 
-                <div class="panel-body">
+
+
+                <div>
+                    <!--
+                        <div style="width:200px;">
+                        <span>Mapping Distance: </span>
+                        <div class="slider" data-slider="true" data-start="1" data-end="3">
+                            <span class="slider-handle"  data-slider-handle="true" role="slider" tabindex="1"></span>
+                            <span class="slider-fill" data-slider-fill="slider"></span>
+                            <input type="hidden"/>
+                        </div>
+                        <div style="margin-top:-25px;width:100%;text-align:center;">
+                            <span style="display:inline; float:left; margin-left:7px">1</span>
+                            <span style="display:inline-block; margin: 0 auto;">2</span>
+                            <span style="display:inline; float:right; margin-right:7px;">3</span>
+                        </div>
+                        </div>-->
+
+                    <th:block th:include="fragments/slider :: slider"></th:block>
 
                              <form>
-                                <span>Mapping Distance: </span>
-                                <select id="distanceDropDown" name="distance">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
+                                 <!--
+                                         <span>Mapping Distance: </span>
+                                         <select id="distanceDropDown" name="distance">
+                                             <option value="1">1</option>
+                                             <option value="2">2</option>
+                                             <option value="3">3</option>
+                                         </select>
 
-                        <!--        <div style="margin-left: 15px;display: inline;">
-                                    <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
-                                </div>-->
-
+                                         <div style="margin-left: 15px;display: inline;">
+                                             <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
+                                         </div>-->
 
 
                                 <input type="hidden" name="distance" th:value="1"/>
@@ -199,13 +205,10 @@
 
 <th:block th:include="fragments/footer :: footer"></th:block>
 
-
 <script type="text/javascript" src="../static/js/vis.js" th:src="@{../js/vis.js}"></script>
-<script type="text/javascript" src="/js/oxo-flare.js" th:src="@{/js/oxo-search-result.js}"></script> <!-- Flare, here?-->
-<script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo-graph.js}"></script>
+ <script type="text/javascript" src="/js/oxo-search-result.js" th:src="@{/js/oxo-search-result.js}"></script>
+<script type="text/javascript" src="/js/oxo-graph.js" th:src="@{/js/oxo-graph.js}"></script>
 <script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-
-
 
 <script>
     $(document).ready(function() {
@@ -219,15 +222,26 @@
         }};
         instance.start(options) */
 
-        reinitialiseTable()
-        drawGraph()
+
 
         //If there is a change in the drop down box, the table and the graph are redrawn
-        $("#distanceDropDown").on('change', function() {
+        /*$("#distanceDropDown").on('change', function() {
             $("input[name=distance]").val(this.value)
             reinitialiseTable()
             drawGraph()
-        })
+        })*/
+
+        //Initialize the table and the graph for the first time
+        reinitialiseTable()
+        //drawGraph()
+
+        $('.slider').on('moved.zf.slider', function(){
+            if ($("input[name=distance]").val()!==$(".slider input").val()){    //Check if there was a change, if there is, update stuff
+                $("input[name=distance]").val($(".slider input").val())
+                reinitialiseTable()
+                drawGraph()
+            }
+        });
     });
 </script>
 

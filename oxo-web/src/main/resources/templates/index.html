@@ -62,19 +62,8 @@
                         </label>
 
 
-                        <!--
-                        <span>Mapping Distance: </span>
-                        <div style="margin-left: 20px;">
-                            <input id="distance-slider" name="distance" data-slider-id='ex1Slider' data-slider-value="2" value="2" type="text"/>
-                        </div> -->
-
-
-                        <!--
-                        <div class="slider" data-slider data-initial-start="50" data-end="200">
-                            <span class="slider-handle"  data-slider-handle role="slider" tabindex="1"></span>
-                            <span class="slider-fill" data-slider-fill></span>
-                            <input type="hidden">
-                        </div> -->
+                        <th:block th:include="fragments/slider :: slider"></th:block>
+                        <input name="distance" type="hidden" value="1"/>
 
                         <span>Enter list of identifiers:</span>
                         <div style="float:right; font-size: 0.8em">
@@ -122,22 +111,10 @@
 </section>
 
 
-
-
-
-
 <th:block th:include="fragments/footer :: footer"></th:block>
-
-
 
 <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo.js}"></script>
 <script type="text/javascript" src="/js/oxo-flare.js" th:src="@{/js/oxo-flare.js}"></script>
-
-<!-- Candidates to be replaced? Do we want bootstrap here, we use foundation with the new layout?! -->
-<!--
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>- - >
-<script type="text/javascript" th:src="@{/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script> -->
-
 
 
 <!-- All JS that is just used on this page should go here, I suppose-->
@@ -173,22 +150,20 @@
 
 
     $(document).ready(function() {
-
-        /*
-        $('#distance-slider').slider({
-            step: 1, min: 1, max: 3,
-            ticks: [1, 2, 3],
-            ticks_labels: ['1', '2', '3'],
-            ticks_snap_bounds: 50
-        })*/
-
         /*-- Where would that be used? $('.datasource-select').select2({placeholder: "Datasources"});-*/
 
         $('#mappingSourcesSelect').select2({placeholder: "Jump to a datasource"})
                 .on('select2:select', function (e) {
-                    //console.log("selected:  " + $(e.currentTarget).val())
                     jumpToSource($(e.currentTarget).val())
                 });
+
+        //listening to slider actions
+        $('.slider').on('moved.zf.slider', function(){
+            if ($("input[name=distance]").val()!==$(".slider input").val()){    //Check if there was a change, if there is, update stuff
+                $("input[name=distance]").val($(".slider input").val())
+            }
+        });
+
     });
 </script>
 

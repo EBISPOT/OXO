@@ -45,7 +45,7 @@
 					</div>
 					<div class="panel-body">
 						<div>
-							<span>From term: </span>
+							<span><b>From term:</b> </span>
 							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
 								<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
 									<span th:if="${mapping.getFromTerm().getLabel()}">
@@ -54,7 +54,7 @@
 							</a>
 						</div>
 						<div>
-							<span>To term: </span>
+							<span><b>To term:</b> </span>
 							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
 								<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
 									<span th:if="${mapping.getToTerm().getLabel()}">
@@ -63,19 +63,19 @@
 							</a>
 						</div>
 						<div>
-							<span>Scope: </span><span th:text="${mapping.getScope()}">id...</span>
+							<span><b>Scope:</b> </span><span th:text="${mapping.getScope()}">id...</span>
 						</div>
 						<div>
-							<span>Created date: </span><span th:text="${mapping.getDate()}">id...</span>
+							<span><b>Created date:</b> </span><span th:text="${mapping.getDate()}">id...</span>
 						</div>
 						<div>
-							<span>Mapping source: </span>
+							<span><b>Mapping source:</b> </span>
 							<a class="ontology-source" th:href="@{../datasources/{id}(id=${mapping.getDatasource().getPrefix()})}" th:text="${mapping.getDatasource().getName()}">id...</a>
 							<span class="ontology-source" th:text="${mapping.getDatasource().getPrefix()}">id...</span>
 						</div>
 
 						<div>
-							<span>Source type: </span><span th:text="${mapping.getSourceType()}">id...</span>
+							<span><b>Source type:</b> </span><span th:text="${mapping.getSourceType()}">id...</span>
 						</div>
 
 						<form method="post" class="form-horizontal" th:if="${username}" th:object="${mapping}">

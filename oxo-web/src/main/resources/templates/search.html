@@ -83,32 +83,9 @@
 <body class="level2">
 <th:block th:include="fragments/header :: header"></th:block>
 
-<div id="wrapper" class="container_24">
-
-    <div id="content" role="main" class="grid_24 clearfix">
-        <div class="container">
-
-
-            <div class="grid_24 alpha">
-
+    <section id="main-content-area" class="row" role="main">
+    <div id="content" class="row">
                 <div class="row">
-
-                    <section class="grid_10 alpha">
-                        <!--
-                        <div style="padding-top: 5px;">
-                            <div id="progressbar" class="center-block">
-                                <div class="progress-label">Fetching mappings...</div>
-                            </div>
-                        </div> -->
-
-                        <!-- Foundation progress bar
-                       <div id="progressbar" class="progress" role="progressbar" tabindex="0" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Loading...">
-                           <div class="progress-meter"></div>
-                       </div>-->
-
-                    </section>
-
-                    <section class="grid_8 alpha">
                         <div class="small-6 columns"><h2>Mapping results</h2></div>
                         <div class="small-4 columns">
                             <ul class="dropdown menu" data-dropdown-menu="true" style="padding-top:5px; float:right;">
@@ -123,13 +100,11 @@
                                 </li>
                             </ul>
                         </div>
-                    </section>
                 </div>
 
-                <div class="grid_24 alpha">
                     <div class="row">
 
-                        <div>
+                        <div class="small-10 columns">
                             <p>
                                 Select a term to see more information. The evidence colums tells you how many times we have seen this mapping and the distance is a how many hops across other mappings you need to go to find this mapping. Distance 1 is a direct mapping, the greater the distance the less likely it is that a mapping holds true.
                                 Max distance is set to <span th:text="${request.getDistance()}"></span>.
@@ -176,12 +151,8 @@
 
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-</div>
+</section>
 
 
 <th:block th:include="fragments/footer :: footer"></th:block>

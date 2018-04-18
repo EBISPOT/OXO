@@ -118,3 +118,13 @@ a .ontology-source {
     vertical-align: middle;
     border-bottom: none;
 }
+
+
+/* datatable customizing */
+.dataTables_length {
+    white-space: nowrap;
+}
+
+.dataTables_info{
+    margin-top: 30px;
+}
