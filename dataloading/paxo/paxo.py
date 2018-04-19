@@ -15,9 +15,20 @@ import listprocessing
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
 def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder, mapSmallest, useLocalOnly):
     logging.info("Start scoring "+sourceOntology+" and "+targetOntology)
-    #Check for the smaller ontology
     olsURL=config.get("Basics","olsAPIURL")
     oxoURL=config.get("Basics","oxoURL")
+
+    #Check if the olsURL is correct
+    if olsURL[-1:]!='/':
+        print "ols url is not ending with / but it is "+olsURL+" - I add the terminating /. Please make sure the URL is correct"
+        olsURL=olsURL+'/'
+        print "Set olsURL to "+olsURL
+    #Check if the oxoURL is correct
+    if oxoURL[-1:]!='/':
+        print "oxo url is not ending with / but it is "+oxoURL+" - I add the terminating /. Please make sure the URL is correct"
+        oxoURL=oxoURL+'/'
+        print "Set oxoURL to "+oxoURL
+
     urls={"ols":olsURL, "oxo":oxoURL}
 
     try:
@@ -43,7 +54,6 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
         logging.error(olsURL+"ontologies/"+targetOntology)
         logging.error(r)
         raise
-
 
     if mapSmallest==True:
         #In case the targetOntology is smaller than the source Ontology, switch the output
