@@ -39,22 +39,22 @@
 				</div>
 
 				<!--@thymesVar id="mapping" type="uk.ac.ebi.spot.model.Mapping"-->
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Mapping info</h3>
+				<div class="row marginBottom">
+					<div>
+						<h3>Mapping info</h3>
 					</div>
-					<div class="panel-body">
+					<div>
 						<div>
-							<span><b>From term:</b> </span>
+							<span><b>From term</b> </span>
 							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getFromTerm().getCurie()})}">
 								<span th:text="${mapping.getFromTerm().getCurie()}"  class="term-source">cxxxxx</span>
 									<span th:if="${mapping.getFromTerm().getLabel()}">
     						         (<span th:text="${mapping.getFromTerm().getLabel()}">id...</span>)
         							</span>
 							</a>
-						</div>
-						<div>
-							<span><b>To term:</b> </span>
+						<!-- </div>
+						<div> -->
+							<span><b>to </b></span>
 							<a class="nounderline" style="border-bottom-width: 0px;" th:href="@{../terms/{id}(id=${mapping.getToTerm().getCurie()})}">
 								<span th:text="${mapping.getToTerm().getCurie()}"  class="term-source">cxxxxx</span>
 									<span th:if="${mapping.getToTerm().getLabel()}">

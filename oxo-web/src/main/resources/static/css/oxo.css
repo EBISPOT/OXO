@@ -17,10 +17,6 @@ margin-top: 1.1em;
   vertical-align: middle;
 }
 
-#ex1Slider .slider-selection {
-    background: #BABABA;
-}
-
 
 .context-help-wrapper {
     position: relative;
@@ -72,6 +68,14 @@ padding: 10px 10px 10px 10px;
 margin: 10px;
 }
 
+
+.marginTop{
+    margin-top:60px;
+}
+
+.marginBottom{
+    margin-bottom:80px;
+}
 
 #network{
     height:500px;
@@ -127,4 +131,8 @@ a .ontology-source {
 
 .dataTables_info{
     margin-top: 30px;
+}
+
+#example_length select{
+    width:60px;
 }
