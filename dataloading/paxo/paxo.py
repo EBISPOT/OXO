@@ -213,9 +213,16 @@ def scoreTermList(termList, targetOntology, scoreParams, params):
 def writeOutPutScore(scoredMatrix, name, predictedTargetFolder, saveToDisc):
     result=[]
     for line in scoredMatrix:
-        sourceTerm=line[0]['sourceTerm']
-        targetLabel=str(line[0]['label'].encode('ascii','ignore'))
-        result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
+        try:
+            sourceTerm=line[0]['sourceTerm']
+            targetLabel=str(line[0]['label'].encode('ascii','ignore'))
+            result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
+        except Exception as e:
+            print "Failed Unfortunatley, try to investigate why!"
+            print e
+            targetLabel="Cound not be found temporarily"
+            result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
+
 
     if saveToDisc==True:
         result.insert(0,['sourceIRI','mappedIRI','score','sourceLabel', 'mappedLabel', 'NormalizedScore'])

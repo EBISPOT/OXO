@@ -14,16 +14,15 @@ var hideFromCol = false;
 var apiPath = '';
 
 function initialisePage() {
-    console.log("In initialise Page")
-
     withProgress =  $("#example").data("with-progress") ? $("#example").data("with-progress") : true;
     hideTableInfo =  $("#example").data("hide-table-info") ?  $("#example").data("hide-table-info"): false;
     hideFromCol =  $("#example").data("hide-from-col") ?  $("#example").data("hide-from-col"): false;
 
     apiPath = $("#example").data("api-path") ? $("#example").data("api-path"): '';
     console.log(apiPath)
+
     if (withProgress) {
-        addProgressBar();
+        addProgressBar();/**/
     }
 
     // need to determine if this is a search by id or search by datasource
@@ -110,15 +109,17 @@ function doSearch(url, requestData, resultsData, noMappings) {
             });
 
             // update progress bar here
-            updateProgress(parseInt(pageNumber / totalPages * 100));
+            /*updateProgress(parseInt(pageNumber / totalPages * 100));*/
 
             if (data._links.next) {
                 doSearch(data._links.next.href, requestData, resultsData, noMappings)
             }
             else {
                 // progress complete
+
                 updateProgress(100);
-                progressComplete();
+                progressComplete();/**/
+
                 // $('#mappings-count').text(resultsData.length - noMappings)
                 if (noMappings > 0) {
                     $('#unmapped').text(noMappings)
@@ -302,8 +303,10 @@ function getApiPath(element) {
     return $(element).data("api-path") ? $(element).data("api-path") : '';
 }
 
+
+
+/* */
 function progressComplete() {
-    $("#searching_bar").hide();
     $("#searching_bar").hide();
     if (withProgress) {
         $( ".progress-label" ).text( "Complete!" );
@@ -311,15 +314,16 @@ function progressComplete() {
 }
 
 function addProgressBar() {
+    //console.log("In add Progress Bar, but nothing happens here anymore?")
 
-    console.log("In add Progress Bar, but nothing happens here anymore?")
-
-/*
-
+    /*
     var progressbar = $( "#progressbar" ),
         progressLabel = $( ".progress-label" );
     var progressbar = $( "#progressbar" ),
         progressLabel = $( ".aria-valuetext" );
+
+
+    var progressbar = $('<div class="progress" role="progressbar" tabindex="0" aria-valuenow="20" aria-valuemin="0" aria-valuetext="25 percent" aria-valuemax="100"> <span class="progress-meter" style="width: 25%"> <p class="progress-meter-text">25%</p> </span> </div>')
 
 
     progressbar.progressbar({
@@ -337,8 +341,7 @@ function addProgressBar() {
 }
 
 function updateProgress(value) {
-    console.log("In Add progress bar, but that is useless now isn't it? ")
-
+    //console.log("In Add progress bar, but that is useless now isn't it? ")
     //if (withProgress) {    $("#progressbar").progressbar( "value", value)   }
 
 }

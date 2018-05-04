@@ -90,17 +90,6 @@
                 <form id="mapping-count-form" method="post" action="../search">
                     <th:block th:include="fragments/slider :: slider"></th:block>
 
-                    <!--
-                    <span>Mapping Distance: </span>
-                    <select id="distanceDropDown">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>-->
-
-                    <!--        <div style="margin-left: 15px;display: inline;">
-                                <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
-                            </div>-->
                     <input type="hidden" name="distance" th:value="1"/>
                     <input type="hidden" id="inputSource" name="inputSource" th:value="${datasource.getPrefix()}"/>
                     <input type="hidden" th:each="target : ${mappingTarget}" th:value="${target}"/>
@@ -108,21 +97,6 @@
                     <input id="mappingTarget" name="mappingTarget" type="hidden"/>
                     <input id="distance-slider" name="distance" type="hidden"/>
                 </form>
-
-
-                <!--
-                <form id="mapping-count-form" method="post" action="../search">
-                    <input type="hidden" name="inputSource" th:value="${datasource.getPrefix()}"/>
-                    <input id="mappingTarget" type="hidden" name="mappingTarget"/>
-                    <span>Mapping Distance: </span>
-                    <div style="margin-left: 15px;display: inline;">
-                        <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}  " type="text"/>
-                    </div>
-
-
-                    <div class="ui-slider-range ui-corner-all ui-widget-header" style="left: 16%; width: 51%;"></div><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 16%;"></span><span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 67%;"></span>
-                </form>
-                -->
 
                 <div>
                     <div id="mapping-vis" style="text-align:center;">
@@ -150,24 +124,6 @@
 
 <script type="text/javascript" src="/oxo-hchart.js" th:src="@{/js/oxo-hchart.js}"></script>
 <script src="//code.highcharts.com/highcharts.js"></script>
-
-<script>
-    console.log("From datasource.html")
-
-    /*
-    $(document).ready(function() {
-        refreshChartData()
-
-        $('#distance-slider').slider({
-            step: 1, min: 1, max: 3,
-            ticks: [1, 2, 3],
-            ticks_labels: ['1', '2', '3'],
-            ticks_snap_bounds: 50
-        }).on('slideStop', function () {
-            refreshChartData()
-        });
-    });*/
-</script>
 
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

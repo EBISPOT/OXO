@@ -104,7 +104,7 @@
 
                     <div class="row">
 
-                        <div class="small-10 columns">
+                        <div class="small-12 columns">
                             <p>
                                 Select a term to see more information. The evidence colums tells you how many times we have seen this mapping and the distance is a how many hops across other mappings you need to go to find this mapping. Distance 1 is a direct mapping, the greater the distance the less likely it is that a mapping holds true.
                                 Max distance is set to <span th:text="${request.getDistance()}"></span>.
@@ -115,7 +115,7 @@
                             You are trying to view over 50,000 mappings! Please use the download link.
                         </div>
 
-                        <div id="mapping-summary" style="display: none;">
+                        <div id="mapping-summary" style="display: none;"  class="small-12 columns">
                             <!--<span>Number of mappings:<span id="mappings-count"></span></span>-->
                             <!--<br/>-->
                             <span>Could not map: <span id="unmapped"></span></span>

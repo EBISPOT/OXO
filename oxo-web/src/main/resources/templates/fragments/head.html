@@ -34,29 +34,10 @@
     <!-- CSS: implied media=all -->
     <!-- CSS concatenated and minified via ant build script -->
 
-    <!-- Deactivating the old include
-    <link rel="stylesheet" href="https://ebi.emblstatic.net//web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/css/foundation.min.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/css/ebi-global.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css" type="text/css" media="all" />
-    -->
-
-    <!--
-        <link rel="stylesheet" href="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/foundation-6/css/foundation.min.css" type="text/css" media="all" />
-        <link rel="stylesheet" href="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/css/ebi-global.css" type="text/css" media="all" />
-        <link rel="stylesheet" href="https://www.ebi.ac.uk/web_guidelines/EBI-Icon-fonts/v1.1/fonts.css" type="text/css" media="all" />
-    -->
-
-
     <!-- Trying to get v1.3 working -->
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" />
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css" type="text/css" media="all" />
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" />
-
-   <!--
-   <link rel="stylesheet" href="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/css/foundation.css" />
-   <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" />
-   -->
-
 
 
     <!-- Use this CSS file for any custom styling -->
@@ -64,27 +45,10 @@
     <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/embl-petrol-colours.css" type="text/css" media="screen"/>
 -->
 
-
-    <!-- Temporary remove  style
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
-    <link rel="stylesheet" href="../static/css/oxo.css" th:href="@{/css/oxo.css}" type="text/css" media="screen"/>
-    -->
-
     <link rel="stylesheet" href="../static/css/oxo.css" th:href="@{/css/oxo.css}" type="text/css" media="screen"/>
     <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{/css/oxo-d3.css}" type="text/css" media="screen"/>
     <link rel="stylesheet" th:href="@{/webjars/select2/4.0.0/dist/css/select2.min.css}" href="/webjars/select2/4.0.0/dist/css/select2.min.css"  type="text/css" media="screen"/>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" type="text/css" media="screen"/>
-
-
-    <!--  bootstrap though!
-     <link  rel="stylesheet" th:href="@{/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
-    -->
-     <!--    bootstrap css needed?    -->
-    <!--
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
-    -->
-
 
     <!-- Is this needed?-->
     <style type="text/css">
@@ -110,6 +74,8 @@
 
     <meta name="ebi:masthead-color" content="#000" />
     <meta name="ebi:masthead-image"  content="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/images/backgrounds/embl-ebi-background-4.jpg"/>
+    <!--<meta name="ebi:masthead-image"  content="img/embl-ebi-background-4.jpg"/>-->
+
 
     <!-- you can replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour for details of how to do this -->
     <!-- also inform ES so we can host your colour palette file -->
@@ -122,11 +88,6 @@
         <!-- for production the above can be replaced with -->
     <!-- <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/mini/ebi-fluid-embl.css" /> -->
     <!-- end CSS-->
-
-
-    <!-- All JavaScript at the bottom, except for Modernizr - - >
-    <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/modernizr/modernizr.custom.49274.js"></script>
-    -->
 
     <script th:unless="${#strings.isEmpty(jsonLD)}" type="application/ld+json" th:utext="${jsonLD}"></script>
 </head>
