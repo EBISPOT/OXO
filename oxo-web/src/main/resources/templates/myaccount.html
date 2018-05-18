@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
 
     <!-- CSS: implied media=all -->
     <!-- CSS concatenated and minified via ant build script-->
@@ -34,8 +34,8 @@
     <!-- also inform ES so we can host your colour palette file -->
     <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/embl-petrol-colours.css" type="text/css" media="screen"/>
 
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
 
     <link rel="stylesheet" href="../static/css/oxo-d3.css" th:href="@{css/oxo-d3.css}" type="text/css" media="screen"/>
@@ -162,8 +162,8 @@
 
             <h1>Hello <span th:text="${username}">you</span></h1>
             <p>
-                <a href="http://orcid.org"><img alt="ORCID logo" src="http://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
-                <a th:text="'http://orcid.org/'+${orcid}" th:href="'http://orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
+                <a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
+                <a th:text="'http://orcid.org/'+${orcid}" th:href="'//orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
             </p>
             <p>ApiKey: <span th:text="${apikey}">you</span></p>
             <p>Role: <span th:text="${role}">you</span></p>
@@ -172,7 +172,7 @@
         <div th:unless="${username}">
             <p>You must have a ORCID iD to login and add mappings.</p>
             <a id="connect-orcid-button" href="/user">
-                <img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
+                <img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
                 Login with your ORCID iD or create an account
             </a>
         </div>
