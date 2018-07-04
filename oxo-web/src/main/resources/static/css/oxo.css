@@ -136,3 +136,23 @@ a .ontology-source {
 #example_length select{
     width:60px;
 }
+
+
+/*Help Pages*/
+
+/* API doc*/
+
+.listingblock{
+    background: #ededed;
+    color: #fff;
+    text-shadow: none;
+    padding: 3%;
+    border-width: 1px;
+    border-style: dotted;
+    overflow: auto;
+}
+
+.listingblock .content .highlight{
+    white-space: pre !important;
+
+}

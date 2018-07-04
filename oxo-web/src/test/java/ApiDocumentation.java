@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.spot.OxoWebApp;
+import uk.ac.ebi.spot.controller.api.MappingController;
 
 import javax.servlet.RequestDispatcher;
 
@@ -42,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = OxoWebApp.class)
 @WebAppConfiguration
-@Ignore
+/*@Ignore*/
 public class ApiDocumentation {
 
     @Rule
@@ -57,6 +60,8 @@ public class ApiDocumentation {
 
     @Before
     public void setUp() {
+
+        System.out.print("Start the Tests");
         this.document = document("{method-name}"
                 ,
                 preprocessRequest(prettyPrint()),
@@ -65,7 +70,7 @@ public class ApiDocumentation {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(documentationConfiguration(this.restDocumentation).uris()
-                                .withScheme("http")
+                                .withScheme("https")
                                 .withHost("www.ebi.ac.uk/spot/oxo")
                                 .withPort(80)
                 )
@@ -73,6 +78,8 @@ public class ApiDocumentation {
                 .build();
     }
 
+
+    /*
     @Test
     public void pageExample () throws Exception {
 
@@ -97,7 +104,7 @@ public class ApiDocumentation {
 
         this.mockMvc.perform(get("/api/ontologies?page=1&size=1"))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 
     @Test
@@ -121,6 +128,8 @@ public class ApiDocumentation {
         ;
     }
 
+
+    /*
     @Test
     public void apiExample () throws Exception {
 
@@ -137,7 +146,7 @@ public class ApiDocumentation {
         );
         this.mockMvc.perform(get("/api").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 
     @Test
@@ -163,6 +172,7 @@ public class ApiDocumentation {
     }
 
 
+    /*
     @Test
     public void mappingsExample () throws Exception {
 
@@ -192,5 +202,5 @@ public class ApiDocumentation {
 
         this.mockMvc.perform(get("/api/mappings/{mapping_id}", "efo").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
+    }*/
 }

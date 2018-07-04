@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"/> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"/> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
+<!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
+
+
+<head th:replace="fragments/head :: head">
+    <title>Ontology Xref Service   &lt; EMBL-EBI</title>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
+    <meta name="keywords" content="biosamples, europe, EBI" />
+    <!- - Describe what this page is about - ->
+    <meta name="description" content="EMBL-EBI" />
+    <meta name="ebi:last-review" content="2016-12-20" />
+    <!- - The last time the content was reviewed - ->
+    <meta name="ebi:expiry" content="2017-12-20" />
+    <!- - When this content is no longer relevant -->
+</head>
+
+<body>
+<th:block th:include="fragments/header :: header"></th:block>
+
+<section id="main-content-area" role="main">
+    <div id="content" role="main" class="row container">
+
+        <!--<div id="docs-header">
+        </div>-->
+
+        <div id="docs-content" style="overflow: hidden;">
+
+        </div>
+
+        <!--<div id="docs-footer">
+        </div>-->
+
+
+    </div>
+</section>
+
+
+<th:block th:include="fragments/footer :: footer"></th:block>
+
+<script>
+
+$(document).ready(function() {
+
+// read the window location to set the breadcrumb
+var path = window.location.pathname;
+var pagename = path.substr(path.lastIndexOf('/') + 1);
+if (pagename == 'docs') {
+pagename = "/index";
+}
+var url_header = "../documents/".concat(pagename).concat(".html #header");
+var url_footer = "../documents/".concat(pagename).concat(".html #footer");
+var url = "../documents/".concat(pagename).concat(".html #content");
+
+$("#docs-header").load (url_header);
+$("#docs-content").load (url);
+$("#docs-footer").load (url_footer);
+
+if (pagename == 'about') {
+$('#local-nav-about').addClass('active');
+} else {
+$('#local-nav-docs').addClass('active');
+
+}
+});
+</script>
+
+</body>
+</html>
