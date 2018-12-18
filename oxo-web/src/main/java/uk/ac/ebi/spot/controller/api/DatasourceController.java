@@ -41,6 +41,7 @@ import java.io.IOException;
 @ExposesResourceFor(Datasource.class)
 @ControllerAdvice(basePackageClasses = RepositoryRestExceptionHandler.class)
 public class DatasourceController implements
+
         ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired
@@ -51,6 +52,7 @@ public class DatasourceController implements
 
     @Autowired
     OrcidUserRepository userRepository;
+
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Datasource>> sources(
             Pageable pageable,
