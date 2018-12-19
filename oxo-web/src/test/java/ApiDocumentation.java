@@ -84,15 +84,14 @@ public class ApiDocumentation {
     @Before
     public void setUp() {
 
+        Mockito.when(neo4jTemplate.query(Mockito.anyString(), Mockito.anyMap(), Mockito.anyBoolean())).thenReturn(new QueryResultModel(null, null));
+
         this.document = document("{method-name}"
                 ,
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())
         );
 
-        Mockito.when(neo4jTemplate.query(Mockito.anyString(), Mockito.anyMap(), Mockito.anyBoolean())).thenReturn(new QueryResultModel(null, null));
-
-        
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(documentationConfiguration(this.restDocumentation).uris()
                                 .withScheme("https")
