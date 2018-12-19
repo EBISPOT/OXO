@@ -28,20 +28,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.spot.OxoWebApp;
-import uk.ac.ebi.spot.model.Datasource;
-import uk.ac.ebi.spot.model.Mapping;
-import uk.ac.ebi.spot.model.SourceType;
-import uk.ac.ebi.spot.model.Term;
+import uk.ac.ebi.spot.model.*;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.MappingService;
 import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.RequestDispatcher;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.halLinks;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -91,6 +85,11 @@ public class ApiDocumentation {
     @MockBean
     Neo4jOperations neo4jTemplate;
 
+    private Datasource datasource = new Datasource("test", "TEST", "test", Collections.emptySet(), "test ids", "database of test identifiers", SourceType.ONTOLOGY);
+    private Datasource diseaseOntology = new Datasource("doid", "DOID", "doid", Collections.emptySet(), "Human Disease Ontology", "Human Disease Ontology", SourceType.ONTOLOGY);
+    private Datasource mondo = new Datasource("mondo", "MONDO", "mondo", Collections.emptySet(), "MONDO: Monarch Disease Ontology", "MONDO: Monarch Disease Ontology", SourceType.ONTOLOGY);
+
+
     @Before
     public void setUp() {
 
@@ -104,52 +103,19 @@ public class ApiDocumentation {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(documentationConfiguration(this.restDocumentation).uris()
-                                .withScheme("https")
-                                .withHost("www.ebi.ac.uk")
-                                .withPort(443)
+                        .withScheme("https")
+                        .withHost("www.ebi.ac.uk")
+                        .withPort(443)
                 )
                 .alwaysDo(this.document)
                 .build();
     }
 
-//    @Test
-//    public void datasourcesListExample () throws Exception {
-//
-//        Datasource datasource = new Datasource("test", "TEST", "test", Collections.emptySet(), "test ids", "database of test identifiers", SourceType.ONTOLOGY);
-//
-//        Page<Datasource> page = new PageImpl<Datasource>(Collections.singletonList(datasource), new PageRequest(1, 20), 60);
-//
-//        this.document.snippets(
-//                responseFields(
-//                        fieldWithPath("_links").description("<<resources-page-links,Links>> to other resources"),
-//                        fieldWithPath("_embedded").description("The list of datasources"),
-//                        fieldWithPath("page.size").description("The number of resources in this page"),
-//                        fieldWithPath("page.totalElements").description("The total number of resources"),
-//                        fieldWithPath("page.totalPages").description("The total number of pages"),
-//                        fieldWithPath("page.number").description("The page number")
-//                ),
-//                links(halLinks(),
-//                        linkWithRel("self").description("This resource list"),
-//                        linkWithRel("first").description("The first page in the resource list"),
-//                        linkWithRel("next").description("The next page in the resource list"),
-//                        linkWithRel("prev").description("The previous page in the resource list"),
-//                        linkWithRel("last").description("The last page in the resource list")
-//                )
-//
-//        );
-//
-//        Mockito.when(datasourceService.getDatasources(new PageRequest(0, 20))).thenReturn(page);
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders
-//                .get("/spot/oxo/api/datasources").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON);
-//
-//        this.mockMvc.perform(requestBuilder)
-//                .andExpect(status().isOk());
-//    }
+
 
     @Test
     public void pageExample () throws Exception {
 
-        Datasource datasource = new Datasource("test", "TEST", "test", Collections.emptySet(), "test ids", "database of test identifiers", SourceType.ONTOLOGY);
 
         Page<Datasource> page = new PageImpl<Datasource>(Collections.singletonList(datasource), new PageRequest(1, 20), 60);
 
@@ -194,7 +160,7 @@ public class ApiDocumentation {
                         fieldWithPath("timestamp").description("The time, in milliseconds, at which the error occurred").optional()));
 
         Mockito.when(datasourceService.getDatasource(Mockito.anyString())).thenReturn(null);
-        
+
         this.mockMvc
                 .perform(get("/error")
                         .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 404)
@@ -217,7 +183,7 @@ public class ApiDocumentation {
                         linkWithRel("terms").description("Link to all the terms in OxO"),
                         linkWithRel("datasources").description("Link to all the datasources for mappings in OxO"),
                         linkWithRel("profile").description("ALPS is not currently supported")
-                        )
+                )
         );
         this.mockMvc.perform(get("/spot/oxo/api").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -227,7 +193,6 @@ public class ApiDocumentation {
     @Test
     public void termsListExample () throws Exception {
 
-        Datasource datasource = new Datasource("test", "TEST", "test", Collections.emptySet(), "test ids", "database of test identifiers", SourceType.ONTOLOGY);
         Term term = new Term("FOO:001", "001", "http://www.example.com/FOO/001", "Foo 1", datasource);
 
         Page<Term> page = new PageImpl<Term>(Collections.singletonList(term), new PageRequest(1, 20), 60);
@@ -241,7 +206,6 @@ public class ApiDocumentation {
     @Test
     public void mappingsListExample () throws Exception {
 
-        Datasource datasource = new Datasource("test", "TEST", "test", Collections.emptySet(), "test ids", "database of test identifiers", SourceType.ONTOLOGY);
         Term term1 = new Term("FOO:001", "001", "http://www.example.com/FOO/001", "Foo 1", datasource);
         Term term2 = new Term("BAR:001", "001", "http://www.example.com/BAR/001", "Bar 1", datasource);
         Mapping mapping = new Mapping();
@@ -260,12 +224,9 @@ public class ApiDocumentation {
     }
 
 
-
     @Test
     public void mappingsExample () throws Exception {
 
-        Datasource diseaseOntology = new Datasource("doid", "DOID", "doid", Collections.emptySet(), "Human Disease Ontology", "Human Disease Ontology", SourceType.ONTOLOGY);
-        Datasource mondo = new Datasource("mondo", "MONDO", "mondo", Collections.emptySet(), "MONDO: Monarch Disease Ontology", "MONDO: Monarch Disease Ontology", SourceType.ONTOLOGY);
         Term term1 = new Term("DOID:162", "162", "http://purl.obolibrary.org/obo/DOID_162", "cancer", diseaseOntology);
         Term term2 = new Term("MONDO:0004992", "0004992", "http://purl.obolibrary.org/obo/MONDO_0004992", "cancer", mondo);
         Mapping mapping = new Mapping();
@@ -273,8 +234,6 @@ public class ApiDocumentation {
         mapping.setDatasource(mondo);
         mapping.setFromTerm(term1);
         mapping.setToTerm(term2);
-
-
         this.document.snippets(
                 pathParameters(
                         parameterWithName("mapping_id").description("The id of the mapping in OxO, note these identifiers are not stable between releases and should not be used to access mapping directly")),
@@ -299,10 +258,127 @@ public class ApiDocumentation {
 
         );
 
+
         Mockito.when(mappingService.getMapping("1")).thenReturn(mapping);
 
-
         this.mockMvc.perform(get("/spot/oxo/api/mappings/{mapping_id}", "1").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void termExample () throws Exception {
+
+        Term term1 = new Term("DOID:162", "162", "http://purl.obolibrary.org/obo/DOID_162", "cancer", diseaseOntology);
+
+        this.document.snippets(
+                pathParameters(
+                        parameterWithName("term_id").description("The id of the term in OxO, typically in compact id format (curie) but OxO will try and resolve any type of id format")),
+
+                responseFields(
+                        fieldWithPath("_links").description("<<terms-links,Links>> to other resources"),
+                        fieldWithPath("curie").description("The term identifier as a canonical compact URI with prefix"),
+                        fieldWithPath("identifier").description("The term identifier without any prefix"),
+                        fieldWithPath("uri").description("A Uniform Resource Identifier (URI) this term"),
+                        fieldWithPath("label").description("A label for the term"),
+                        fieldWithPath("datasource").description("The source ontology or database where this term originates")
+                ),
+                links(halLinks(),
+                        linkWithRel("self").description("This mapping"),
+                        linkWithRel("datasource").description("The source <<resources-datasource,datasource>> where this term originates"),
+                        linkWithRel("mappings").description("All <<resources-datasource,mappings>> to this term"),
+                        linkWithRel("ols").description("If it is an ontology term, this will link to the REST URL for the term in OLS")
+                )
+
+        );
+
+        Mockito.when(termService.getTerm(Mockito.anyString())).thenReturn(term1);
+
+        this.mockMvc.perform(get("/spot/oxo/api/terms/{term_id}", "DOID:162").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void datasourcesListExample () throws Exception {
+
+        Page<Datasource> page = new PageImpl<Datasource>(Collections.singletonList(datasource), new PageRequest(1, 20), 60);
+
+        Mockito.when(datasourceService.getDatasources(new PageRequest(0, 20))).thenReturn(page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/spot/oxo/api/datasources").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON);
+
+        this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void datasourceExample () throws Exception {
+
+        this.document.snippets(
+                pathParameters(
+                        parameterWithName("datasource_id").description("The id of the datasource in OxO, these are typically the short database name from either OLS or identifiers.org")),
+
+                responseFields(
+                        fieldWithPath("_links").description("<<terms-links,Links>> to other resources"),
+                        fieldWithPath("prefix").description("The canonical prefix name for this datasource"),
+                        fieldWithPath("preferredPrefix").description("The preferred prefix for this resource"),
+                        fieldWithPath("idorgNamespace").description("The prefix used by identifiers.org"),
+                        fieldWithPath("alternatePrefix").description("Any alternative prefixes known for this datasource"),
+                        fieldWithPath("alternateIris").description("Any URIs/IRIs known for this resource"),
+                        fieldWithPath("name").description("The name of the datasource"),
+                        fieldWithPath("orcid").description("The ORCID id for the datasource in cases where the source of terms/mappings is a person"),
+                        fieldWithPath("description").description("A longer description of the datasource"),
+                        fieldWithPath("source").description("The type of datasource e.g. ONTOLOGY, DATABASE, ALGORITHM or USER"),
+                        fieldWithPath("licence").description("Any licence assoiciated with terms or mappings from this datasource"),
+                        fieldWithPath("versionInfo").description("Information about when this datasource was last accessed by OxO")
+                ),
+                links(halLinks(),
+                        linkWithRel("self").description("This mapping"),
+                        linkWithRel("terms").description("The <<resources-term,terms>> from this datasource")
+                )
+
+        );
+
+        Mockito.when(datasourceService.getDatasource(Mockito.anyString())).thenReturn(diseaseOntology);
+
+        this.mockMvc.perform(get("/spot/oxo/api/datasources/{datasource_id}", "doid").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void search () throws Exception {
+
+        ArrayList<String> inputIds = new ArrayList<String>();
+        inputIds.add("DOID:162");
+
+        MappingSearchRequest searchRequest = new MappingSearchRequest(inputIds, )
+        this.document.snippets(
+                pathParameters(
+                        parameterWithName("datasource_id").description("The id of the datasource in OxO, these are typically the short database name from either OLS or identifiers.org")),
+
+                responseFields(
+                        fieldWithPath("_links").description("<<terms-links,Links>> to other resources"),
+                        fieldWithPath("prefix").description("The canonical prefix name for this datasource"),
+                        fieldWithPath("preferredPrefix").description("The preferred prefix for this resource"),
+                        fieldWithPath("idorgNamespace").description("The prefix used by identifiers.org"),
+                        fieldWithPath("alternatePrefix").description("Any alternative prefixes known for this datasource"),
+                        fieldWithPath("alternateIris").description("Any URIs/IRIs known for this resource"),
+                        fieldWithPath("name").description("The name of the datasource"),
+                        fieldWithPath("orcid").description("The ORCID id for the datasource in cases where the source of terms/mappings is a person"),
+                        fieldWithPath("description").description("A longer description of the datasource"),
+                        fieldWithPath("source").description("The type of datasource e.g. ONTOLOGY, DATABASE, ALGORITHM or USER"),
+                        fieldWithPath("licence").description("Any licence assoiciated with terms or mappings from this datasource"),
+                        fieldWithPath("versionInfo").description("Information about when this datasource was last accessed by OxO")
+                ),
+                links(halLinks(),
+                        linkWithRel("self").description("This mapping"),
+                        linkWithRel("terms").description("The <<resources-term,terms>> from this datasource")
+                )
+
+        );
+
+        Mockito.when(datasourceService.getDatasource(Mockito.anyString())).thenReturn(diseaseOntology);
+
+        this.mockMvc.perform(get("/spot/oxo/api/datasources/{datasource_id}", "doid").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 }
