@@ -27,6 +27,7 @@ import uk.ac.ebi.spot.security.repository.OrcidUserRepository;
 import uk.ac.ebi.spot.service.DatasourceService;
 import uk.ac.ebi.spot.service.TermService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -37,7 +38,7 @@ import java.io.IOException;
  */
 @Controller
 @CrossOrigin
-@RequestMapping("/api/datasources")
+@RequestMapping(path = "/api/datasources", name = "datasources")
 @ExposesResourceFor(Datasource.class)
 @ControllerAdvice(basePackageClasses = RepositoryRestExceptionHandler.class)
 public class DatasourceController implements
@@ -54,7 +55,7 @@ public class DatasourceController implements
     OrcidUserRepository userRepository;
 
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<Datasource>> sources(
+    HttpEntity<PagedResources<Datasource>> datasources(
             Pageable pageable,
             PagedResourcesAssembler resourceAssembler) throws ResourceNotFoundException {
 
@@ -78,6 +79,7 @@ public class DatasourceController implements
             @PathVariable("prefix") String prefix) throws ResourceNotFoundException {
 
         Datasource page = datasourceService.getDatasource(prefix);
+        if (page == null) throw new ResourceNotFoundException("Datasource not found");
 
         return new ResponseEntity<>(datasourceAssembler.toResource(page), HttpStatus.OK);
     }
@@ -98,6 +100,13 @@ public class DatasourceController implements
         throw new UnsupportedOperationException("Can't delete datasources");
     }
 
+    @Override
+    public RepositoryLinksResource process(RepositoryLinksResource resource) {
+        resource.add(ControllerLinkBuilder.linkTo(DatasourceController.class).withRel("datasources"));
+        return resource;
+    }
+
+
     //////////////// Exception handling ///////////////////
     // throw a 422
     @ExceptionHandler (DuplicateKeyException.class)
@@ -110,10 +119,9 @@ public class DatasourceController implements
         response.sendError(HttpStatus.UNPROCESSABLE_ENTITY.value(), exception.getMessage());
     }
 
-    @Override
-    public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(DatasourceController.class).withRel("datasource"));
-        return resource;
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public void handleNotFoundError(HttpServletResponse response, Exception exception)  throws IOException {
+        response.sendError(HttpStatus.NOT_FOUND.value(), exception.getMessage());
     }
 
     // throw a 422
