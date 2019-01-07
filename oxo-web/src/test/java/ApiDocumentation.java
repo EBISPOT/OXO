@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -29,9 +31,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.spot.OxoWebApp;
 import uk.ac.ebi.spot.model.*;
-import uk.ac.ebi.spot.service.DatasourceService;
-import uk.ac.ebi.spot.service.MappingService;
-import uk.ac.ebi.spot.service.TermService;
+import uk.ac.ebi.spot.service.*;
 
 import javax.servlet.RequestDispatcher;
 
@@ -43,6 +43,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -50,6 +51,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -60,7 +62,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = OxoWebApp.class)
 @WebAppConfiguration
-@Ignore
 public class ApiDocumentation {
 
     @Rule
@@ -345,40 +346,23 @@ public class ApiDocumentation {
     }
 
     @Test
-    public void search () throws Exception {
+    public void searchByIdsToJson () throws Exception {
 
         ArrayList<String> inputIds = new ArrayList<String>();
         inputIds.add("DOID:162");
 
-        MappingSearchRequest searchRequest = new MappingSearchRequest(inputIds, )
-        this.document.snippets(
-                pathParameters(
-                        parameterWithName("datasource_id").description("The id of the datasource in OxO, these are typically the short database name from either OLS or identifiers.org")),
+        MappingSearchRequest searchRequest = new MappingSearchRequest(inputIds, Collections.singleton("MONDO"), Collections.singleton("MONDO"));
 
-                responseFields(
-                        fieldWithPath("_links").description("<<terms-links,Links>> to other resources"),
-                        fieldWithPath("prefix").description("The canonical prefix name for this datasource"),
-                        fieldWithPath("preferredPrefix").description("The preferred prefix for this resource"),
-                        fieldWithPath("idorgNamespace").description("The prefix used by identifiers.org"),
-                        fieldWithPath("alternatePrefix").description("Any alternative prefixes known for this datasource"),
-                        fieldWithPath("alternateIris").description("Any URIs/IRIs known for this resource"),
-                        fieldWithPath("name").description("The name of the datasource"),
-                        fieldWithPath("orcid").description("The ORCID id for the datasource in cases where the source of terms/mappings is a person"),
-                        fieldWithPath("description").description("A longer description of the datasource"),
-                        fieldWithPath("source").description("The type of datasource e.g. ONTOLOGY, DATABASE, ALGORITHM or USER"),
-                        fieldWithPath("licence").description("Any licence assoiciated with terms or mappings from this datasource"),
-                        fieldWithPath("versionInfo").description("Information about when this datasource was last accessed by OxO")
-                ),
-                links(halLinks(),
-                        linkWithRel("self").description("This mapping"),
-                        linkWithRel("terms").description("The <<resources-term,terms>> from this datasource")
-                )
+        MappingResponse mappingResponse = new MappingResponse("MONDO:0004992","cancer", Arrays.asList("mondo", "efo"), "MONDO", 2 );
+        SearchResult result = new SearchResult("DOID:162", null, "DOID:162", "cancer", Lists.newArrayList(mappingResponse));
+        Page<SearchResult> resultPage = new PageImpl<SearchResult>(Collections.singletonList(result), new PageRequest(0, 20), 20);
 
-        );
 
-        Mockito.when(datasourceService.getDatasource(Mockito.anyString())).thenReturn(diseaseOntology);
+//        Mockito.when(mappingService.getMappingsSearchByIds(searchRequest.getIds(), searchRequest.getDistance(), searchRequest.getMappingSource(), searchRequest.getMappingTarget(), new PageRequest(1, 20))).thenReturn(resultPage);
+        Mockito.when(mappingService.getMappingsSearchByIds(Mockito.anyListOf(String.class), Mockito.anyInt(), Mockito.anyCollectionOf(String.class), Mockito.anyCollectionOf(String.class), Mockito.any() )).thenReturn(resultPage);
 
-        this.mockMvc.perform(get("/spot/oxo/api/datasources/{datasource_id}", "doid").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
+        ObjectMapper mapper = new ObjectMapper();
+        this.mockMvc.perform(post("/spot/oxo/api/search").contextPath("/spot/oxo").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(searchRequest)))
                 .andExpect(status().isOk());
     }
 }

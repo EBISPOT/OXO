@@ -136,6 +136,10 @@
 
     <packaging>war</packaging>
 
+    <properties>
+        <snippetsDirectory>${project.basedir}/src/main/asciidoc/generated-snippets</snippetsDirectory>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>
@@ -154,6 +158,43 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Documentation.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <id>output-html</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDirectory>src/main/asciidoc</sourceDirectory>
+                    <outputDirectory>src/main/resources/static/documents/</outputDirectory>
+                    <backend>html</backend>
+                    <doctype>book</doctype>
+                    <attributes>
+                        <!--<toc />-->
+                        <!--<imagesdir>img</imagesdir>-->
+                        <snippets>${snippetsDirectory}</snippets>
+                    </attributes>
+                    <!--<headerFooter>false</headerFooter>-->
+                    <!--<preserveDirectories>true</preserveDirectories>-->
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>

@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
@@ -48,9 +49,19 @@ public class IndexController {
         return "index";
     }
 
-    @RequestMapping(path = "docs")
-    public String docs(Model model) {
-        return "docs";
+    @RequestMapping({"docs"})
+    public String showDocsIndex(Model model) {
+        return "redirect:docs/index";
+    }
+    // ok, this is bad, need to find a way to deal with trailing slashes and constructing relative URLs in the thymeleaf template...
+    @RequestMapping({"docs/"})
+    public String showDocsIndex2(Model model) {
+        return "redirect:index";
+    }
+    @RequestMapping({"docs/{page}"})
+    public String showDocs(@PathVariable("page") String pageName, Model model) {
+        model.addAttribute("page", pageName);
+        return "docs-template";
     }
 
     @RequestMapping(path = "about")
