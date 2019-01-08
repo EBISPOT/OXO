@@ -203,8 +203,6 @@ The mappings resource is used to list mappings in OxO
 [[resources-mappings-list]]
 === Listing term mappings
 
-include::{snippets}/mappings-list-example/path-parameters.adoc[]
-
 ==== Example request
 
 include::{snippets}/mappings-list-example/curl-request.adoc[]
@@ -240,11 +238,6 @@ include::{snippets}/mapping-example/links.adoc[]
 
 The datasources resource is used to list mappings in OxO. Datasoources can be the source of terms or the source of mappings. E.g. All terms with the EFO prefix
 are from the EFO datasource. The EFO datasource may also provide mappings between terms e.g. EFO includes mappings between Orphanet and the Human Disease Ontology.
-
-[[resources-datasources-list]]
-=== Listing datasources
-
-include::{snippets}/datasources-list-example/path-parameters.adoc[]
 
 ==== Example request
 

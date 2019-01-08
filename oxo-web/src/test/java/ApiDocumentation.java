@@ -122,7 +122,7 @@ public class ApiDocumentation {
 
         this.document.snippets(
                 responseFields(
-                        fieldWithPath("_links").description("<<resources-page-links,Links>> to other resources"),
+                        fieldWithPath("_links").description("<<resources-api-links,Links>> to other resources"),
                         fieldWithPath("_embedded").description("The list of resources"),
                         fieldWithPath("page.size").description("The number of resources in this page"),
                         fieldWithPath("page.totalElements").description("The total number of resources"),
@@ -226,7 +226,7 @@ public class ApiDocumentation {
 
 
     @Test
-    public void mappingsExample () throws Exception {
+    public void mappingExample () throws Exception {
 
         Term term1 = new Term("DOID:162", "162", "http://purl.obolibrary.org/obo/DOID_162", "cancer", diseaseOntology);
         Term term2 = new Term("MONDO:0004992", "0004992", "http://purl.obolibrary.org/obo/MONDO_0004992", "cancer", mondo);
@@ -240,7 +240,7 @@ public class ApiDocumentation {
                         parameterWithName("mapping_id").description("The id of the mapping in OxO, note these identifiers are not stable between releases and should not be used to access mapping directly")),
 
                 responseFields(
-                        fieldWithPath("_links").description("<<mappings-links,Links>> to other resources"),
+                        fieldWithPath("_links").description("<<mapping-links,Links>> to other resources"),
                         fieldWithPath("mappingId").description("The short unique id for the mapping"),
                         fieldWithPath("datasource").description("The datasource that provided the mapping"),
                         fieldWithPath("sourcePrefix").description("The prefix for the datasource that provided this mapping"),

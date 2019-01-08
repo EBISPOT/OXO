@@ -51,13 +51,14 @@ public class IndexController {
 
     @RequestMapping({"docs"})
     public String showDocsIndex(Model model) {
-        return "redirect:docs/index";
+        return "redirect:docs/";
     }
     // ok, this is bad, need to find a way to deal with trailing slashes and constructing relative URLs in the thymeleaf template...
     @RequestMapping({"docs/"})
     public String showDocsIndex2(Model model) {
-        return "redirect:index";
+        return "docs";
     }
+
     @RequestMapping({"docs/{page}"})
     public String showDocs(@PathVariable("page") String pageName, Model model) {
         model.addAttribute("page", pageName);

@@ -12,7 +12,7 @@
          More info: h5bp.com/b/378 -->
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
 
-    <title>Documentation &lt; Ontology Lookup Service &lt; EMBL-EBI</title>
+    <title>Docs &lt; Ontology Xref Service &lt; EMBL-EBI</title>
     <meta name="description" content="EMBL-EBI"/><!-- Describe what this page is about -->
     <meta name="keywords" content="bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
     <meta name="author" content="EMBL-EBI"/><!-- Your [project-name] here -->
@@ -38,8 +38,8 @@
     <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/mini/ebi-fluid-embl.css">
     -->
 
-    <link rel="stylesheet" href="../css/ols.css" th:href="@{../css/ols.css}" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="../css/ols-colors.css" th:href="@{../css/ols-colors.css}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
 
 
     <style type="text/css">
@@ -182,10 +182,8 @@
             <!-- local-title -->
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
-            <div id="local-title" class=" alpha logo-title">
-                <a href="../index" title="Back to OLS homepage">
-                    <img style="width: 80px" th:src="@{../img/ols-logo.jpg}" src="../img/ols-logo.jpg" alt="OLS logo"/></a>
-                <span><h1>Ontology Lookup Service</h1></span>
+            <div id="local-title" class="alpha logo-title">
+                <span><h1>Ontology Xref Service</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -221,11 +219,21 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="../index">Home</a></li>
-                    <li><a href="../ontologies">Ontologies</a></li>
-                    <li id="local-nav-docs" ><a href="docs" >Documentation</a></li>
-                    <li id="local-nav-about" class="last" ><a href="about">About</a></li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
+                    <li class="first"><a href="index">OxO</a></li>
+                    <li class="active"><a href="docs">Documentation</a></li>
+                    <li class="last" ><a href="about">About</a></li>
+                    <li th:if="not ${username}  and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                        Logout <span th:text="${username}">user</span>
+                        <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
+                          </form>
+                    </a></li>
+                    <li th:if="${username} and not ${readonly}" class="functional">
+                        <a href="myaccount" class="icon icon-functional" data-icon="5">
+                            My mappings
+                        </a>
+                    </li>
+                    <li class="functional last"><a href="contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -306,6 +314,6 @@
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
 <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="../js/docs.js" th:src="@{../js/ols-docs.js}"></script>
+<script src="../js/docs.js" th:src="@{../js/docs.js}"></script>
 </body>
 </html>
