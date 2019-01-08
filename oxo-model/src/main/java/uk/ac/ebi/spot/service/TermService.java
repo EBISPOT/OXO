@@ -54,7 +54,7 @@ public class TermService {
     Session session;
     private Object summaryGraphJson;
 
-    @Value("${oxo.indexer.chunks}")
+    @Value("${oxo.indexer.chunks:10000}")
     int chunks = 10000;
 
     /**
