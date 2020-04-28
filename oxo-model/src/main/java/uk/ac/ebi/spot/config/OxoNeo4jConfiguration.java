@@ -24,7 +24,6 @@ import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.Term;
 
-import javax.annotation.Resource;
 import java.net.MalformedURLException;
 
 /**
