@@ -21,25 +21,12 @@ public class DatasourceConverter implements AttributeConverter<Datasource, Strin
 
    @Override
    public String toGraphProperty(Datasource value) {
-
-       ObjectMapper mapper = new ObjectMapper();
-       try {
-           return mapper.writeValueAsString(value);
-       } catch (JsonProcessingException e) {
-           e.printStackTrace();
-       }
-       return "";
+        return value.getPrefix();
    }
 
    @Override
    public Datasource toEntityAttribute(String value) {
-       ObjectMapper mapper = new ObjectMapper();
-       try {
-           return mapper.readValue(value, Datasource.class);
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-       return new Datasource();
-   }
+       return datasourceRepository.findByPrefix(value);
 
+   }
 }
