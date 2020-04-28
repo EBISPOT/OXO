@@ -23,7 +23,7 @@ services:
         volumes:
           - ./neo4jimport:/var/lib/neo4j/import
     oxo:
-        image: oxo:latest
+        build: .
         depends_on:
           - neo4j
           - solr
