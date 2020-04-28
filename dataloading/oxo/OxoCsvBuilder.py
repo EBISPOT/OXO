@@ -20,7 +20,7 @@ class Builder:
             terms[ap.lower()] = 1
             terms[ap.upper()] = 1
 
-        return terms.keys()
+        return list(terms.keys())
 
     def exportDatasourceToCsv(self, file, datasources):
         with open(file, 'w') as csvfile:
@@ -29,21 +29,21 @@ class Builder:
             spamwriter.writerow(
                 ['prefix', "idorgNamespace", "title", "description", "sourceType", "baseUri", "alternatePrefixes",
                  "licence", "versionInfo"])
-            for key, value in datasources.iteritems():
+            for key, value in datasources.items():
                 value.alternatePrefixes.append(key)
                 alternatePrefixes = self.generateAllAltPrefixes(value.alternatePrefixes)
 
-                spamwriter.writerow([value.prefPrefix, value.idorgNamespace, unicode(value.title).encode("utf-8"),
-                                     unicode(value.description).encode("utf-8"), value.sourceType, value.baseUri,
-                                     ",".join(alternatePrefixes), unicode(value.licence).encode("utf-8"),
-                                     unicode(value.versionInfo).encode("utf-8")])
+                spamwriter.writerow([value.prefPrefix, value.idorgNamespace, str(value.title).encode("utf-8"),
+                                     str(value.description).encode("utf-8"), value.sourceType, value.baseUri,
+                                     ",".join(alternatePrefixes), str(value.licence).encode("utf-8"),
+                                     str(value.versionInfo).encode("utf-8")])
 
     def exportTermsToCsv(self, file, terms):
         with open(file, 'w') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',',
                                     quoting=csv.QUOTE_ALL, escapechar='\\', doublequote=False)
             spamwriter.writerow(['identifier', "curie", "label", "uri", "prefix"])
-            for key, term in terms.iteritems():
+            for key, term in terms.items():
                 label = None
                 uri = None
 

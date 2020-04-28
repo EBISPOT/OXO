@@ -9,10 +9,10 @@ __date__ = "03/03/2018"
 
 
 import OxoClient
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import csv
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -46,14 +46,14 @@ efoAnnotationsParams = {
     'rows' : 0,
     'wt' : 'csv'
 }
-getEfoAnnotationsUrl = solrBaseUrl+"/ontology/select?"+urllib.urlencode(efoAnnotationsParams)
+getEfoAnnotationsUrl = solrBaseUrl+"/ontology/select?"+urllib.parse.urlencode(efoAnnotationsParams)
 
 efoSolrQueryParams = {
     'fq': 'ontology_name:"efo" AND type:"class" AND is_obsolete:false',
     'q':'*',
     'wt':'json',
 }
-efoSolrQueryUrl = solrBaseUrl+"/ontology/select?"+urllib.urlencode(efoSolrQueryParams)
+efoSolrQueryUrl = solrBaseUrl+"/ontology/select?"+urllib.parse.urlencode(efoSolrQueryParams)
 
 olsDbxrefSolrParams = {
     'q':'hasDbXref_annotation:* OR database_cross_reference_annotation:* OR has_alternative_id_annotation:* OR definition_citation_annotation:*',
@@ -61,7 +61,7 @@ olsDbxrefSolrParams = {
     'wt':'json',
     'fq':'type:"class" AND !ontology_name: (ncbitaxon OR pr OR vto OR ogg) AND is_obsolete:false',
 }
-olsDbxrefSolrQuery = solrBaseUrl + "/ontology/select?" + urllib.urlencode(olsDbxrefSolrParams)
+olsDbxrefSolrQuery = solrBaseUrl + "/ontology/select?" + urllib.parse.urlencode(olsDbxrefSolrParams)
 
 solrChunks=config.getint("Basics","solrChunks")
 
@@ -75,7 +75,7 @@ termToLabel = {}
 idorgNamespace = {}
 prefixToDatasource = {}
 
-print "Reading datasources from OxO..."
+print("Reading datasources from OxO...")
 for data in OXO.getOxODatasets():
     del data['_links']
     del data['description']
@@ -87,7 +87,7 @@ for data in OXO.getOxODatasets():
         if "idorgNamespace" in data and  data["idorgNamespace"] != '':
             idorgNamespace[altPrefix.lower()] = data["idorgNamespace"]
             idorgNamespace[prefix.lower()] = data["idorgNamespace"]
-print "Reading datasources from OxO done"
+print("Reading datasources from OxO done")
 
 # these are the annotation properties where we look for xrefs
 knownAnnotations = [
@@ -98,7 +98,7 @@ knownAnnotations = [
 # find all the EFO xref annotation propertied
 # note EFO does xrefs in a different way to all the other OBO ontologies so
 # give it special consideration
-response = urllib.urlopen(getEfoAnnotationsUrl)
+response = urllib.request.urlopen(getEfoAnnotationsUrl)
 cr = csv.reader(response)
 for row in cr:
     for p in row:
@@ -117,7 +117,7 @@ postMappings = []
 def processSolrDocs(url):
     rows = solrChunks
     initUrl = url + "&start=0&rows=" + str(rows)
-    reply = urllib.urlopen(initUrl)
+    reply = urllib.request.urlopen(initUrl)
     anwser = json.load(reply)
 
     size = anwser["response"]["numFound"]
@@ -142,16 +142,16 @@ def processSolrDocs(url):
                 fromId = OXO.getIdFromCui(fromShortForm)
 
             if not fromPrefix:
-                print "Can't determine prefix for " + fromShortForm + " so skipping"
+                print("Can't determine prefix for " + fromShortForm + " so skipping")
                 continue
 
             if not fromId:
-                print "Can't determine id for " + fromShortForm + " so skipping"
+                print("Can't determine id for " + fromShortForm + " so skipping")
                 continue
             # do we know the source term from the prefix?
 
             if fromPrefix not in prefixToPreferred:
-                print "unknown prefix " + fromPrefix + " so skipping"
+                print("unknown prefix " + fromPrefix + " so skipping")
                 continue
 
             fromPrefix = prefixToPreferred[fromPrefix]
@@ -177,11 +177,11 @@ def processSolrDocs(url):
                             toId = OXO.getIdFromCui(xref)
 
                             if not toPrefix or not toId:
-                                print "Can't get prefix or id for " + xref.encode('utf-8')
+                                print("Can't get prefix or id for " + xref.encode('utf-8'))
                                 continue
 
                             if not toPrefix:
-                                print "Can't extract prefix for " + xref.encode('utf-8')
+                                print("Can't extract prefix for " + xref.encode('utf-8'))
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1
@@ -206,7 +206,7 @@ def processSolrDocs(url):
 
 
                             if fromOntology not in  prefixToPreferred:
-                                print "mapping from unknown source " + fromOntology
+                                print("mapping from unknown source " + fromOntology)
                                 continue
 
                             # we know some ontologies have information about BT/NT or exact mappings. This needs to be better exposed in
@@ -239,21 +239,21 @@ def processSolrDocs(url):
                                 idorgUri = "http://identifiers.org/" + idorgNamespace[toPrefix.lower()] + "/" + toId
                                 terms[toCurie]["uri"] = idorgUri
 
-        print str(x)
+        print(str(x))
         initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
-        reply = urllib.urlopen(initUrl)
+        reply = urllib.request.urlopen(initUrl)
         anwser = json.load(reply)
 
 
 # do the query to get docs from solr and process
 
 processSolrDocs(efoSolrQueryUrl)
-print "Done processing EFO, starting to query OLS"
+print("Done processing EFO, starting to query OLS")
 processSolrDocs(olsDbxrefSolrQuery)
-print "Done processing OLS"
+print("Done processing OLS")
 
-print "Looking for OLS terms with no labels..."
-for key, term in terms.iteritems():
+print("Looking for OLS terms with no labels...")
+for key, term in terms.items():
     if term["label"] is None:
         prefix = OXO.getPrefixFromCui(key)
         if prefix == "NCIT":
@@ -266,15 +266,15 @@ for key, term in terms.iteritems():
                 if term["label"] is None:
                     terms[key]["label"] = object["label"]
             else:
-                print "No label found for" + str(terms[key])
+                print("No label found for" + str(terms[key]))
 
 # dump out the list of unkonwn sources
-print "Finished, here are all the unknown sources"
-for key, value in unknownSource.iteritems() :
+print("Finished, here are all the unknown sources")
+for key, value in unknownSource.items() :
     # see if we can match prefix to db
-    print key.encode('utf-8', 'ignore')
+    print(key.encode('utf-8', 'ignore'))
 
-print "Generating CSV files for neo loading..."
+print("Generating CSV files for neo loading...")
 
 
 import OxoCsvBuilder
@@ -283,4 +283,4 @@ builder = OxoCsvBuilder.Builder()
 builder.exportTermsToCsv(exportFileTerms, terms)
 builder.exportMappingsToCsv(exportFileMappings, postMappings, prefixToDatasource)
 
-print "Finished process!"
+print("Finished process!")

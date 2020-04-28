@@ -8,8 +8,8 @@ __license__ = "Apache 2.0"
 __date__ = "03/03/2018"
 
 import OxoClient
-import MySQLdb
-from ConfigParser import SafeConfigParser
+import pymysql
+from configparser import ConfigParser
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -19,7 +19,7 @@ parser.add_option("-c", "--config", help="config file", default="config.ini")
 
 (options, args) = parser.parse_args()
 
-config = SafeConfigParser()
+config = ConfigParser()
 config.read(options.config)
 
 exportFileTerms=config.get("Paths","exportFileTerms")
@@ -36,7 +36,7 @@ host=config.get("SQLumls","host")
 sqldb=config.get("SQLumls","db")
 port=config.getint("SQLumls","port")
 
-db = MySQLdb.connect(user=user, passwd=password,
+db = pymysql.connect(user=user, passwd=password,
                      host=host,
                      db=sqldb, port=port)
 
@@ -53,7 +53,7 @@ termToLabel = {}
 idorgNamespace = {}
 prefixToDatasource = {}
 
-print "Reading datasources from OxO..."
+print("Reading datasources from OxO...")
 for data in OXO.getOxODatasets():
     del data['_links']
     del data['description']
@@ -66,7 +66,7 @@ for data in OXO.getOxODatasets():
             idorgNamespace[altPrefix.lower()] = data["idorgNamespace"]
             idorgNamespace[prefix.lower()] = data["idorgNamespace"]
 
-print "Reading datasources from OxO done!"
+print("Reading datasources from OxO done!")
 
 terms = {}
 umlsMapping = {}
@@ -134,7 +134,7 @@ def getUMLSMappingFromRow(row, terms, umlsMapping):
 # umls loader
 cur = db.cursor()
 
-print "Fetching all mappings from UMLS..."
+print("Fetching all mappings from UMLS...")
 
 # get all pref labels for UMLS concepts
 getUmlsLabelsSqlQuery = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where ts ='P' and stt = 'PF' and ispref = 'Y' and sab != 'src'"
@@ -146,12 +146,12 @@ for row in fetched:
     try:
         getUMLSMappingFromRow(row, terms, umlsMapping)
     except Exception as e:
-        print e
-        print "Experienced a problem with "
-        print row
-        print "Catched it and try to move on"
+        print(e)
+        print("Experienced a problem with ")
+        print(row)
+        print("Catched it and try to move on")
 
-print "Fetching all source terms info from from UMLS..."
+print("Fetching all source terms info from from UMLS...")
 
 # now get source term labels
 getPreferredLabelFromSource = "select distinct cui,sab, scui, sdui, str, tty, ts, stt, ispref from MRCONSO where tty = 'PT' and  sab != 'src'"
@@ -162,12 +162,12 @@ for row in fetched:
     try:
         getUMLSMappingFromRow(row, terms, umlsMapping)
     except Exception as e:
-        print e
-        print "Experienced a problem with "
-        print row
-        print "Catched it and try to move on"
+        print(e)
+        print("Experienced a problem with ")
+        print(row)
+        print("Catched it and try to move on")
 
-for formIdKey, toIdValues in umlsMapping.iteritems():
+for formIdKey, toIdValues in umlsMapping.items():
     for toIdKey in toIdValues:
         postMappings.append({
         "fromId": formIdKey,
@@ -180,9 +180,9 @@ for formIdKey, toIdValues in umlsMapping.iteritems():
 
 
 db.close()
-print "Fetching all mappings from UMLS done!"
+print("Fetching all mappings from UMLS done!")
 
-print "Generating CSV files for neo loading..."
+print("Generating CSV files for neo loading...")
 
 import OxoCsvBuilder
 builder = OxoCsvBuilder.Builder()
@@ -191,4 +191,4 @@ builder.exportTermsToCsv(exportFileTerms, terms)
 builder.exportMappingsToCsv(exportFileMappings, postMappings, prefixToDatasource)
 
 
-print "Finished process!"
+print("Finished process!")

@@ -3,7 +3,7 @@
 Python client to the OxO REST API
 """
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
 import json
 #from ConfigParser import SafeConfigParser
@@ -61,10 +61,10 @@ class OXO:
         #print url
         r = requests.post(url, data=json.dumps(postdata), headers=headers)
         if r.status_code != requests.codes.ok:
-            print r
-            print r.text
-            print r.status_code
-            print json.loads(r.text)["message"]
+            print(r)
+            print(r.text)
+            print(r.status_code)
+            print(json.loads(r.text)["message"])
 
     def saveMapping(self, fromPrefix, fromId, fromLabel, fromUri, mappingSourceId, toPrefix, toId, sourceType):
 
@@ -86,7 +86,7 @@ class OXO:
         r = requests.post(url, data=json.dumps(postdata), headers=headers)
 
         if r.status_code != requests.codes.ok:
-            print json.loads(r.text)["message"]
+            print(json.loads(r.text)["message"])
 
     def saveMappings(self, mappings):
 
@@ -98,7 +98,7 @@ class OXO:
         r = requests.post(url, data=json.dumps(mappings), headers=headers)
 
         if r.status_code != requests.codes.ok:
-            print json.loads(r.text)["message"]
+            print(json.loads(r.text)["message"])
 
     def updateTerm(self, curie, iri, label):
         # if iri and label then patch
@@ -106,18 +106,18 @@ class OXO:
 
         params=None
         if iri and label:
-            params = "uri=" + urllib.quote_plus(iri.encode('utf-8'))+"&label=" + urllib.quote_plus(label.encode('utf-8'))
+            params = "uri=" + urllib.parse.quote_plus(iri.encode('utf-8'))+"&label=" + urllib.parse.quote_plus(label.encode('utf-8'))
         if not iri and not label:
             iriMap = self.getIriAndLabelFromOls(curie)
             if iriMap:
                 olsIri = iriMap["uri"]
                 if olsIri:
-                    params = "uri=" + urllib.quote_plus(olsIri.encode('utf-8'))
+                    params = "uri=" + urllib.parse.quote_plus(olsIri.encode('utf-8'))
                     olsLabel = iriMap["label"]
                     if olsLabel:
-                        params = "uri=" + urllib.quote_plus(olsIri.encode('utf-8')) + "&label=" + urllib.quote_plus(olsLabel.encode('utf-8'))
+                        params = "uri=" + urllib.parse.quote_plus(olsIri.encode('utf-8')) + "&label=" + urllib.parse.quote_plus(olsLabel.encode('utf-8'))
         if not iri and label:
-            params = "label=" + urllib.quote_plus(label.encode('utf-8'))
+            params = "label=" + urllib.parse.quote_plus(label.encode('utf-8'))
 
 
         if params:
@@ -132,10 +132,10 @@ class OXO:
             return {"uri" : self.olsIri[curie], "label": self.olsLabel[curie]}
         else:
             query = self.olsurl+"/terms?obo_id="+curie
-            reply = urllib.urlopen(query)
+            reply = urllib.request.urlopen(query)
             if reply.getcode() == 200:
                 anwser = json.load(reply)
-                if "_embedded" in anwser.keys():
+                if "_embedded" in list(anwser.keys()):
                     terms = anwser["_embedded"]["terms"]
                     label = None
                     uri = None
@@ -158,10 +158,10 @@ class OXO:
             return self.olsLabel[curie]
         else:
             olsurl = self.olsurl+"/terms?obo_id="+curie
-            reply = urllib.urlopen(olsurl)
+            reply = urllib.request.urlopen(olsurl)
             if reply.getcode() == 200:
                 anwser = json.load(reply)
-                if "_embedded" in anwser.keys():
+                if "_embedded" in list(anwser.keys()):
                     terms = anwser["_embedded"]["terms"]
                     label = None
                     uri = None
@@ -184,10 +184,10 @@ class OXO:
             return self.alreadyScoped[target]
 
         olsurl = self.olsurl + "/ontologies/"+ontology+"/terms?obo_id=" + curie
-        reply = urllib.urlopen(olsurl)
+        reply = urllib.request.urlopen(olsurl)
         if reply.getcode() == 200:
             anwser = json.load(reply)
-            if "_embedded" in anwser.keys():
+            if "_embedded" in list(anwser.keys()):
                 terms = anwser["_embedded"]["terms"]
                 for term in terms:
                     if "obo_xref" in term:
@@ -209,8 +209,8 @@ class OXO:
 
     def getOxODatasets(self):
         url = self.oxoUrl + "/api/datasources?size=4000"
-        print "querying " + url
-        reply = urllib.urlopen(url)
+        print("querying " + url)
+        reply = urllib.request.urlopen(url)
         answer = json.load(reply)
         if "_embedded" not in answer:
             return []

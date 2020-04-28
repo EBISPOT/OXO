@@ -8,7 +8,7 @@ __license__ = "Apache 2.0"
 __date__ = "03/03/2018"
 
 from neo4j.v1 import GraphDatabase, basic_auth
-from ConfigParser import SafeConfigParser
+from configparser import ConfigParser
 from optparse import OptionParser
 
 class Neo4jOxOLoader:
@@ -17,7 +17,7 @@ class Neo4jOxOLoader:
         #     print "\nNot enough arguments! Please pass a (path) of a config file!"
         #     raise Exception("Not enough arguments! Please pass in a config file!")
         # else:
-        #     config = SafeConfigParser()
+        #     config = ConfigParser()
         #     config.read(sys.argv[1])
 
         parser = OptionParser()
@@ -29,7 +29,7 @@ class Neo4jOxOLoader:
 
         (options, args) = parser.parse_args()
 
-        config = SafeConfigParser()
+        config = ConfigParser()
         config.read(options.config)
 
         uri = config.get("Basics", "neoURL")
@@ -45,20 +45,20 @@ class Neo4jOxOLoader:
 
         if options.wipe:
             while self.deleteMappings() > 0:
-                print "Still deleting..."
-            print "Mappings deleted!"
+                print("Still deleting...")
+            print("Mappings deleted!")
 
             while self.deleteSourceRels() > 0:
-                print "Still deleting..."
-            print "Source rels deleted!"
+                print("Still deleting...")
+            print("Source rels deleted!")
 
             while self.deleteTerms() > 0:
-                print "Still deleting..."
-            print "Terms deleted!"
+                print("Still deleting...")
+            print("Terms deleted!")
 
             while self.deleteDatasources() > 0:
-                print "Still deleting..."
-            print "Datasources deleted!"
+                print("Still deleting...")
+            print("Datasources deleted!")
 
         if options.datasources:
             self.loadDatasources(options.datasources)
@@ -89,7 +89,7 @@ class Neo4jOxOLoader:
             return record["count"]
 
     def loadTerms(self, terms):
-        print "Loading terms from "+terms+"..."
+        print("Loading terms from "+terms+"...")
 
         loadTermsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+terms+"""' AS line
                         MATCH (d:Datasource {prefix : line.prefix})
@@ -99,20 +99,20 @@ class Neo4jOxOLoader:
                         with t,d
                         CREATE (t)-[:HAS_SOURCE]->(d)"""
         result = self.session.run(loadTermsCypher)
-        print result.summary()
+        print(result.summary())
 
     def loadMappings(self, mappings):
-        print "Loading mappings from "+mappings+"..."
+        print("Loading mappings from "+mappings+"...")
         loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+mappings+"""' AS line
                         MATCH (f:Term { curie: line.fromCurie}),(t:Term { curie: line.toCurie})
                         WITH f,t,line
                         CREATE (f)-[m:MAPPING { sourcePrefix: line.datasourcePrefix, datasource: line.datasource, sourceType: line.sourceType, scope: line.scope, date: line.date}]->(t)"""
 
         result = self.session.run(loadMappingsCypher)
-        print result.summary()
+        print(result.summary())
 
     def loadDatasources(self, datasources):
-        print "Loading datasrouces from " + datasources + " ..."
+        print("Loading datasrouces from " + datasources + " ...")
         loadDatasourcesCypher = """
             LOAD CSV WITH HEADERS FROM 'file:///"""+datasources+"""' AS line
             WITH line
@@ -121,7 +121,7 @@ class Neo4jOxOLoader:
             SET d.preferredPrefix = line.prefix, d.name = line.title, d.description = line.description, d.versionInfo = line.versionInfo, d.idorgNamespace = line.idorgNamespace, d.licence = line.licence, d.sourceType = line.sourceType, d.alternatePrefix = split(line.alternatePrefixes,",")
             """
         result = self.session.run(loadDatasourcesCypher)
-        print result.summary()
+        print(result.summary())
 
 if __name__ == '__main__':
     Neo4jOxOLoader()

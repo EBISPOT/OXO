@@ -9,12 +9,12 @@ __license__ = "Apache 2.0"
 __date__ = "03/03/2018"
 
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import xml.etree.ElementTree as ET
 import yaml
 import OxoClient
-from ConfigParser import SafeConfigParser
+from configparser import ConfigParser
 from optparse import OptionParser
 
 
@@ -32,7 +32,7 @@ parser.add_option("-c", "--config", help="config file", default="config.ini")
 
 (options, args) = parser.parse_args()
 
-config = SafeConfigParser()
+config = ConfigParser()
 config.read(options.config)
 OXO = OxoClient.OXO()
 
@@ -50,7 +50,7 @@ exportFileDatasources=config.get("Paths","exportFileDatasources")
 if options.datasources:
     exportFileDatasources = options.datasources
 
-reply = urllib.urlopen(olsurl)
+reply = urllib.request.urlopen(olsurl)
 anwser = json.load(reply)
 
 ontologies  = anwser["_embedded"]["ontologies"]
@@ -123,9 +123,9 @@ for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
             altPrefixes.append(altPrefixs.text)
 
     if prefPrefix.lower() in prefixToPreferred:
-        print "Ignoring "+namespace+" from idorg as it is already registered as a datasource"
+        print("Ignoring "+namespace+" from idorg as it is already registered as a datasource")
     elif namespace.lower() in prefixToPreferred:
-        print "Ignoring " + namespace + " from idorg as it is already registered as a datasource"
+        print("Ignoring " + namespace + " from idorg as it is already registered as a datasource")
     else:
         idorgNamespace[prefPrefix.lower()] = prefPrefix
         idorgNamespace[namespace.lower()] = prefPrefix
@@ -140,7 +140,7 @@ for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
 
 #oboDbxrefUrl = 'https://raw.githubusercontent.com/geneontology/go-site/master/metadata/db-xrefs.yaml'
 # Read from OBO db-xrefs
-yamlData = yaml.load(urllib.urlopen(oboDbxrefUrl))
+yamlData = yaml.load(urllib.request.urlopen(oboDbxrefUrl))
 
 for database in yamlData:
     namespace= database["database"]
@@ -149,7 +149,7 @@ for database in yamlData:
 
     altPrefixes = [namespace]
     if namespace.lower() in prefixToPreferred:
-        print "Ignoring " + namespace + " from OBO as it is already registered as a datasource"
+        print("Ignoring " + namespace + " from OBO as it is already registered as a datasource")
     else:
         urlSyntax = None
         if "entity_types" in database:
@@ -163,7 +163,7 @@ for database in yamlData:
 
 
 # Create Paxo as datasources
-print "Adding paxo as datasource"
+print("Adding paxo as datasource")
 prefPrefix="paxo"
 namespace=None
 title="paxo"
