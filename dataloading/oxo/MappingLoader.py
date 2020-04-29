@@ -1,7 +1,7 @@
-import MySQLdb
+import pymysql
 import OxoClient as OXO
 from pip._vendor.requests.packages.urllib3.connection import port_by_scheme
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import xml.etree.ElementTree as ET
 import yaml
@@ -9,12 +9,12 @@ import csv
 import sys
 import datetime
 from neo4j.v1 import GraphDatabase, basic_auth
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 
 #Parse the input parameters. A config file and a flag is expected
 if len(sys.argv)!=2:
-    print "\nNot enough arguments! Please pass a (path) of a config file!"
+    print("\nNot enough arguments! Please pass a (path) of a config file!")
     raise Exception("Not enough arguments! Please pass in a config file!")
 else:
     config = SafeConfigParser()
@@ -50,8 +50,8 @@ port=config.getint("SQLumls","port")
 
 driver = GraphDatabase.driver(uri, auth=basic_auth("neo4j", "dba"))
 session = driver.session()
-print "neo success no sql"
-db = MySQLdb.connect(user=user, passwd=password,
+print("neo success no sql")
+db = pymysql.connect(user=user, passwd=password,
                      host=host,
                      db=sqldb, port=port)
 
@@ -64,7 +64,7 @@ termToLabel = {}
 idorgNamespace = {}
 prefixToDatasource = {}
 
-print "Reading datasources from OxO..."
+print("Reading datasources from OxO...")
 for data in OXO.getOxODatasets():
     del data['_links']
     del data['description']
@@ -83,18 +83,18 @@ knownAnnotations = [
     "hasDbXref_annotation"
 ]
 
-print "Reading datasources from OxO done"
+print("Reading datasources from OxO done")
 # hack to get EFO xref annotations
 
-response = urllib.urlopen(getEfoAnnotationsUrl)
+response = urllib.request.urlopen(getEfoAnnotationsUrl)
 cr = csv.reader(response)
 for row in cr:
     for p in row:
         if 'definition_citation' in p:
             knownAnnotations.append(p)
 
-print "\n knownAnnotations"
-print knownAnnotations
+print("\n knownAnnotations")
+print(knownAnnotations)
 
 
 unknownSource = {}
@@ -106,7 +106,7 @@ postMappings = []
 def processSolrDocs(url):
     rows = solrChunks
     initUrl = url + "&start=0&rows=" + str(rows)
-    reply = urllib.urlopen(initUrl)
+    reply = urllib.request.urlopen(initUrl)
     anwser = json.load(reply)
 
     size = anwser["response"]["numFound"]
@@ -135,16 +135,16 @@ def processSolrDocs(url):
                 fromId = OXO.getIdFromCui(fromShortForm)
 
             if not fromPrefix:
-                print "Can't determine prefix for " + fromShortForm + " so skipping"
+                print("Can't determine prefix for " + fromShortForm + " so skipping")
                 continue
 
             if not fromId:
-                print "Can't determine id for " + fromShortForm + " so skipping"
+                print("Can't determine id for " + fromShortForm + " so skipping")
                 continue
             # do we know the source term from the prefix?
 
             if fromPrefix not in prefixToPreferred:
-                print "unknown prefix " + fromPrefix + " so skipping"
+                print("unknown prefix " + fromPrefix + " so skipping")
                 continue
 
             fromPrefix = prefixToPreferred[fromPrefix]
@@ -170,11 +170,11 @@ def processSolrDocs(url):
                             toId = OXO.getIdFromCui(xref)
 
                             if not toPrefix or not toId:
-                                print "Can't get prefix or id for " + xref.encode('utf-8')
+                                print("Can't get prefix or id for " + xref.encode('utf-8'))
                                 continue
 
                             if not toPrefix:
-                                print "Can't extract prefix for " + xref.encode('utf-8')
+                                print("Can't extract prefix for " + xref.encode('utf-8'))
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1
@@ -199,7 +199,7 @@ def processSolrDocs(url):
 
 
                             if fromOntology not in  prefixToPreferred:
-                                print "mapping from unknown source " + fromOntology
+                                print("mapping from unknown source " + fromOntology)
                                 continue
                             mapping = {
                                 "fromId": fromCurie,
@@ -225,20 +225,20 @@ def processSolrDocs(url):
                                 idorgUri = "http://identifiers.org/" + idorgNamespace[toPrefix.lower()] + "/" + toId
                                 terms[toCurie]["uri"] = idorgUri
 
-        print str(x)
+        print(str(x))
         # OXO.saveMappings(postMappings)
         # postMappings = []
         initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
-        reply = urllib.urlopen(initUrl)
+        reply = urllib.request.urlopen(initUrl)
         anwser = json.load(reply)
 
 
 # do the query to get docs from solr and process
 
 processSolrDocs(efoSolrQueryUrl)
-print "Done processing EFO, starting to query OLS"
+print("Done processing EFO, starting to query OLS")
 processSolrDocs(olsDbxerfSolrQuery)
-print "Done processing OLS"
+print("Done processing OLS")
 
 #terms={ "DOID:0080184" :{"prefix": "DOID",
 #        "id": "0080184",
@@ -248,8 +248,8 @@ print "Done processing OLS"
 #    }
 
 
-print "Looking for OLS terms with no labels..."
-for key, term in terms.iteritems():
+print("Looking for OLS terms with no labels...")
+for key, term in terms.items():
     if term["label"] is None:
         prefix = OXO.getPrefixFromCui(key)
         if prefixToDatasource[prefixToPreferred[prefix]]["source"] == "ONTOLOGY":
@@ -260,9 +260,9 @@ for key, term in terms.iteritems():
                 if term["label"] is None:
                     terms[key]["label"] = object["label"]
             else:
-                print "Object None!"
-                print object
-                print terms[key]
+                print("Object None!")
+                print(object)
+                print(terms[key])
 
 
 
@@ -278,10 +278,10 @@ for key, term in terms.iteritems():
 
 
 # dump out the list of unkonwn sources
-print "Finished, here are all the unknown sources"
-for key, value in unknownSource.iteritems() :
+print("Finished, here are all the unknown sources")
+for key, value in unknownSource.items() :
     # see if we can match prefix to db
-    print key.encode('utf-8', 'ignore')
+    print(key.encode('utf-8', 'ignore'))
 
 
 # print all the first cell of all the rows
@@ -321,8 +321,8 @@ def getUMLSMappingFromRow(row):
         if label!="":
             terms[fromCurie]["label"] = label
         else:
-            print "FROM UMLS label is none for "
-            print fromCurie
+            print("FROM UMLS label is none for ")
+            print(fromCurie)
 
     if toCurie not in terms:
         terms[toCurie] = {
@@ -336,8 +336,8 @@ def getUMLSMappingFromRow(row):
         if label!="":
             terms[toCurie]["label"] = label
         else:
-            print "FROM UMLS - label is NONE! for"
-            print toCurie
+            print("FROM UMLS - label is NONE! for")
+            print(toCurie)
 #### End empty labels
 
     if idorgNamespace[source.lower()]:
@@ -385,10 +385,10 @@ for row in fetched:
         if mappingRow is not None:
             postMappings.append(mappingRow)
     except Exception as e:
-        print e
-        print "Experienced a problem with "
-        print row
-        print "Catched it and try to move on"
+        print(e)
+        print("Experienced a problem with ")
+        print(row)
+        print("Catched it and try to move on")
         #Experienced a problem with  ('C1180021', 'NCI', 'C33333', None, 'Plus End of the Microtubule')
         #('C0796501', 'NCI', 'C11519', None, 'Asparaginase/Dexamethasone/Prednisone/Vincristine')
 
@@ -396,14 +396,14 @@ db.close()
 
 
 
-print
-print "Generating CSV files for neo loading..."
+print()
+print("Generating CSV files for neo loading...")
 
 with open(exportFileTerms, 'w') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',
                             quoting=csv.QUOTE_ALL, escapechar='\\',doublequote=False)
     spamwriter.writerow(['identifier', "curie", "label","uri", "prefix" ])
-    for key, term in terms.iteritems():
+    for key, term in terms.items():
         label = None
         uri = None
 
@@ -426,7 +426,7 @@ with open(exportFileMappings, 'w') as csvfile:
         datasource = prefixToDatasource[mapping["datasourcePrefix"]]
         spamwriter.writerow( [mapping["fromId"],mapping["toId"],mapping["datasourcePrefix"],json.dumps(datasource),mapping["sourceType"],mapping["scope"],  datetime.datetime.now().strftime("%y-%m-%d")])
 
-print "Generating CSV files for neo loading done, now loading them..."
+print("Generating CSV files for neo loading done, now loading them...")
 
 # CREATE CONSTRAINT ON (i:Term) ASSERT i.curie IS UNIQUE
 # CREATE CONSTRAINT ON (i:Datasource) ASSERT i.prefix IS UNIQUE
@@ -436,30 +436,30 @@ def deleteMappings():
     result = session.run("match (t)-[m:MAPPING]->() WITH m LIMIT 50000 DETACH DELETE m RETURN count(*) as count")
     for record in result:
         return record["count"]
-print "Deleting mappings..."
+print("Deleting mappings...")
 while deleteMappings() > 0:
-    print "Still deleting..."
-print "Mappings deleted!"
+    print("Still deleting...")
+print("Mappings deleted!")
 
-print "Deleting previous has_source"
+print("Deleting previous has_source")
 def deleteSourceRels():
     result = session.run("match (t)-[m:HAS_SOURCE]->()  WITH m LIMIT 50000 DETACH DELETE m RETURN count(*) as count")
     for record in result:
         return record["count"]
 while deleteSourceRels() > 0:
-    print "Still deleting..."
-print "Source rels deleted!"
+    print("Still deleting...")
+print("Source rels deleted!")
 
-print "Deleting previous terms"
+print("Deleting previous terms")
 def deleteTerms():
     result = session.run("match (t:Term) WITH t LIMIT 50000 DETACH DELETE t RETURN count(*) as count")
     for record in result:
         return record["count"]
 while deleteTerms() > 0:
-    print "Still deleting..."
-print "Terms deleted!"
+    print("Still deleting...")
+print("Terms deleted!")
 
-print "Loading terms.csv..."
+print("Loading terms.csv...")
 loadTermsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+exportFileTerms+"""' AS line
                 MATCH (d:Datasource {prefix : line.prefix})
                 WITH d, line
@@ -467,18 +467,18 @@ loadTermsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:
                 with t,d
                 CREATE (t)-[:HAS_SOURCE]->(d)"""
 result = session.run(loadTermsCypher)
-print result.summary()
+print(result.summary())
 
-print "Loading mappings.csv..."
+print("Loading mappings.csv...")
 loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+exportFileMappings+"""' AS line
                     MATCH (f:Term { curie: line.fromCurie}),(t:Term { curie: line.toCurie})
                     WITH f,t,line
                     CREATE (f)-[m:MAPPING { sourcePrefix: line.datasourcePrefix, datasource: line.datasource, sourceType: line.sourceType, scope: line.scope, date: line.date}]->(t)"""
 
 result = session.run(loadMappingsCypher)
-print result.summary()
+print(result.summary())
 
 #After Loading, update indexes
-print "updating indexes"
-reply = urllib.urlopen(OXO.oxoUrl+"/api/search/rebuild?apikey="+OXO.apikey)
-print "Finished process!"
+print("updating indexes")
+reply = urllib.request.urlopen(OXO.oxoUrl+"/api/search/rebuild?apikey="+OXO.apikey)
+print("Finished process!")
