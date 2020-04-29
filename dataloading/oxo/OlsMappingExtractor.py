@@ -12,7 +12,7 @@ import OxoClient
 import urllib.request, urllib.parse, urllib.error
 import json
 import csv
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -22,7 +22,7 @@ parser.add_option("-c", "--config", help="config file", default="config.ini")
 
 (options, args) = parser.parse_args()
 
-config = SafeConfigParser()
+config = ConfigParser()
 config.read(options.config)
 
 OXO = OxoClient.OXO()
