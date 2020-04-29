@@ -5,28 +5,49 @@ import csv
 import time
 import requests
 import json
+import os
 from ConfigParser import SafeConfigParser
 import ast
 import neoExporter
 import sys
 import listprocessing
 
-
 #Compares to ontologies from the OLS. This process can take a while and procudes a csv with primary results
-def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder):
+def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder, mapSmallest, useLocalOnly):
     logging.info("Start scoring "+sourceOntology+" and "+targetOntology)
-    #Check for the smaller ontology
-
     olsURL=config.get("Basics","olsAPIURL")
     oxoURL=config.get("Basics","oxoURL")
-    urls={"ols":olsURL, "oxo":oxoURL}
 
+    #Check if the olsURL is correct
+    if olsURL[-1:]!='/':
+        print "ols url is not ending with / but it is "+olsURL+" - I add the terminating /. Please make sure the URL is correct"
+        olsURL=olsURL+'/'
+        print "Set olsURL to "+olsURL
+    #Check if the oxoURL is correct
+    if oxoURL[-1:]!='/':
+        print "oxo url is not ending with / but it is "+oxoURL+" - I add the terminating /. Please make sure the URL is correct"
+        oxoURL=oxoURL+'/'
+        print "Set oxoURL to "+oxoURL
+
+    urls={"ols":olsURL, "oxo":oxoURL}
 
     try:
         r = requests.get(olsURL+"ontologies/"+sourceOntology)
         numberOfTerms=r.json()['numberOfTerms']
+        #Logging some meta data
+        logging.info("MetaData for "+sourceOntology+": ")
+        logging.info(" OLS update date: "+str(r.json()["updated"]))
+        logging.info(" OLS version field: "+str(r.json()["config"]["version"]))
+        logging.info(" OLS versionIRI field: "+str(r.json()["config"]["versionIri"]))
+
         r = requests.get(olsURL+"ontologies/"+targetOntology)
         numberOfTerms2 = r.json()['numberOfTerms']
+        #Logging some meta data
+        logging.info("MetaData for "+targetOntology+": ")
+        logging.info(" OLS update date: "+str(r.json()["updated"]))
+        logging.info(" OLS version field: "+str(r.json()["config"]["version"]))
+        logging.info(" OLS versionIRI field: "+str(r.json()["config"]["versionIri"]))
+
     except:
         logging.error("Error getting number of terms throw webservice call!")
         logging.error(olsURL+"ontologies/"+sourceOntology)
@@ -34,16 +55,17 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
         logging.error(r)
         raise
 
-    #In case the targetOntology is smaller than the source Ontology, switch the output
-    if (numberOfTerms>numberOfTerms2):
-        tmpOntology=sourceOntology
-        sourceOntology=targetOntology
-        targetOntology=tmpOntology
+    if mapSmallest==True:
+        #In case the targetOntology is smaller than the source Ontology, switch the output
+        if (numberOfTerms>numberOfTerms2):
+            tmpOntology=sourceOntology
+            sourceOntology=targetOntology
+            targetOntology=tmpOntology
 
     termsUrl=olsURL+"ontologies/"+sourceOntology+"/terms?size=500&fieldList=iri,label,synonym"
     results=[]
 
-    results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "synOxo", "bridgeTerms"])
+    results.append(["sourceLabel","sourceIRI", "fuzzy", "oxo", "synFuzzy", "bridgeTerms"])
     counter=0
     while True:
         try:
@@ -60,53 +82,51 @@ def scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFo
             originalLabel=term["label"]
             synonyms=term["synonyms"]
 
-            #Check if the term is actually defined in that ontology
-            if term['is_defining_ontology'] is True:
-                    pscore=paxo_internals.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
-                    try:
-                        calculatedMappings=paxo_internals.processPScore(pscore)
-                    except Exception as e:
-                        print "Exception in primary Scoring"
-                        print e
-                        print term["iri"]
-                        print originalLabel
-                        print targetOntology
-                        logging.info("Exception in primary Scoring")
-                        logging.info(term["iri"]+" "+originalLabel)
-                        calculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
+            #Check if the term is actually defined in that ontology. Via flag it can be changed to process all terms
+            if term['is_defining_ontology'] is True or term['is_defining_ontology'] is useLocalOnly:
+                pscore=paxo_internals.scoreTermOLS(term["iri"], originalLabel, targetOntology, scoreParams, urls)
+                try:
+                    calculatedMappings=paxo_internals.processPScore(pscore)
+                except Exception as e:
+                    print "Exception in primary Scoring"
+                    print e
+                    print term["iri"]
+                    print originalLabel
+                    print targetOntology
+                    logging.info("Exception in primary Scoring")
+                    logging.info(term["iri"]+" "+originalLabel)
+                    calculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
 
-                    #If synonyms are available, run through the same steps with synonyms to score an ontology
-                    synCalculatedMappings={}
-                    if synonyms!=None:
-                        for synonym in synonyms:
-                            try:
-                                synPscore=paxo_internals.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
-                                synCalculatedMappings=paxo_internals.processPScore(synPscore)         #Process the primaryScore for synonyms
-                                synCalculatedMappings['sourceIRI']=term["iri"]
-                            except Exception as e:
-                                print "Exception in Synonym processPScore Term"
-                                print e
-                                synCalculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
-                                logging.info("Exception in  Synonym processPScore Term")
-                                logging.info(term["iri"]+" "+synonym+" "+targetOntology)
-                                synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN - ERROR', 'fuzzyIri': 'UNKNOWN - ERROR'}]
-                                synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
-                                synCalculatedMappings['sourceIRI']=term["iri"]
+                #If synonyms are available, run through the same steps with synonyms to score an ontology
+                synCalculatedMappings={}
+                if synonyms!=None:
+                    for synonym in synonyms:
+                        try:
+                            synPscore=paxo_internals.primaryScoreTerm('', synonym, targetOntology, scoreParams, urls)
+                            synCalculatedMappings=paxo_internals.processPScore(synPscore)         #Process the primaryScore for synonyms
+                            synCalculatedMappings['sourceIRI']=term["iri"]
+                        except Exception as e:
+                            print "Exception in Synonym processPScore Term"
+                            print e
+                            synCalculatedMappings={'sourceTerm':term["iri"]+"ERROR", "olsFuzzyScore": [], "oxoScore": [], "bridgeEvidence": []}
+                            logging.info("Exception in  Synonym processPScore Term")
+                            logging.info(term["iri"]+" "+synonym+" "+targetOntology)
+                            synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN - ERROR', 'fuzzyIri': 'UNKNOWN - ERROR'}]
+                            synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
+                            synCalculatedMappings['sourceIRI']=term["iri"]
 
-                    else:
-                        synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
-                        synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
+                else:
+                    synCalculatedMappings['olsFuzzyScore']=[{'fuzzyScore': 0, 'fuzzyMapping': 'UNKNOWN', 'fuzzyIri': 'UNKNOWN'}]
+                    synCalculatedMappings['oxoScore']=[{'distance': 0, 'oxoCurie': 'UNKNOWN', 'oxoScore': 0}]
 
-                    results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], synCalculatedMappings['oxoScore'], calculatedMappings['bridgeEvidence']])
-
-
+                results.append([originalLabel.encode(encoding='UTF-8'), term["iri"].encode(encoding='UTF-8'), calculatedMappings['olsFuzzyScore'], calculatedMappings['oxoScore'], synCalculatedMappings['olsFuzzyScore'], calculatedMappings['bridgeEvidence']])
         try:
             termsUrl=r.json()['_links']['next']['href']
             counter=counter+1
             if counter%2==0:
                 print "Processed "+str(counter)+" pages"
                 logging.info("Processed "+str(counter)+" pages")
-                #break  #Uncomment this for testing (to not parse the whole ontology)
+                #break  #Uncomment this for testing the -s flag (so not the whole ontology is parsed but 2 pages)
         except:
             logging.info("Reached last page I recon")
             print "Reached last page I recon"
@@ -136,28 +156,23 @@ def scoreOntologyPrimaryScore(name, scorefolder):
             tmp=row[4]
             synFuzzy=ast.literal_eval(tmp)
             tmp=row[5]
-            synOxo=ast.literal_eval(tmp)
-            tmp=row[6]
             bridgeEvidence=ast.literal_eval(tmp)
 
             for i in fuzzy:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                #obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri ,"iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in oxo:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy,  "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in synFuzzy:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
-                scoreMatrix.append(obj)
-
-            for i in synOxo:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['fuzzyIri'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
             for i in bridgeEvidence:
-                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "synOxo":synOxo, "bridgeEvidence":bridgeEvidence}
+                obj={"sourceTerm":originalLabel, "sourceIRI":orginaliri, "iri": i['oxoCurie'], "olsFuzzyScore": fuzzy, "oxoScore": oxo, "synFuzzy": synFuzzy, "bridgeEvidence":bridgeEvidence}
                 scoreMatrix.append(obj)
 
 
@@ -182,8 +197,6 @@ def processOntologyPrimaryScore(pScore, params):
     for entry in result:
         if entry!=[]:
             tmp.append(entry)
-        #else:
-        #    print "entry in results!"
 
     #SortScore
     tmp=sorted(tmp, key=lambda tmp:tmp[0]['finaleScore'], reverse=True)
@@ -196,21 +209,28 @@ def scoreTermList(termList, targetOntology, scoreParams, params):
         result.append(paxo_internals.scoreTermLabel(term, targetOntology, scoreParams, params))
     return result
 
-# Process an IRI list via OLS instead of a termList
-# def scoreIriList(IriList, targetOntology, params):
-
 #Process scoredMatrix to prepare for validation or save to disc
 def writeOutPutScore(scoredMatrix, name, predictedTargetFolder, saveToDisc):
     result=[]
-
     for line in scoredMatrix:
-        result.append([line[0]['sourceIRI'], line[0]['iri'], line[0]['finaleScore'], line[0]['sourceTerm']])
+        try:
+            sourceTerm=line[0]['sourceTerm']
+            targetLabel=str(line[0]['label'].encode('ascii','ignore'))
+            result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
+        except Exception as e:
+            print "Failed Unfortunatley, try to investigate why!"
+            print e
+            targetLabel="Cound not be found temporarily"
+            result.append([line[0]['sourceIRI'], line[0]['iri'], float(line[0]['finaleScore']), sourceTerm, targetLabel, float(line[0]['normalizedScore'])])
+
 
     if saveToDisc==True:
+        result.insert(0,['sourceIRI','mappedIRI','score','sourceLabel', 'mappedLabel', 'NormalizedScore'])
         with open(predictedTargetFolder+'calculated_output_'+name+'.csv', 'w') as f:
             writer = csv.writer(f)
             writer.writerows(result)
             f.close()
+        result.pop(0)
 
     return result
 
@@ -221,32 +241,21 @@ def curationOntologyFinalScore(scoredMatrix):
     doubleEntryCounter=0
     replacedList=[]
     for counter, line in enumerate(scoredMatrix):
-        #print line
         if line[1] not in endmap:
             endmap.append(line[1])
             unified.append(line)
         else:
-            #print "Double entry Found!!!"
             doubleEntryCounter=doubleEntryCounter+1
             index=endmap.index(line[1])
-            #print unified[index]
-            #print scoredMatrix[counter]
 
+            #Found higher score, so replace the lower!
             if unified[index][2]<scoredMatrix[counter][2]:
-                print "Found higher score, so will replace now! "
-                #replacedList.append(unified[index])
                 unified[index]=scoredMatrix[counter] #Replace that line with the higher scored line!
 
-
-    print "A total of "+str(doubleEntryCounter)+" processed!"
-    if len(replacedList)!=0:
-        print "Write file of replaced terms now"
-        print "Total length of replaced is "+str(len(replacedList))
-    #    with open('pipeline_output/replaced_terms.csv', 'wb') as f:
-    #        writer = csv.writer(f)
-    #        writer.writerows(replacedList)
-    #        f.close()
-
+    #print "A total of "+str(doubleEntryCounter)+" processed!"
+    #if len(replacedList)!=0:
+        #print "Write file of replaced terms now"
+        #print "Total length of replaced is "+str(len(replacedList))
     return unified
 
 
@@ -254,6 +263,12 @@ def curationOntologyFinalScore(scoredMatrix):
 def calculatePrimaryScore(combinedOntologyName, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries):
     simplerMatrix=scoreOntologyPrimaryScore(combinedOntologyName, scoringTargetFolder)
     scoredMatrix=processOntologyPrimaryScore(simplerMatrix, params)
+
+    #Maximum would be caluclated like that, anyway, who knows if we really want that
+    #maximum=(4*params["fuzzyUpperFactor"]+params["oxoDistanceOne"]+params["oxoDistanceOne"]*params["bridgeOxoFactor"])/4.0
+    for row in scoredMatrix:
+        row[0]['normalizedScore']=row[0]['finaleScore']/4.0
+
     preparedScoredMatrix=writeOutPutScore(scoredMatrix, combinedOntologyName, predictedTargetFolder, writeToDisc)
 
     #Make mappings unique if the Flag is set to true, if not - we get way more mappings, miss less from the standard but are not unique
@@ -272,28 +287,45 @@ def calculateAndValidateOntologyPrimaryScore(onto1, onto2, stdName, stdFile, par
 #Goes through the sections and calls scoreOntologies for every section
 def scoreListOntologies(sections):
     scoringtargetFolder=config.get('Params', 'scoringTargetFolder')
+    if os.path.exists(scoringtargetFolder)==False:
+        print "Could not find "+scoringtargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
         stopwordList=config.get("Params","StopwordsList").split(',')
-        #print stopwordList
-        #print type(stopwordList)
-        #hp_doid_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : [('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('abnormality','disease')]}
+
+        mapSmallest=config.getboolean("Params", 'mapSmallest')
+        useLocalOnly=config.getboolean("Params", 'useLocalOnly')
+
         scoreParams={"removeStopwordsList":stopwordList, "replaceTermList" : []}
         print "Score "+sourceOntology+" "+targetOntology
-        scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder)
+        logging.info("Score "+sourceOntology+" "+targetOntology)
+        scoreOntologies(sourceOntology, targetOntology, scoreParams, scoringtargetFolder, mapSmallest, useLocalOnly)
 
 #Goes through the sections and calls calculateAndValidateOntologyPrimaryScore for every section
 def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoubleEntries):
     validationTargetFolder=config.get('Params', 'validationTargetFolder')
     scoringtargetFolder=config.get('Params', 'scoringTargetFolder')
     predictedTargetFolder=config.get('Params', 'predictedTargetFolder')
+
+    if os.path.exists(scoringtargetFolder)==False:
+        print "Could not find "+scoringtargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+    if os.path.exists(predictedTargetFolder)==False:
+        print "Could not find "+predictedTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+    if os.path.exists(validationTargetFolder)==False:
+        print "Could not find "+validationTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
+    returnValue=[]
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
         targetOntology=config.get(section, 'targetOntology')
-
         stdNames=config.get(section, 'standard').split(',')
-        #stdNames=['loom', 'silver']
+
         for name in stdNames:
             stdFile=config.get(section, name)
             uri1=int(config.get(section, 'uri1'+name))
@@ -301,12 +333,11 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
             scorePosition=int(config.get(section, 'scorePosition'+name))
             delimiter=config.get(section, 'delimiter'+name)
             if delimiter=='t':
-                print "have to change delimiter!"
+                #print "Have to change delimiter!"
                 delimiter=str('\t')
 
             parseParms={'uri1':uri1, 'uri2':uri2, 'scorePosition':scorePosition, 'delimiter':delimiter}
 
-            #params={"exactFactor":1, "fuzzyFactor": 1, "oxoFactor": 1, "synExactFactor": 1, "synFuzzyFactor": 1, "synOxoFactor": 1, "threshold":0.3}
             fuzzyUpperLimit=float(config.get(section,'fuzzyUpperLimit'))
             fuzzyLowerLimit=float(config.get(section,'fuzzyLowerLimit'))
             fuzzyUpperFactor=float(config.get(section,'fuzzyUpperFactor'))
@@ -315,19 +346,31 @@ def calculateAndValidateListOntologies(sections, writeToDiscFlag, curationOfDoub
             oxoDistanceTwo=float(config.get(section,'oxoDistanceTwo'))
             oxoDistanceThree=float(config.get(section,'oxoDistanceThree'))
             synFuzzyFactor=float(config.get(section,'synFuzzyFactor'))
-            synOxoFactor=float(config.get(section,'synOxoFactor'))
             bridgeOxoFactor=float(config.get(section,'bridgeOxoFactor'))
             threshold=float(config.get(section,'threshold'))
-            params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+            #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+            params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
 
-            print "Validate "+sourceOntology+" "+targetOntology+" "+name
-            print calculateAndValidateOntologyPrimaryScore(sourceOntology, targetOntology, name, stdFile, params, scoringtargetFolder, writeToDiscFlag, predictedTargetFolder, parseParms, curationOfDoubleEntries,validationTargetFolder,config.get('Basics','olsAPIURL')+"search")
+            #print "Validate "+sourceOntology+" "+targetOntology+" "+name
+            returnCV=calculateAndValidateOntologyPrimaryScore(sourceOntology, targetOntology, name, stdFile, params, scoringtargetFolder, writeToDiscFlag, predictedTargetFolder, parseParms, curationOfDoubleEntries,validationTargetFolder,config.get('Basics','olsAPIURL')+"search")
+            #returnCV=[{"source":sourceOntology,"target": targetOntology}, returnCV]
+            returnValue.append({"source":sourceOntology,"target": targetOntology, "misses":returnCV['misses'], "alternatives":returnCV['alternatives']})
+            #returnValue={"source":sourceOntology,"target": targetOntology, "misses":returnCV['misses'], "alternatives":returnCV['alternatives']}
 
+    return returnValue
 
 #Goes through the sections and calls calculateOntologyPrimaryScore for every section
 def calculateListOntologies(sections, writeToDisc, curationOfDoubleEntries):
     scoringTargetFolder=config.get('Params','scoringTargetFolder')
     predictedTargetFolder=config.get('Params','predictedTargetFolder')
+
+    if os.path.exists(scoringTargetFolder)==False and writeToDisc==True:
+        print "Could not find "+scoringTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
+
+    if os.path.exists(predictedTargetFolder)==False and writeToDisc==True:
+        print "Could not find "+predictedTargetFolder+" - please make sure the folder exists!\n"
+        raise Exception("Folder does not exists")
 
     for section in sections:
         sourceOntology=config.get(section, 'sourceOntology')
@@ -341,16 +384,14 @@ def calculateListOntologies(sections, writeToDisc, curationOfDoubleEntries):
         oxoDistanceTwo=float(config.get(section,'oxoDistanceTwo'))
         oxoDistanceThree=float(config.get(section,'oxoDistanceThree'))
         synFuzzyFactor=float(config.get(section,'synFuzzyFactor'))
-        synOxoFactor=float(config.get(section,'synOxoFactor'))
+        #synOxoFactor=float(config.get(section,'synOxoFactor'))
         bridgeOxoFactor=float(config.get(section,'bridgeOxoFactor'))
         threshold=float(config.get(section,'threshold'))
-        params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
-
-
-        print predictedTargetFolder
+        #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
+        params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold}
         print "Calculate "+sourceOntology+" "+targetOntology
-        print scoringTargetFolder
-        print calculatePrimaryScore(sourceOntology+"_"+targetOntology, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries)
+        logging.info("Calculate "+sourceOntology+" "+targetOntology)
+        calculatePrimaryScore(sourceOntology+"_"+targetOntology, params, scoringTargetFolder, writeToDisc, predictedTargetFolder, curationOfDoubleEntries)
 
 
 def exportNeoList(sections):
@@ -359,6 +400,13 @@ def exportNeoList(sections):
         targetOntology=config.get(section, 'targetOntology')
         predictedFolder=config.get('Params','predictedTargetFolder')
         targetFolder=config.get('Params','neoFolder')
+
+        if os.path.exists(predictedFolder)==False:
+            print "Could not find "+predictedFolder+" - please make sure input file exists!\n"
+            raise Exception("File does not exists")
+        if os.path.exists(targetFolder)==False:
+            print "Could not find "+targetFolder+" - please make sure input file exists!\n"
+            raise Exception("File does not exists")
 
         olsURL=config.get('Basics', 'olsAPIURL')
         neoURL=config.get('Basics','neoURL')
@@ -371,9 +419,12 @@ def exportNeoList(sections):
 
 
 def runListAnnotation():
-    print "In list processing, let's get config"
     inputFile=config.get("Basics","inputFile")
     resultFile=config.get("Basics","resultFile")
+    if os.path.exists(inputFile)==False:
+        print "Could not find "+inputFile+" - please make sure input file exists!\n"
+        raise Exception("File does not exists")
+
     targetOntology=config.get("Basics", 'targetOntology')
     delimiter=config.get("Basics", 'delimiter')
     olsURL=config.get("Basics","olsAPIURL")
@@ -394,13 +445,15 @@ def runListAnnotation():
     oxoDistanceTwo=float(config.get("Basics",'oxoDistanceTwo'))
     oxoDistanceThree=float(config.get("Basics",'oxoDistanceThree'))
     synFuzzyFactor=float(config.get("Basics",'synFuzzyFactor'))
-    synOxoFactor=float(config.get("Basics",'synOxoFactor'))
+    #synOxoFactor=float(config.get("Basics",'synOxoFactor'))
     bridgeOxoFactor=float(config.get("Basics",'bridgeOxoFactor'))
     threshold=float(config.get("Basics",'threshold'))
     stopwordList=config.get("Params","StopwordsList").split(',')
+    synonymSplitChar=config.get("Basics","synonymSplitChar")
 
-    params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
-    options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel}
+    #params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "synOxoFactor": synOxoFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
+    params={"fuzzyUpperLimit": fuzzyUpperLimit, "fuzzyLowerLimit": fuzzyLowerLimit,"fuzzyUpperFactor": fuzzyUpperFactor,"fuzzyLowerFactor":fuzzyLowerFactor, "oxoDistanceOne":oxoDistanceOne, "oxoDistanceTwo":oxoDistanceTwo, "oxoDistanceThree":oxoDistanceThree, "synFuzzyFactor":synFuzzyFactor, "bridgeOxoFactor":bridgeOxoFactor, "threshold":threshold, "ols": olsURL, "oxo":oxoURL}
+    options={"inputFile":inputFile, "resultFile":resultFile, "delimiter":delimiter, "targetOntology":targetOntology, "detailLevel": detailLevel, "synonymSplitChar":synonymSplitChar}
     #ScoreParameters define stopwords
     scoreParams={"removeStopwordsList": stopwordList, "replaceTermList" : replacementTerms}
 
@@ -434,16 +487,16 @@ helptext="""Start the client with exactly two input parameters: The path to the 
 if len(sys.argv)<3:
     print helptext
     print "\nNot enough arguments! Take exactly two, "+str(len(sys.argv)-1)+" given!"
+    #raise
 elif len(sys.argv)>3:
     print helptext
     print "\nToo many arguments! Take exactly two, "+str(len(sys.argv)-1)+" given!"
-else:
-
+    raise
+elif len(sys.argv)==3:
     config = SafeConfigParser()
     config.read(sys.argv[1])
     logFile=config.get("Basics","logFile")
     logging.basicConfig(filename=logFile, level=logging.INFO, format='%(asctime)s - %(message)s')
-
     writeToDiscFlag=config.getboolean("Params","writeToDiscFlag")
     uniqueMaps=config.getboolean("Params","uniqueMaps")
 
@@ -456,86 +509,15 @@ else:
     elif sys.argv[2]=="-c":
         calculateListOntologies(sections, writeToDiscFlag, uniqueMaps)
     elif sys.argv[2]=="-cv":
-        calculateAndValidateListOntologies(sections, writeToDiscFlag, uniqueMaps)
+        print calculateAndValidateListOntologies(sections, writeToDiscFlag, uniqueMaps)
     elif sys.argv[2]=="-n":
         exportNeoList(sections)
     else:
         print "Could not recognize option. So I execute what's uncommented in the else branch. This should just be during development"
-        #removeStopwordsList=['of', 'the']
-        #replaceTermList=[('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('abnormality','disease')]
-        #scoreParams={"removeStopwordsList": removeStopwordsList, "replaceTermList" :replaceTermList}
-        #hp_doid_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : [('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('abnormality','disease')]}
-
-
-        ### Primary score ontologies
-        #ordo_hp_scoreParams={"removeStopwordsList": ['of', 'the', 'Rare'], "replaceTermList" : [('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('tumor', 'neoplasm'), ('tumor','cancer'), ('abnormality', 'disease'), ('decreased', 'reduced'), ('morphology', '')]}
-        #scoreOntologies("ordo","hp", ordo_hp_scoreParams, 'final_dec/scoring/')
-        #
-        #doid_mp_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
-        #scoreOntologies("doid","mp", doid_mp_scoreParams, 'final_dec/scoring/')
-        # #
-        # doid_ordo_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
-        # scoreOntologies("doid","ordo", doid_ordo_scoreParams, 'final_dec/scoring/')
-        # #
-        # hp_doid_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : [('cancer', 'neoplasm'), ('cancer','carcinoma'), ('abnormality','disease'), 'abnormality','disease']}
-        # scoreOntologies("hp","doid",hp_doid_scoreParams, 'final_dec/scoring/')
-        # #
-        # hp_mp_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : [('cancer', 'carcinom'), ('cancer', 'neoplasm'), ('cancer','carcinoma'),('abnormality','disease'), ('abnormal','Abnormality')]}
-        # scoreOntologies("hp","mp", hp_mp_scoreParams, 'final_dec/scoring/')
-        # #
-        # ordo_mp_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
-        # scoreOntologies("ordo","mp", ordo_mp_scoreParams, 'final_dec/scoring/')
-
-
-        #mesh_scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
-        #scoreOntologies("mesh","hp", mesh_scoreParams, 'final_dec/scoring/')
-        #scoreOntologies("mesh","doid", mesh_scoreParams, 'final_dec/scoring/')
-        #scoreOntologies("mesh","ordo", mesh_scoreParams, 'final_dec/scoring/')
-        #scoreOntologies("mesh","mp", mesh_scoreParams, 'final_dec/scoring/')
-
-
-
         #Could/Should be changed so parameters come from the config file
         params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.6}
-        #params={"fuzzyUpperLimit": 0.8, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.8}
-
-        ### Execute Calculate and validate for a certain file
-        #print calculateAndValidateOntologyPrimaryScore('hp', 'doid', 'loom', 'Loom/DOID_HP_loom.csv', params, 'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/', {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/validation/')
-        #print calculateAndValidateOntologyPrimaryScore('hp','doid', 'silver','silver_nov/Consensus-3-hp-doid.tsv', params, 'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/',{'uri1':0, 'uri2':2, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/validation/')
-        #print calculateAndValidateOntologyPrimaryScore('ordo', 'hp', 'loom', 'Loom/ordo_hp_loom.csv', params,'final_dec/scoring/',  writeToDisc, final_dec/predicted/', {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/validation/')
-
-
-        #params={"fuzzyUpperLimit": 0, "fuzzyLowerLimit": 0,"fuzzyUpperFactor": 0.65, "fuzzyLowerFactor":0, "oxoDistanceOne":0.00029, "oxoDistanceTwo":0.57, "oxoDistanceThree":0.027, "synFuzzyFactor":0.247, "synOxoFactor": 0.62, "bridgeOxoFactor":0.829, "threshold":0.6}
-
-        #print calculateAndValidateOntologyPrimaryScore('ordo', 'hp', 'silver','silver_nov/Consensus-3-hp-ordo.tsv', params,'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/',{'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/validation/')
-        # {'misses': 210, 'alternatives': 350}
-
-        # #
-        # print calculateAndValidateOntologyPrimaryScore('mp','hp', 'loom','Loom/MP_HP_loom.csv', params,'final_dec/scoring/', writeToDiscFag, 'final_dec/predicted/', {'uri1':0, 'uri2':1, 'scorePosition':2 , 'delimiter':','}, uniqueMaps, 'final_dec/evaluation/')
-        #print calculateAndValidateOntologyPrimaryScore('mp','hp', 'silver','silver_nov/Consensus-3-hp-mp.tsv', params, 'final_dec/scoring/',writeToDiscFlag, 'final_dec/predicted/', {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/evaluation/')
-        # print calculateAndValidateOntologyPrimaryScore('ordo','doid', 'loom' ,'Loom/DOID_ORDO_loom.csv', params, 'final_dec/scoring/',writeToDisc, 'final_dec/predicted/', {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/evaluation/')
-        #print calculateAndValidateOntologyPrimaryScore('ordo','doid', 'silver','silver_nov/Consensus-3-doid-ordo.tsv', params, 'final_dec/scoring/', writeToDiscFlag,'final_dec/predicted/', {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/evaluation/')
-        # print calculateAndValidateOntologyPrimaryScore('ordo','mp', 'loom', 'Loom/mp_ordo_loom.csv', params,'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/', {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/evaluation/')
-        #print calculateAndValidateOntologyPrimaryScore('ordo','mp', 'silver','silver_nov/Consensus-3-mp-ordo.tsv', params,'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/', {'uri1':2, 'uri2':0, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/evaluation/')
-        #print calculateAndValidateOntologyPrimaryScore('mp','doid', 'loom', 'Loom/DOID_MP_loom.csv', params, 'final_dec/scoring/',writeToDiscFlag, 'final_dec/predicted/', {'uri1':1, 'uri2':0, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/evaluation/')
-        #print calculateAndValidateOntologyPrimaryScore('mp','doid', 'silver','silver_nov/Consensus-3-mp-doid.tsv', params, 'final_dec/scoring/',writeToDiscFlag,'final_dec/predicted/',  {'uri1':0, 'uri2':2, 'scorePosition':4 , 'delimiter':'\t'}, uniqueMaps, 'final_dec/evaluation/')
-        # #
-        #
-
-        # print calculateAndValidateOntologyPrimaryScore('mesh','doid', 'loom', 'Loom/DOID_MESH_loom_new.csv', params, 'final_dec/scoring/',writeToDisc,'final_dec/predicted/',  {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/validation/')
-        # print calculateAndValidateOntologyPrimaryScore('mesh','doid', 'silver', 'silver_nov/Consensus-3-doid-mesh3.tsv', 'final_dec/scoring/',params, writeToDisc, 'final_dec/predicted/', {'uri1':2, 'uri2':0, 'scorePosition':2, 'delimiter':'\t'}, uniqueMaps, 'final_dec/validation/')
-        # print calculateAndValidateOntologyPrimaryScore('mesh','hp', 'loom', 'Loom/mesh_hp_loom_new.csv', params, 'final_dec/scoring/',writeToDisc,'final_dec/predicted/',  {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/validation/')
-        # print calculateAndValidateOntologyPrimaryScore('mesh','hp', 'silver', 'silver_nov/Consensus-3-hp-mesh3.tsv', params, 'final_dec/scoring/',writeToDisc,'final_dec/predicted/',  {'uri1':1, 'uri2':0, 'scorePosition':2, 'delimiter':'\t'}, uniqueMaps, 'final_dec/validation/')
-        # print calculateAndValidateOntologyPrimaryScore('mesh','mp', 'loom', 'Loom/mesh_mp_loom_new.csv', params, 'final_dec/scoring/',writeToDisc,'final_dec/predicted/',  {'uri1':0, 'uri2':1, 'scorePosition':2, 'delimiter':','}, uniqueMaps, 'final_dec/validation/')
-        # print calculateAndValidateOntologyPrimaryScore('mesh','mp', 'silver', 'silver_nov/Consensus-3-mp-mesh3.tsv', params,'final_dec/scoring/', writeToDisc, 'final_dec/predicted/', {'uri1':1, 'uri2':0, 'scorePosition':2, 'delimiter':'\t'}, uniqueMaps, 'final_dec/validation/')
-
-
-        #Just run calculate without validation
-        #calculatePrimaryScore('ordo'+"_"+'doid', params, 'final_dec/scoring/', writeToDiscFlag, 'final_dec/predicted/', uniqueMaps)
-
 
         ###Execute functions for terms
         scoreParams={"removeStopwordsList": ['of', 'the'], "replaceTermList" : []}
         params={"fuzzyUpperLimit": 0.6, "fuzzyLowerLimit": 0.6,"fuzzyUpperFactor": 1,"fuzzyLowerFactor":0.6, "oxoDistanceOne":1, "oxoDistanceTwo":0.3, "oxoDistanceThree":0.1, "synFuzzyFactor":0.6, "synOxoFactor": 0.4, "bridgeOxoFactor":1, "threshold":0.6, "ols":"https://www.ebi.ac.uk/ols/api/", "oxo":"https://www.ebi.ac.uk/ols/api/"}
         print paxo_internals.scoreTermLabel("Nuclear cataract", "doid", scoreParams, params)
-        #print scoreTermList(["Asthma", "Dermatitis atopic"], "doid", scoreParams, params)

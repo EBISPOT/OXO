@@ -316,3 +316,29 @@ You can also set the response format using HTTP headers of either `Accept: text/
 include::{snippets}/search-by-ids-to-json/http-response.adoc[]
 
 
+include::{snippets}/api-example/http-response.adoc[]
+
+
+
+
+=== Datasource
+Example request
+include::{snippets}/datasources-list-example/curl-request.adoc[]
+include::{snippets}/datasources-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/datasources-list-example/http-response.adoc[]
+
+
+=== mappings
+Example request
+include::{snippets}/mappings-list-example/curl-request.adoc[]
+include::{snippets}/mappings-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/mappings-list-example/http-response.adoc[]
+
+=== terms
+Example request
+include::{snippets}/terms-list-example/curl-request.adoc[]
+include::{snippets}/terms-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/terms-list-example/http-response.adoc[]

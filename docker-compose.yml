@@ -8,12 +8,13 @@ services:
         - 8983:8983
         volumes:
         - ./solr-config:/home/mysolrhome
-#        - ./solr-config/data:/home/mysolrhome/mapping/data
+        - ./solr-config/data:/home/mysolrhome/mapping/data
         command: ["solr", "-f"]
     neo4j:
         image: neo4j:3.1.1
         environment:
-        - NEO4J_HEAP_MEMORY=2048 # configure the heap memory
+        - NEO4J_HEAP_MEMORY=10g # configure the heap memory
+        - NEO4J_dbms_memory_heap_maxSize=8g
         - NEO4J_AUTH=neo4j/dba
         cap_add:
          - SYS_RESOURCE

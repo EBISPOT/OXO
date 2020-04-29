@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+<body>
+
+<div th:fragment="header" >
+    <div id="skip-to">
+        <a href="#content">Skip to main content</a>
+    </div>
+
+    <header id="masthead-black-bar" class="clearfix masthead-black-bar">
+    </header>
+    <div id="content">
+        <div data-sticky-container="true">
+            <header id="masthead" class="masthead" data-sticky="true" data-sticky-on="large" data-top-anchor="content:top" data-btm-anchor="content:bottom">
+                <div class="masthead-inner row">
+                    <!-- local-title -->
+                    <div class="columns medium-12" id="local-title">
+                        <!--<h1><a href="../../" title="Back to Oxo homepage">Ontology Xref Service</a></h1>-->
+                        <a href="../../" title="Back to Oxo homepage">
+                        <img th:src="@{/img/OXO_logo_2017_colour_background.png}" style="height:100px;"/>
+                        </a>
+                    </div>
+
+                    <!-- /local-title -->
+                    <!-- local-nav -->
+                    <nav>
+                        <ul class="dropdown menu float-left"
+                            data-description="navigational">
+                            <li class=""><a th:href="@{/index}">Home</a></li>
+                            <li class=""><a th:href="@{/docs}">Documentation</a></li>
+                            <li class=""><a th:href="@{/about}">About</a></li>
+
+                            <!-- This has to be revisted!-->
+                            <li th:if="not ${username} and not ${readonly}" class="functional"><a th:href="@{/login}" class="icon icon-functional" data-icon="l">Login</a></li>
+                            <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
+                                Logout <span th:text="${username}">user</span>
+                                <form name="logoutForm" th:action="@{logout}" method="post" th:hidden="true">
+                                </form>
+                            </a></li>
+                            <li th:if="${username}  and not ${readonly}" class="functional">
+                                <a href="myaccount" class="icon icon-functional" data-icon="5">
+                                    My mappings
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                    <!-- /local-nav -->
+                </div>
+            </header>
+        </div>
+
+   </div>
+</div>
+</body>
+</html>

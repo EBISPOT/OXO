@@ -1,6 +1,6 @@
 import csv
 import logging
-import flaskMapping
+import paxo_internals
 import time
 from datetime import datetime
 
@@ -10,13 +10,6 @@ from neo4j.v1 import GraphDatabase, basic_auth
 date=datetime.now().strftime('%Y-%m-%d')
 
 def writeTermsToNeo(termsFile, session):
-    #loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+termsFile+"""' AS line
-    #            MATCH (d:Datasource {prefix : line.prefix})
-    #            WITH d, line
-    #            MERGE (t:Term { curie: line.curie})
-    #            with t,d
-    #            CREATE (t)-[:HAS_SOURCE]->(d)"""
-
     loadMappingsCypher = "USING PERIODIC COMMIT 10000 LOAD CSV WITH HEADERS FROM 'file:///"+termsFile+"""' AS line
                 MATCH (d:Datasource {prefix : line.prefix})
                 WITH d, line
@@ -44,7 +37,7 @@ def writeMappingsToNeo(mappingsFile, session):
 
 def createNode(iri, ontology, olsURL):
     data={"q": iri, "ontology":ontology, "exact":True,  "type":"class", "local":True, "fieldList":"label,ontology_prefix,obo_id"}
-    jsonReply=flaskMapping.apiCall(olsURL+"search", data)
+    jsonReply=paxo_internals .apiCall(olsURL+"search", data)
 
     try:
         jsonReply=jsonReply.json()
@@ -83,9 +76,7 @@ def createNode(iri, ontology, olsURL):
 
 
         identifier=obo_id.split(':')[1]
-
-
-
+        
         #if we couldn't retrieve doc from OLS we return empty line so it's not added to the csv
         if obo_id=='UNKNOWN:UNKNOWN':
             return []
@@ -109,7 +100,6 @@ def exportInNeo(onto1, onto2, predictedFolder, targetFolder, olsURL, neoURL, neo
     encrypted=False
     driver = GraphDatabase.driver(uri, auth=basic_auth(neoUser, neoPW))
     session = driver.session()
-
 
     paxo_term=[]
     paxo_mappings=[]
@@ -135,13 +125,6 @@ def exportInNeo(onto1, onto2, predictedFolder, targetFolder, olsURL, neoURL, neo
             if firstRow!=[] and secondRow!=[]:
                 paxo_mappings.append(createMap(firstRow[1],secondRow[1], row[2]))
 
-            #This is just for Testing, don't take more than 10
-            #counter=counter+1
-            #if counter%500:
-            #   print "Processed "+str(counter)+" entries"
-                #break  #This is just for Testing
-
-        #print paxo_term
         with open(targetFolder+onto1+"_"+onto2+'_termsNeo.csv', 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(paxo_term)

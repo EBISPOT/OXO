@@ -32,7 +32,11 @@ class Neo4jOxOLoader:
         config = ConfigParser()
         config.read(options.config)
 
-        uri = config.get("Basics", "neoURL")
+        try:
+            uri = config.get("Basics", "neoURL")
+        except:
+            print "No config found, please supply a config.ini using -c"
+            exit (1)
         neoUser = config.get("Basics", "neoUser")
         neoPass = config.get("Basics", "neoPass")
 

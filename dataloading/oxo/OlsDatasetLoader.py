@@ -1,22 +1,11 @@
-#!/usr/bin/env python
-"""
-This script pulls data about ontologies and databases registeted in EBI's OLS, identifiers.org and OBO xrefs. This creates a
-CSV file of datasources that can be loaded into OxO using the OxoNeo4jLoader.py script. Datasources must be loaded into OxO
-before any mappings can be loaded.
-"""
-__author__ = "jupp"
-__license__ = "Apache 2.0"
-__date__ = "03/03/2018"
-
-
-import urllib.request, urllib.parse, urllib.error
+import urllib
 import json
 import xml.etree.ElementTree as ET
 import yaml
-import OxoClient
-from configparser import ConfigParser
-from optparse import OptionParser
-
+import OxoClient as OXO
+import csv
+from ConfigParser import SafeConfigParser
+import sys
 
 prefixToPreferred = {}
 idorgNamespace = {}
@@ -25,53 +14,34 @@ unprocessedIds = {}
 termToIri = {}
 termToLabel = {}
 
-parser = OptionParser()
-parser.add_option("-d", "--datasources", help="datasources csv export file")
-parser.add_option("-i", "--idorg", help="id.org config file")
-parser.add_option("-c", "--config", help="config file", default="config.ini")
-
-(options, args) = parser.parse_args()
-
-config = ConfigParser()
-config.read(options.config)
-OXO = OxoClient.OXO()
+#Parse the input parameters. A config file and a flag is expected
+if len(sys.argv)!=2:
+    print "\nNot enough arguments! Please pass a (path) of a config file!"
+    raise Exception("Not enough arguments! Please pass in a config file!")
+else:
+    config = SafeConfigParser()
+    config.read(sys.argv[1])
 
 OXO.oxoUrl = config.get("Basics","oxoUrl")
+OXO.apikey = config.get("Basics", "oxoAPIkey")
 oboDbxrefUrl= config.get("Basics", "oboDbxrefUrl")
 
 olsurl=config.get("Basics", "olsurl")
 olsurl=olsurl+"/ontologies?size=1000"
 
 idorgDataLocation = config.get("Paths", "idorgDataLocation")
-if options.idorg:
-    idorgDataLocation = options.idorg
 
-exportFileDatasources=config.get("Paths","exportFileDatasources")
-if options.datasources:
-    exportFileDatasources = options.datasources
-
-reply = urllib.request.urlopen(olsurl)
+reply = urllib.urlopen(olsurl)
 anwser = json.load(reply)
 
 ontologies  = anwser["_embedded"]["ontologies"]
-
-datasources = {}
 
 for ontology in ontologies:
     namespace = ontology["config"]["namespace"]
     version = ontology["updated"]
 
-    altPrefixes = [namespace]
     if namespace == 'ordo':
         prefPrefix = 'Orphanet'
-    elif namespace == 'hp':
-        prefPrefix = 'HP'
-        altPrefixes = [namespace, "hpo"]
-        prefixToPreferred["HPO"] = prefPrefix
-        prefixToPreferred["hpo"] = prefPrefix
-    elif namespace == "ncit":
-        prefPrefix = "NCIT"
-        altPrefixes = [namespace, "NCI_Thesaurus", "NCI", "ncithesaurus", "NCI2009_04D"]
     else:
         prefPrefix = ontology["config"]["preferredPrefix"]
 
@@ -80,9 +50,7 @@ for ontology in ontologies:
     prefixToPreferred[prefPrefix.lower()] = prefPrefix
     prefixToPreferred[namespace.lower()] = prefPrefix
 
-    datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, None, title, desc, "ONTOLOGY", None, altPrefixes, "https://creativecommons.org/licenses/by/4.0/",  "Last updated in the ontology lookup service on "+version )
-
-altPrefixes = []
+    OXO.saveDatasource(prefPrefix, None, title, desc, "ONTOLOGY", None, [namespace], "https://creativecommons.org/licenses/by/4.0/",  "Last updated in the ontology lookup service on "+version )
 # get namespaces from identifiers.org
 
 #urllib.urlopen('http://www.ebi.ac.uk/miriam/main/export/xml/')
@@ -96,6 +64,7 @@ rootElem = tree.getroot()
 for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
     namespace =  datatype.find('{http://www.biomodels.net/MIRIAM/}namespace').text
     prefPrefix = namespace
+
 
     title =  datatype.find('{http://www.biomodels.net/MIRIAM/}name').text
     desc =  datatype.find('{http://www.biomodels.net/MIRIAM/}definition').text
@@ -123,9 +92,9 @@ for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
             altPrefixes.append(altPrefixs.text)
 
     if prefPrefix.lower() in prefixToPreferred:
-        print("Ignoring "+namespace+" from idorg as it is already registered as a datasource")
+        print "Ignoring "+namespace+" from idorg as it is already registered as a datasource"
     elif namespace.lower() in prefixToPreferred:
-        print("Ignoring " + namespace + " from idorg as it is already registered as a datasource")
+        print "Ignoring " + namespace + " from idorg as it is already registered as a datasource"
     else:
         idorgNamespace[prefPrefix.lower()] = prefPrefix
         idorgNamespace[namespace.lower()] = prefPrefix
@@ -133,14 +102,12 @@ for datatype in rootElem.findall('{http://www.biomodels.net/MIRIAM/}datatype'):
         prefixToPreferred[prefPrefix.lower()] = prefPrefix
         prefixToPreferred[namespace.lower()] = prefPrefix
         prefixToPreferred[title.lower()] = prefPrefix
-
-        if prefPrefix not in datasources:
-            datasources[prefPrefix] = OxoClient.Datasource (prefPrefix, namespace, title, desc, "DATABASE", None, altPrefixes, licence, versionInfo)
+        OXO.saveDatasource(prefPrefix, namespace, title, desc, "DATABASE", None, altPrefixes, licence, versionInfo)
 
 
 #oboDbxrefUrl = 'https://raw.githubusercontent.com/geneontology/go-site/master/metadata/db-xrefs.yaml'
 # Read from OBO db-xrefs
-yamlData = yaml.load(urllib.request.urlopen(oboDbxrefUrl))
+yamlData = yaml.load(urllib.urlopen(oboDbxrefUrl))
 
 for database in yamlData:
     namespace= database["database"]
@@ -149,7 +116,7 @@ for database in yamlData:
 
     altPrefixes = [namespace]
     if namespace.lower() in prefixToPreferred:
-        print("Ignoring " + namespace + " from OBO as it is already registered as a datasource")
+        print "Ignoring " + namespace + " from OBO as it is already registered as a datasource"
     else:
         urlSyntax = None
         if "entity_types" in database:
@@ -157,15 +124,11 @@ for database in yamlData:
                 urlSyntax = database["entity_types"][0]["url_syntax"].replace("[example_id]", "")
         prefixToPreferred[namespace.lower()] = prefPrefix
 
-        if prefPrefix not in datasources:
-            print "New datasource " + namespace + " from GO db-xrefs file"
-
-            datasources[prefPrefix] = OxoClient.Datasource (prefPrefix, None, title, None, "DATABASE",urlSyntax, altPrefixes, None, None)
-
+        OXO.saveDatasource(prefPrefix, None, title, None, "DATABASE",urlSyntax, altPrefixes, None, None)
 
 
 # Create Paxo as datasources
-print("Adding paxo as datasource")
+print "Save paxo as datasource"
 prefPrefix="paxo"
 namespace=None
 title="paxo"
@@ -175,10 +138,4 @@ urlSyntax=None
 altPrefixes=["paxo"]
 licence=None
 versionInfo=1
-datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
-
-# print OxO loading csv file
-import OxoCsvBuilder
-
-buider = OxoCsvBuilder.Builder()
-buider.exportDatasourceToCsv(exportFileDatasources, datasources)
+OXO.saveDatasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)

@@ -11,6 +11,8 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.response.model.QueryResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -30,8 +32,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.spot.OxoWebApp;
-import uk.ac.ebi.spot.model.*;
-import uk.ac.ebi.spot.service.*;
+import uk.ac.ebi.spot.controller.api.MappingController;
+import uk.ac.ebi.spot.model.Datasource;
+import uk.ac.ebi.spot.model.Mapping;
+import uk.ac.ebi.spot.model.SourceType;
+import uk.ac.ebi.spot.model.Term;
+import uk.ac.ebi.spot.service.DatasourceService;
+import uk.ac.ebi.spot.service.MappingService;
+import uk.ac.ebi.spot.service.TermService;
 
 import javax.servlet.RequestDispatcher;
 
@@ -62,6 +70,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = OxoWebApp.class)
 @WebAppConfiguration
+/*@Ignore*/
 public class ApiDocumentation {
 
     @Rule
@@ -94,8 +103,7 @@ public class ApiDocumentation {
     @Before
     public void setUp() {
 
-        Mockito.when(neo4jTemplate.query(Mockito.anyString(), Mockito.anyMap(), Mockito.anyBoolean())).thenReturn(new QueryResultModel(null, null));
-
+        System.out.print("Start the Tests");
         this.document = document("{method-name}"
                 ,
                 preprocessRequest(prettyPrint()),
@@ -104,16 +112,16 @@ public class ApiDocumentation {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(documentationConfiguration(this.restDocumentation).uris()
-                        .withScheme("https")
-                        .withHost("www.ebi.ac.uk")
-                        .withPort(443)
+                                .withScheme("https")
+                                .withHost("www.ebi.ac.uk/spot/oxo")
+                                .withPort(80)
                 )
                 .alwaysDo(this.document)
                 .build();
     }
 
 
-
+    /*
     @Test
     public void pageExample () throws Exception {
 
@@ -145,8 +153,7 @@ public class ApiDocumentation {
 
         this.mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
-
-    }
+    }*/
 
 
     @Test
@@ -172,6 +179,8 @@ public class ApiDocumentation {
         ;
     }
 
+
+    /*
     @Test
     public void apiExample () throws Exception {
 
@@ -188,7 +197,7 @@ public class ApiDocumentation {
         );
         this.mockMvc.perform(get("/spot/oxo/api").contextPath("/spot/oxo").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 
     @Test
@@ -225,6 +234,7 @@ public class ApiDocumentation {
     }
 
 
+    /*
     @Test
     public void mappingExample () throws Exception {
 
@@ -364,5 +374,5 @@ public class ApiDocumentation {
         ObjectMapper mapper = new ObjectMapper();
         this.mockMvc.perform(post("/spot/oxo/api/search").contextPath("/spot/oxo").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(searchRequest)))
                 .andExpect(status().isOk());
-    }
+    }*/
 }

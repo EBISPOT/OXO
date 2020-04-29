@@ -3,9 +3,26 @@
  */
 
 $(document).ready(function() {
-
+    console.log("Document ready, let's refresh data")
     refreshChartData()
+
+    /*
+    $("#distanceDropDown").on('change', function() {
+        $("input[name=distance]").val(this.value)
+        refreshChartData()
+    }) */
+
+
+    $('.slider').on('moved.zf.slider', function(){
+        console.log("Slider action dedected")
+        if ($("input[name=distance]").val()!==$(".slider input").val()){    //Check if there was a change, if there is, update stuff
+            $("input[name=distance]").val($(".slider input").val())
+            refreshChartData()
+        }
+    });
+
 });
+
 
 function refreshChartData() {
     $("#graphic").html('');
@@ -13,6 +30,9 @@ function refreshChartData() {
 
     var prefix =  $("#graphic").data("prefix");
     var distance = $("input[name=distance]").val() ? $("input[name=distance]").val() : 1;
+
+    console.log("Got prefix, it is "+prefix)
+    console.log("Got distance, it is "+distance)
 
     $.ajax({
         url: '../api/mappings/summary/counts?datasource='+prefix+'&distance='+distance,
@@ -80,8 +100,11 @@ function drawChart(data) {
                 point: {
                     events: {
                         click: function () {
-                            // console.log('clicked' + this.category)
+                            console.log('clicked ' + this.category)
                             $('#mappingTarget').val(this.category)
+                            $('#distance-slide').val($('#distanceDropDown').val())
+                            //msg="We got following parameters: "+$('#mappingTarget').val()+"  "+$('#distance-slider').val()+"  "+$('#inputSource').val()
+                            //alert(msg)
                             $('#mapping-count-form').submit()
                         }
                     }

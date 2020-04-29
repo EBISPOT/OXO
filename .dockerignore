@@ -3,6 +3,7 @@ oxo-*
 .idea
 dataloading
 neo4jimport/*.csv
+neo4jdata
 db
 solr-config/data
 *.rtf
