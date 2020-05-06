@@ -1,3 +1,7 @@
+
+scripts to generate predicted mappings.
+You can evaluate paxo using a gold standard set of mappings. The *standard folder* contains an example of how the gold standard mapppings needs to be formatted. 
+
 ### Prerequisite
 
 - In order to install dependencies, first ensure that you have Python 2.7 and a corresponding version of pip.

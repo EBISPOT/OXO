@@ -33,10 +33,10 @@ class Builder:
                 value.alternatePrefixes.append(key)
                 alternatePrefixes = self.generateAllAltPrefixes(value.alternatePrefixes)
 
-                spamwriter.writerow([value.prefPrefix, value.idorgNamespace, str(value.title).encode("utf-8"),
-                                     str(value.description).encode("utf-8"), value.sourceType, value.baseUri,
-                                     ",".join(alternatePrefixes), str(value.licence).encode("utf-8"),
-                                     str(value.versionInfo).encode("utf-8")])
+                spamwriter.writerow([value.prefPrefix, value.idorgNamespace, str(value.title),
+                                     str(value.description), value.sourceType, value.baseUri,
+                                     ",".join(alternatePrefixes), str(value.licence),
+                                     str(value.versionInfo)])
 
     def exportTermsToCsv(self, file, terms):
         with open(file, 'w') as csvfile:

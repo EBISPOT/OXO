@@ -1,0 +1,25 @@
+version: '2'
+services:
+    solr:
+        image: solr:5.5.3-alpine
+        environment:
+          - SOLR_HOME=/mnt/solr
+        ports:
+          - 8983:8983
+        volumes:
+          - ./data/solr:/mnt/solr
+        command: ["solr", "-f"]
+    neo4j:
+        image: neo4j:3.1.1
+        environment:
+          - NEO4J_HEAP_MEMORY=10g # configure the heap memory
+          - NEO4J_dbms_memory_heap_maxSize=8g
+          - NEO4J_AUTH=neo4j/dba
+        cap_add:
+          - SYS_RESOURCE
+        ports:
+          - 7474:7474
+          - 7687:7687
+        volumes:
+          - ./data/neo4jimport:/var/lib/neo4j/import
+          - ./data/neo4j:/data

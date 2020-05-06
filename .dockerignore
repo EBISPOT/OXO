@@ -11,3 +11,5 @@ solr-config/data
 *.xml
 *.md
 !oxo-web/target/oxo-web.war
+__pycache__
+*.pyc
