@@ -3,7 +3,7 @@ ontologies, vocabularies and coding standards. OxO imports mappings from a
 variety of sources including the [Ontology Lookup Service](https://www.ebi.ac.uk/ols/index) and a subset of
 mappings provided by the [UMLS](https://www.nlm.nih.gov/research/umls/index.html).
 
-# OxO with Docker
+# OxO with Docker
 
 OxO is comprised of three components:
 
@@ -17,7 +17,7 @@ The OxO Web application, solr, and neo4j can be started using docker-compose:
 
 The docker-compose configuration, by default, stores all persistent data (the hsqldb, neo4j, and solr data files) in the data/ directory by mounting volumes.  However, these datasets are empty until the loader and indexer have been executed.
 
-## Running the loader
+## Running the loader
 
 The loader requires neo4j to be running.  If using docker-compose, neo4j can be
 started on its own:
