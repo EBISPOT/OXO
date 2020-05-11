@@ -3,12 +3,13 @@ services:
     solr:
         image: solr:5.5.3-alpine
         environment:
-          - SOLR_HOME=/mnt/solr
+          - SOLR_HOME=/mnt/solr-config
         ports:
           - 8983:8983
         volumes:
-          - ./data/solr:/mnt/solr
-        command: ["solr", "-f"]
+          - ./data/solr:/mnt/solr-data
+          - ./solr-config:/mnt/solr-config
+        command: ["solr", "-Dsolr.solr.home=/mnt/solr-config", "-Dsolr.data.dir=/mnt/solr-data", "-Dsolr.log=/mnt/solr-data/logs", "-f"]
     neo4j:
         image: neo4j:3.1.1
         environment:
@@ -23,8 +24,10 @@ services:
         volumes:
           - ./data/neo4jimport:/var/lib/neo4j/import
           - ./data/neo4j:/data
-    oxo:
-        build: oxo-web
+    oxo-web:
+        build:
+            context: .
+            dockerfile: oxo-web/Dockerfile
         depends_on:
           - neo4j
           - solr

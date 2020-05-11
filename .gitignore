@@ -11,3 +11,4 @@ oxo-web/src/main/resources/templates/search-orig.html
 oxo-web/src/main/asciidoc/generated-snippets
 oxo-web/src/main/resources/static
 .settings
+data/solr/data/*

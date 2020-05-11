@@ -19,21 +19,12 @@ The docker-compose configuration, by default, stores all persistent data (the hs
 
 ## Running the loader
 
-The loader requires neo4j to be running.  If using docker-compose, neo4j can be
-started on its own:
-
-    docker-compose up neo4j
-
-The loader scripts can then be used as documented in the oxo-loader/ directory
-to load data into neo4j.
+The loader scripts are documented in the README of the oxo-loader/ directory.
 
 ## Running the indexer
 
-The indexer requires neo4j and solr to be running.  If using docker-compose:
-
-    docker-compose up neo4j solr
-
-The indexer can be executed using Docker:
+After using the loader to load data into neo4j, the indexer can be executed
+using Docker:
 
     docker build -f oxo-indexer/Dockerfile -t oxo-indexer
     docker run oxo-indexer

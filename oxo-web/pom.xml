@@ -4,6 +4,7 @@
         <artifactId>oxo</artifactId>
         <groupId>uk.ac.ebi.spot</groupId>
         <version>0.0.17-SNAPSHOT</version>
+        <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

@@ -1,12 +1,15 @@
 
-FROM maven:3.5-jdk-8 AS build
-COPY pom.xml /opt/OxO/pom.xml
-COPY oxo-web /opt/OxO/
-COPY oxo-model /opt/OxO/
-COPY oxo-indexer /opt/OxO/
-RUN cd /opt/OxO && mvn clean package
+FROM maven:3.6-jdk-8 AS build
+RUN mkdir /opt/oxo
+COPY pom.xml /opt/oxo/pom.xml
+COPY oxo-web /opt/oxo/oxo-web
+COPY oxo-model /opt/oxo/oxo-model
+COPY oxo-indexer /opt/oxo/oxo-indexer
+RUN cd /opt/oxo && mvn clean package
 
 FROM openjdk:8-jre-alpine
-COPY --from=build /opt/OxO/oxo-web/target/oxo-web.war /opt/oxo-web.war
+RUN apk add bash
+COPY --from=build /opt/oxo/oxo-web/target/oxo-web.war /opt/oxo-web.war
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/opt/oxo-web.war"]
+
