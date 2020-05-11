@@ -36,8 +36,10 @@ For example:
 
     "DrugBank","drugbank","DrugBank","The DrugBank database is a bioinformatics and chemoinformatics resource that combines detailed drug (i.e. chemical, pharmacological and pharmaceutical) data with comprehensive drug target (i.e. sequence, structure, and pathway) information. This collection references drug information.","DATABASE","","drugbank,DRUGBANK,DrugBank","None","None"
 
-This metadata can then be loaded into the OxO neo4j database using the `OxoNeo4jLoader.py` script:
+This metadata can then be loaded into the OxO neo4j database using the `OxoNeo4jLoader.py` script.  If using the provided
+docker-compose neo4j, first copy datasources.csv to the data/neo4jimport directory.
 
+    cp datasources.csv ../data/neo4jimport
     python OxoNeo4jLoader.py -c config.ini -W -d datasources.csv
 
 # OlsMappingExtractor
