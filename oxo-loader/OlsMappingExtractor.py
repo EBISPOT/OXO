@@ -30,7 +30,7 @@ OXO = OxoClient.OXO()
 OXO.oxoUrl=config.get("Basics","oxoUrl")
 OXO.olsurl=config.get("Basics","olsurl")
 
-solrBaseUrl=config.get("Basics","solrBaseUrl")
+solrBaseUrl=config.get("Basics","olsSolrBaseUrl")
 
 exportFileTerms= config.get("Paths","exportFileTerms")
 if options.terms:
