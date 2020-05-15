@@ -45,7 +45,22 @@ docker-compose neo4j, first copy datasources.csv to the data/neo4jimport directo
 # OlsMappingExtractor
 
 After the metadata about datasets has been loaded into neo4j, the `OlsMappingExtractor.py` script is used to
-pull mappings from OLS and generate two CSV files: one for terms, and one for mappings.
+pull mappings from OLS and generate two CSV files: one for terms, and one for mappings.  The terms CSV has the form:
+
+    "identifier","curie","label","uri","prefix"
+
+For example:
+
+    "0012920","MONDO:0012920","type 1 diabetes mellitus 21","http://purl.obolibrary.org/obo/MONDO_0012920","MONDO"
+
+And the mappings CSV has the form:
+
+    "fromCurie","toCurie","datasourcePrefix","datasource","sourceType","scope","date"
+
+For example:
+
+    "MONDO:0012920","DOID:0110758","MONDO","{\"alternateIris\": [], \"name\": \"MONDO: Monarch Disease Ontology\", \"source\": \"ONTOLOGY\", \"idorgNamespace\": \"\", \"alternatePrefix\": [\"mondo\", \"MONDO\"], \"prefix\": \"MONDO\", \"licence\": \"https://creativecommons.org/licenses/by/4.0/\", \"orcid\": null, \"versionInfo\": \"Last updated in the ontology lookup service on 2019-05-27T04:26:17.673+0000\", \"preferredPrefix\": \"MONDO\"}","ONTOLOGY","RELATED","19-06-01"
+
 OlsMappingExtractor uses the OxO API.  Therefore, OxO and neo4j must be running.
 OlsMappingExtractor also requires access to a running OLS Solr instance (not the OxO Solr instance) configured with the olsSolrBaseUrl option.
     
