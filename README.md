@@ -26,8 +26,8 @@ The loader scripts are documented in the README of the oxo-loader/ directory.
 After using the loader to load data into neo4j, the indexer can be executed
 using Docker:
 
-    docker build -f oxo-indexer/Dockerfile -t oxo-indexer
-    docker run oxo-indexer
+    docker build -f oxo-indexer/Dockerfile -t oxo-indexer .
+    docker run --net=host oxo-indexer
 
 
 # OxO without Docker
