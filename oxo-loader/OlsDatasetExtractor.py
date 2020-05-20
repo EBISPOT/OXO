@@ -182,7 +182,7 @@ print("Adding loinc as datasource")
 prefPrefix="LNC"
 namespace=None
 title="LOINC"
-desc=None
+desc="Logical Observation Identifiers Names and Codes"
 sourceType="DATABASE"
 urlSyntax=None
 altPrefixes=["loinc", "LOINC"]
