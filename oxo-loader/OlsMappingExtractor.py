@@ -99,7 +99,9 @@ knownAnnotations = [
 # note EFO does xrefs in a different way to all the other OBO ontologies so
 # give it special consideration
 response = urllib.request.urlopen(getEfoAnnotationsUrl)
-cr = csv.reader(response)
+print(getEfoAnnotationsUrl)
+print(response)
+cr = csv.reader(response.read().decode('utf-8'))
 for row in cr:
     for p in row:
         if 'definition_citation' in p:
@@ -177,11 +179,11 @@ def processSolrDocs(url):
                             toId = OXO.getIdFromCui(xref)
 
                             if not toPrefix or not toId:
-                                print("Can't get prefix or id for " + xref.encode('utf-8'))
+                                print("Can't get prefix or id for " + xref)
                                 continue
 
                             if not toPrefix:
-                                print("Can't extract prefix for " + xref.encode('utf-8'))
+                                print("Can't extract prefix for " + xref)
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1

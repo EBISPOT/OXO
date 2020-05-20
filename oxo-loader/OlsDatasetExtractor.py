@@ -177,6 +177,21 @@ licence=None
 versionInfo=1
 datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
 
+
+print("Adding loinc as datasource")
+prefPrefix="LNC"
+namespace=None
+title="LOINC"
+desc=None
+sourceType="DATABASE"
+urlSyntax=None
+altPrefixes=["loinc", "LOINC"]
+licence=None
+versionInfo=1
+datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
+
+
+
 # print OxO loading csv file
 import OxoCsvBuilder
 
