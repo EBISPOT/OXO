@@ -40,11 +40,16 @@ public class IndexController {
     @Autowired
     MappingService mappingService;
 
+    @Autowired
+    CustomisationProperties customisationProperties;
+
     @RequestMapping(path = {"", "index"})
     public String home(Model model) {
 
         model.addAttribute("datasources",datasourceService.getDatasourceWithMappings());
         model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
+
+        customisationProperties.setCustomisationModelAttributes(model);
 
         return "index";
     }
@@ -94,6 +99,8 @@ public class IndexController {
 
         }
 
+        customisationProperties.setCustomisationModelAttributes(model);
+
         return "myaccount";
     }
 
@@ -114,6 +121,7 @@ public class IndexController {
     @RequestMapping({"docs/{page}"})
     public String showDocs(@PathVariable("page") String pageName, Model model) {
         model.addAttribute("page", pageName);
+        customisationProperties.setCustomisationModelAttributes(model);
         return "docs-template";
     }
 

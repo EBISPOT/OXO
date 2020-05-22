@@ -43,6 +43,9 @@ public class MappingControllerUI {
     @Autowired
     MappingService mappingService;
 
+    @Autowired
+    CustomisationProperties customisationProperties;
+
     @RequestMapping(path = "", produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
     public String getMappings (
             Model model,
@@ -78,6 +81,8 @@ public class MappingControllerUI {
             }
         }
 
+        customisationProperties.setCustomisationModelAttributes(model);
+
         return "index";
     }
 
@@ -92,6 +97,9 @@ public class MappingControllerUI {
         }  else {
             model.addAttribute("mapping", mapping);
         }
+
+        customisationProperties.setCustomisationModelAttributes(model);
+
         return "mapping";
     }
 
@@ -102,6 +110,8 @@ public class MappingControllerUI {
             @AuthenticationPrincipal OrcidPrinciple principle,
             Model model,
             final RedirectAttributes redirectAttributes) {
+
+        customisationProperties.setCustomisationModelAttributes(model);
 
         Mapping mapping = mappingService.getMapping(id);
 

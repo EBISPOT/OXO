@@ -36,6 +36,10 @@ public class TermControllerUI {
 
     @Autowired
     MappingService mappingService;
+
+    @Autowired
+    CustomisationProperties customisationProperties;
+
     @RequestMapping(path = "/{curie}", produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
     public String getTerms (@PathVariable("curie") String curie, Model model, final RedirectAttributes redirectAttributes) {
 
@@ -55,6 +59,7 @@ public class TermControllerUI {
             model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
         }
 
+        customisationProperties.setCustomisationModelAttributes(model);
 
         return "terms";
     }

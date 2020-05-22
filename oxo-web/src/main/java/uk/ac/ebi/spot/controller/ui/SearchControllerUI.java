@@ -34,6 +34,9 @@ public class SearchControllerUI {
     @Autowired
     DatasourceService datasourceService;
 
+    @Autowired
+    CustomisationProperties customisationProperties;
+
 
     @GetMapping
     public String search() {
@@ -65,6 +68,8 @@ public class SearchControllerUI {
         }
 
         model.addAttribute("request", request);
+
+        customisationProperties.setCustomisationModelAttributes(model);
 
         return "search";
     }
