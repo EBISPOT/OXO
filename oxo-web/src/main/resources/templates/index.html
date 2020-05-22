@@ -8,7 +8,7 @@
 
 
 <head th:replace="fragments/head :: head">
-    <title>Ontology Xref Service   &lt; EMBL-EBI</title>
+    <title th:inline="text">[[${title}]]  &lt; [[${shortTitle}]]</title>
     <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
     <meta name="keywords" content="biosamples, europe, EBI" />
     <!- - Describe what this page is about - ->
@@ -32,8 +32,8 @@
 
     <div class="row">
         <div class="grayBackground">
-            <h4>Welcome to the EMBL-EBI Ontology Xref Service (OxO).</h4>
-            <p style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mappings from a variety of sources including the
+            <h4 th:inline="text">Welcome to the [[${org}]] [[${title}]] ([[${shortTitle}]]).</h4>
+            <p th:unless="debrand" style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mappings from a variety of sources including the
         <a href="http://www.ebi.ac.uk/ols">Ontology Lookup Service</a> and a subset of mappings provided by the <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a>. We're still developing the service so please <a href="contact">get in touch</a> if you have any feedback.</p>
     </div>
     </div>
@@ -43,7 +43,7 @@
 
             <div class="small-3 columns" style="height:1009px">
                 <form id="queryForm" method="post" action="search">
-                    <h4 class="panel-title">Search OxO by term id</h4>
+                    <h4 class="panel-title" th:inline="text">Search [[${shortTitle}]] by term id</h4>
                     <fieldset>
                         <!--<legend>Search OxO by term id</legend>-->
 
@@ -79,11 +79,11 @@
             <div class="small-8 columns">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">OxO summary view</h4>
+                        <h4 class="panel-title" th:inline="text">[[${shortTitle}]] summary view</h4>
                     </div>
                     <div class="panel-body">
-                        <p>
-                            To use OxO either search for mappings using a particular identifier (e.g. MESH:D009202) or select a datasource below to view all mappings between datasources.
+                        <p th:inline="text">
+                            To use [[${shortTitle}]] either search for mappings using a particular identifier (e.g. MESH:D009202) or select a datasource below to view all mappings between datasources.
                         </p>
 
 

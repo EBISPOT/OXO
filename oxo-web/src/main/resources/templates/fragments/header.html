@@ -10,8 +10,9 @@
         <a href="#content">Skip to main content</a>
     </div>
 
-    <header id="masthead-black-bar" class="clearfix masthead-black-bar">
+    <header th:unless="debrand" id="masthead-black-bar" class="clearfix masthead-black-bar">
     </header>
+
     <div id="content">
         <div data-sticky-container="true">
             <header id="masthead" class="masthead" data-sticky="true" data-sticky-on="large" data-top-anchor="content:top" data-btm-anchor="content:bottom">
@@ -31,7 +32,7 @@
                             data-description="navigational">
                             <li class=""><a th:href="@{/index}">Home</a></li>
                             <li class=""><a th:href="@{/docs}">Documentation</a></li>
-                            <li class=""><a th:href="@{/about}">About</a></li>
+                            <li th:unless="debrand" class=""><a th:href="@{/about}">About</a></li>
 
                             <!-- This has to be revisted!-->
                             <li th:if="not ${username} and not ${readonly}" class="functional"><a th:href="@{/login}" class="icon icon-functional" data-icon="l">Login</a></li>
