@@ -1,6 +1,6 @@
 FROM python:3-alpine
 
-ADD oxo-loader /opt/
+ADD oxo-loader /opt/oxo-loader
 
 RUN apk add --no-cache bash mariadb-dev build-base
 #RUN apk --update add mysql mysql-client
