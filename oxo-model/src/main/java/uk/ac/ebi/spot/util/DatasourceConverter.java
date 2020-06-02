@@ -16,12 +16,16 @@ import java.io.IOException;
  */
 public class DatasourceConverter implements AttributeConverter<Datasource, String> {
 
+    // does not actually get autowired because DatasourceConverter is not
+    // instantiated by Spring
     @Autowired
     DatasourceRepository datasourceRepository;
 
    @Override
    public String toGraphProperty(Datasource value) {
 
+       //return value.getPrefix();
+       //
        ObjectMapper mapper = new ObjectMapper();
        try {
            return mapper.writeValueAsString(value);
@@ -33,6 +37,9 @@ public class DatasourceConverter implements AttributeConverter<Datasource, Strin
 
    @Override
    public Datasource toEntityAttribute(String value) {
+
+       //return datasourceRepository.findByPrefix(value);
+       //
        ObjectMapper mapper = new ObjectMapper();
        try {
            return mapper.readValue(value, Datasource.class);
@@ -41,5 +48,4 @@ public class DatasourceConverter implements AttributeConverter<Datasource, Strin
        }
        return new Datasource();
    }
-
 }

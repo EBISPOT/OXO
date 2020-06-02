@@ -11,8 +11,7 @@
     <!-- Use the .htaccess and remove these lines to avoid edge case issues.
          More info: h5bp.com/b/378 -->
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
-
-    <title>Docs &lt; Ontology Xref Service &lt; EMBL-EBI</title>
+    <title th:inline="text">Docs &lt; [[${title}]]   &lt; [[${org}]]</title>
     <meta name="description" content="EMBL-EBI Ontology Lookup Service is a repository of bio-medical ontologies and provides a powerful REST API for searching and accessing ontology term information"/><!-- Describe what this page is about -->
     <meta name="keywords" content="ontology, ontologies, bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
     <meta name="author" content="Samples Phenotypes and Ontologies Team, EMBL-EBI"/><!-- Your [project-name] here -->
@@ -21,7 +20,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
-    <link rel="stylesheet" href="http://www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="//www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
 
     <!-- CSS: implied media=all -->
     <!-- CSS concatenated and minified via ant build script-->
@@ -107,7 +106,7 @@
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
             <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Xref Service</h1></span>
+                <span><h1 th:inline="text">[[${title}]]</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -122,7 +121,7 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="index">OxO</a></li>
+                    <li class="first"><a href="index" th:inline="text">[[${shortTitle}]]</a></li>
                     <li><a href="docs">Documentation</a></li>
                     <li class="last active" ><a href="about">About</a></li>
                     <li th:if="not ${username}  and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
@@ -229,6 +228,7 @@
 
   ga('create', 'UA-69391170-2', 'auto');
   ga('send', 'pageview');
+  ga('set', 'anonymizeIp', true);
 
 </script>
 </body>

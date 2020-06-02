@@ -164,8 +164,7 @@ public class SearchController {
         // if Ids are provided then we know what to lookup
         List<String> ids =request.getIds();;
         if (!ids.isEmpty()) {
-            Page<SearchResult> results =  mappingService.getMappingsSearchByIds(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
-            return results;
+            return mappingService.getMappingsSearchByIds(ids, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);
         }
         String inputSource = request.getInputSource();
         return mappingService.getMappingsSearchByDatasource(inputSource, request.getDistance(), request.getMappingSource(), request.getMappingTarget(), pageable);

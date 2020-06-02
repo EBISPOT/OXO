@@ -1,0 +1,45 @@
+version: '2'
+services:
+    solr:
+        image: solr:5.5.3-alpine
+        environment:
+          - SOLR_HOME=/mnt/solr-config
+        ports:
+          - 8983:8983
+        volumes:
+          - ./data/solr:/mnt/solr-data
+          - ./solr-config:/mnt/solr-config
+        command: ["solr", "-Dsolr.solr.home=/mnt/solr-config", "-Dsolr.data.dir=/mnt/solr-data", "-Dsolr.log=/mnt/solr-data/logs", "-f"]
+    neo4j:
+        image: neo4j:3.1.1
+        environment:
+          - NEO4J_HEAP_MEMORY=10g # configure the heap memory
+          - NEO4J_dbms_memory_heap_maxSize=8g
+          - NEO4J_AUTH=neo4j/dba
+        cap_add:
+          - SYS_RESOURCE
+        ports:
+          - 7474:7474
+          - 7687:7687
+        volumes:
+          - ./data/neo4jimport:/var/lib/neo4j/import
+          - ./data/neo4j:/data
+    oxo-web:
+        build:
+            context: .
+            dockerfile: oxo-web/Dockerfile
+        depends_on:
+          - neo4j
+          - solr
+        links:
+          - neo4j
+          - solr
+        environment:
+          - spring.datasource.url=jdbc:hsqldb:file:/mnt/hsqldb
+          - oxo.neo.driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
+          - oxo.neo.uri=http://neo4j:dba@neo4j:7474
+          - spring.data.solr.host=http://solr:8983/solr
+        volumes:
+          - ./data/hsqldb:/mnt/hsqldb
+        ports:
+        - 8080:8080

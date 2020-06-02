@@ -1,11 +1,9 @@
 == Developer Resources
 
 === OxO source code
-
-* You can obtain the source code at https://github.com/EBISPOT/OLS-mapping-service
+* You can obtain the source code at https://github.com/EBISPOT/OxO
 
 === OxO REST API
-* Information about the API access to our services can be found at (http://www.ebi.ac.uk/ols/docs/api)
+* Information about the API access to our services can be found link:../docs/api[here]
 
-=== Local OxO installation
-* Details on how to build a local OLS can be found link:../docs/installation-guide[here]
+

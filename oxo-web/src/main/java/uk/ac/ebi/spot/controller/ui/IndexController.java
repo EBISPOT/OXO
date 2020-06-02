@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
@@ -39,19 +40,39 @@ public class IndexController {
     @Autowired
     MappingService mappingService;
 
+    @Autowired
+    CustomisationProperties customisationProperties;
+
     @RequestMapping(path = {"", "index"})
     public String home(Model model) {
 
         model.addAttribute("datasources",datasourceService.getDatasourceWithMappings());
         model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
 
+        customisationProperties.setCustomisationModelAttributes(model);
+
         return "index";
     }
 
+    /*
+    @RequestMapping({"docs"})
+    public String showDocsIndex(Model model) {
+        return "redirect:docs/";
+    }
+    // ok, this is bad, need to find a way to deal with trailing slashes and constructing relative URLs in the thymeleaf template...
+    @RequestMapping({"docs/"})
+    public String showDocsIndex2(Model model) {*/
+    /*
     @RequestMapping(path = "docs")
     public String docs(Model model) {
         return "docs";
-    }
+    } 
+
+    @RequestMapping({"docs/{page}"})
+    public String showDocs(@PathVariable("page") String pageName, Model model) {
+        model.addAttribute("page", pageName);
+        return "docs-template";
+    }*/
 
     @RequestMapping(path = "about")
     public String about(Model model) {
@@ -78,6 +99,36 @@ public class IndexController {
 
         }
 
+        customisationProperties.setCustomisationModelAttributes(model);
+
         return "myaccount";
     }
+
+
+
+
+
+    @RequestMapping({"docs"})
+    public String showDocsIndex(Model model) {
+        return "redirect:docs/index";
+    }
+    // ok, this is bad, need to find a way to deal with trailing slashes and constructing relative URLs in the thymeleaf template...
+    @RequestMapping({"docs/"})
+    public String showDocsIndex2(Model model) {
+        return "redirect:index";
+    }
+
+    @RequestMapping({"docs/{page}"})
+    public String showDocs(@PathVariable("page") String pageName, Model model) {
+        model.addAttribute("page", pageName);
+        customisationProperties.setCustomisationModelAttributes(model);
+        return "docs-template";
+    }
+
+
+
+
+
+
+
 }

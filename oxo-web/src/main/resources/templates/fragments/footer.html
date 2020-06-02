@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+<body>
+<div th:fragment="footer">
+
+    <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
+    <!--
+    <footer id="local-footer" class="local-footer" role="local-footer">
+      <div class="row">
+        <span class="reference">How to reference this page: ...</span>
+      </div>
+    </footer>
+    -->
+    <!-- End optional local footer -->
+
+
+<footer>
+    <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html
+    <div id="elixir-banner" data-color="none" data-name="This service" data-description="I am a super cool service" data-more-information-link="https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi" data-use-basic-styles="true"></div>
+    -->
+        <div th:unless="debrand" id="global-footer" class="global-footer">
+            <nav id="global-nav-expanded" class="global-nav-expanded row">
+                <!-- Footer will be automatically inserted by footer.js -->
+            </nav>
+            <section id="ebi-footer-meta" class="ebi-footer-meta row">
+                <!-- Footer meta will be automatically inserted by footer.js -->
+            </section>
+        </div>
+</footer>
+
+
+    <script th:unless="debrand" defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
+
+
+
+    <!-- JavaScript -->
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+    <!--
+    <script>window.jQuery || document.write('<script src="../js/libs/jquery-1.10.2.min.js"><\/script>')</script>
+
+
+    We include Jquery from war below, then we'd don't need this line  .... -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- <script type="text/javascript" th:src="@{/webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>-->
+
+
+    <!-- Your custom JavaScript file scan go here... change names accordingly -->
+    <!--
+    <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/plugins.js"></script>
+    <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/script.js"></script>
+    -->
+
+    <!--<script defer="defer" th:src="@{/js/jquery.autocomplete.min.js}" ></script> Doesn't exists for us -->
+
+    <!-- This is Biosamples script, replace if necessary with own scripts
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $('#local-searchbox').autocomplete({
+                serviceUrl: '[(@{/samples/autocomplete})]',
+                paramName: 'text',
+                onSelect: function (suggestion) {
+                    //alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+                    //location.href = '[(@{/samples})]?'+$.param({text:suggestion.value});
+                }
+            });
+        });
+    </script>   -->
+
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-69391170-2', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+    <!-- Using other URL for v1.3 does not change anything -->
+    <script defer="defer" src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/script.js"></script>
+    <script src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+    <script src="//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script>
+    <script type="text/JavaScript">$(document).foundation();</script>
+    <script type="text/JavaScript">$(document).foundationExtendEBI();</script>
+
+    <script type="text/javascript" th:src="@{/webjars/d3js/3.5.17/d3.min.js}" src="/webjars/d3js/3.5.17/d3.min.js"></script>
+    <script type="text/javascript" th:src="@{/webjars/select2/4.0.0/dist/js/select2.min.js}" src="/webjars/select2/4.0.0/dist/js/select2.min.js"></script>
+
+
+
+    <!-- What we have to incoperate
+
+
+<script>
+
+    function submitIds(e) {
+
+//        var form = $('#queryForm');
+//        form.on('submit', function (e) {
+//        });
+
+        var ids = $('#identifiers').val();
+        if (ids != '') {
+            $.each(ids.split('\n'), function (index, id) {
+                if (id != '') {
+                    $('<input/>').attr({
+                        type: 'hidden',
+                        name: 'ids',
+                        value: id
+                    }).appendTo($('#queryForm'));
+                }
+            });
+
+            return true
+        }
+
+        return false;
+
+    }
+
+    function jumpToSource(source) {
+        window.location = 'datasources/' +source;
+    }
+
+    $(document).ready(function() {
+        $('#distance-slider').slider({
+            step: 1, min: 1, max: 3,
+            ticks: [1, 2, 3],
+            ticks_labels: ['1', '2', '3'],
+            ticks_snap_bounds: 50
+        })
+
+        $('.datasource-select').select2({placeholder: "Datasources"});
+
+        $('.mappingSourcesSelect').select2({placeholder: "Jump to a datasource"})
+                .on('select2:select', function (e) {
+                    console.log("selected:  " + $(e.currentTarget).val())
+                    jumpToSource($(e.currentTarget).val())
+                });
+
+
+    });
+
+
+
+</script>
+
+
+
+
+    -->
+
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+.git
+.idea
+dataloading
+neo4jimport/*.csv
+neo4jdata
+db
+solr-config/data
+*.rtf
+*.iml
+*.md
+!oxo-web/target/oxo-web.war
+__pycache__
+*.pyc

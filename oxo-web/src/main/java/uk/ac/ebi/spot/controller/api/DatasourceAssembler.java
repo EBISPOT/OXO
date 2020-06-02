@@ -18,7 +18,7 @@ import uk.ac.ebi.spot.model.Datasource;
 public class DatasourceAssembler implements ResourceAssembler<Datasource, Resource<Datasource>> {
 
     @Autowired
-        EntityLinks entityLinks;
+    EntityLinks entityLinks;
 
     @Override
     public Resource<Datasource> toResource(Datasource datasource) {

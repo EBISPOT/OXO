@@ -24,7 +24,6 @@ import uk.ac.ebi.spot.model.Datasource;
 import uk.ac.ebi.spot.model.Mapping;
 import uk.ac.ebi.spot.model.Term;
 
-import javax.annotation.Resource;
 import java.net.MalformedURLException;
 
 /**
@@ -40,9 +39,9 @@ import java.net.MalformedURLException;
 @EnableTransactionManagement
 public class OxoNeo4jConfiguration extends Neo4jConfiguration {
 
-    @Value("${oxo.neo.driver}")
+    @Value("${oxo.neo.driver:org.neo4j.ogm.drivers.http.driver.HttpDriver}")
     String driver;
-    @Value("${oxo.neo.uri}")
+    @Value("${oxo.neo.uri:http://localhost:7474}")
     String uri;
     @Bean
     public SessionFactory getSessionFactory() {

@@ -4,10 +4,13 @@ import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.spot.exception.InvalidCurieException;
@@ -33,10 +36,10 @@ public class TermService {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private DatasourceService datasourceService;
+    DatasourceService datasourceService;
 
     @Autowired
-    private TermGraphRepository termGraphRepository;
+    TermGraphRepository termGraphRepository;
 
     @Autowired
     DocumentRepository documentRepository;
@@ -50,6 +53,9 @@ public class TermService {
     @Autowired
     Session session;
     private Object summaryGraphJson;
+
+    @Value("${oxo.indexer.chunks:10000}")
+    int chunks = 10000;
 
     /**
      *
@@ -227,27 +233,30 @@ public class TermService {
 
     public void rebuildIndexes(String source) {
 
-
-
         documentRepository.deleteAll();
+
+        int termCount = termGraphRepository.getIndexableTermCount();
+        log.info("Total terms to index " + termCount);
 
         List<Document> chunk = new ArrayList<Document>();
 
-        for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms()) {
-            if (t != null) {
+        for (int x = 0; x <= termCount; x +=chunks) {
+            log.info("Reading " +x + " terms from term repository...");
+            for (IndexableTermInfo t : termGraphRepository.getAllIndexableTerms(x, chunks)) {
                 chunk.add(DocumentBuilder.getDocumentFromTerm(t));
+                // save solr in chunks of 10000
                 if (chunk.size() == 10000) {
-                    log.info("Saving 10000 documents...");
+                    log.info("Saving " +chunk.size() + " documents...");
                     documentRepository.save(chunk);
-                    chunk =  new ArrayList<Document>();
+                    chunk.clear();
                 }
             }
         }
 
-        if (!chunk.isEmpty()) {
+        if (!chunk.isEmpty())  {
+            log.info("Saving " +chunk.size() + " documents...");
             documentRepository.save(chunk);
         }
-
     }
 
     public void rebuildIndexes() {

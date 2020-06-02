@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<div th:fragment="slider">
+<div style="width:200px;">
+    <span>Mapping Distance</span>
+    <div class="slider" data-slider="true" data-start="1" data-end="3">
+        <span class="slider-handle"  data-slider-handle="true" role="slider" tabindex="1"></span>
+        <span class="slider-fill" data-slider-fill="slider"></span>
+        <input type="hidden"/>
+    </div>
+    <div style="margin-top:-25px;width:100%;text-align:center;">
+        <span style="display:inline; float:left; margin-left:7px">1</span>
+        <span style="display:inline-block; margin: 0 auto;">2</span>
+        <span style="display:inline; float:right; margin-right:7px;">3</span>
+    </div>
+   </div>
+</div>
+
+</body>
+</html>

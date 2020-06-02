@@ -1,17 +1,20 @@
+h1,h2,h3,h4,h5,h6 {
+font-weight: normal;
+}
+div#local-title.logo-title span {
+margin-top: 1.1em;
+}
+
 .no-mapping{
   background-color: #ff0100;
   padding:2px;
   padding-right:4px;
   color: white;
-  /*font-size: larger;*/
-  border-radius: 3px;
+  /*font-size: larger;
+  border-radius: 3px;*/
   display: inline-block;
   margin-right: 4px;
   vertical-align: middle;
-}
-
-#ex1Slider .slider-selection {
-    background: #BABABA;
 }
 
 
@@ -35,6 +38,7 @@
     color: inherit;
 }
 
+
 .context-help-label:after {
     font-family: 'EBI-Generic';
     font-size: 70%;
@@ -48,3 +52,107 @@
     cursor: pointer;
 }
 
+/* Here we introduce new css for the new version*/
+.alert-warning{
+    background-color: #faebcc;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    padding: 10px 10px 10px 10px;
+    border-radius: 0px;
+}
+
+.grayBackground{
+background-color: #f2f2f2;
+/*border-radius: 25px;*/
+padding: 10px 10px 10px 10px;
+margin: 10px;
+}
+
+
+.marginTop{
+    margin-top:60px;
+}
+
+.marginBottom{
+    margin-bottom:80px;
+}
+
+#network{
+    height:500px;
+    width: 100%;
+    border: 0px black solid;
+}
+
+
+
+/*Migrated fomr fomrs.lens.css*/
+label {
+    display: inline-block !important;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+
+}
+
+
+/* Migrated from OLS css (used previously by OxO) to the oxo.css*/
+.term-source {
+    background-color: #ffac1b;
+    padding: 2px;
+    padding-right: 2px;
+    padding-right: 4px;
+    color: white;
+    font-size: larger;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+a .ontology-source {
+    background-color: #5FBDCE;
+    padding: 2px;
+    padding-right: 2px;
+    padding-right: 4px;
+    color: white;
+    font-size: larger;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+    border-bottom: none;
+}
+
+
+/* datatable customizing */
+.dataTables_length {
+    white-space: nowrap;
+}
+
+.dataTables_info{
+    margin-top: 30px;
+}
+
+#example_length select{
+    width:60px;
+}
+
+
+/*Help Pages*/
+
+/* API doc*/
+
+.listingblock{
+    background: #ededed;
+    color: #fff;
+    text-shadow: none;
+    padding: 3%;
+    border-width: 1px;
+    border-style: dotted;
+    overflow: auto;
+}
+
+.listingblock .content .highlight{
+    white-space: pre !important;
+
+}

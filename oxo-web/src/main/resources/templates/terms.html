@@ -5,443 +5,186 @@
 <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
 <!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
 <!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
-<head>
-    <meta charset="utf-8"/>
-
-    <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-         More info: h5bp.com/b/378 -->
-    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
-
-    <title>Terms &lt; Ontology Xref Service &lt; EMBL-EBI</title>
-    <meta name="description" content="EMBL-EBI Ontology Lookup Service is a repository of bio-medical ontologies and provides a powerful REST API for searching and accessing ontology term information"/><!-- Describe what this page is about -->
-    <meta name="keywords" content="ontology, ontologies, bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
-    <meta name="author" content="Samples Phenotypes and Ontologies Team, EMBL-EBI"/><!-- Your [project-name] here -->
-
-    <!-- Mobile viewport optimized: j.mp/bplateviewport -->
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css" type="text/css" media="screen"/>
-
-    <!-- CSS: implied media=all -->
-    <!-- CSS concatenated and minified via ant build script-->
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/boilerplate-style.css"/>
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/ebi-global.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/ebi-visual.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/984-24-col-fluid.css" type="text/css" media="screen"/>
-
-    <!-- you can replace this with [projectname]-colours.css. See http://frontier.ebi.ac.uk/web/style/colour for details of how to do this -->
-    <!-- also inform ES so we can host your colour palette file -->
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/develop/embl-petrol-colours.css" type="text/css" media="screen"/>
 
 
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/ols.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="https://www.ebi.ac.uk/ols/css/ols-colors.css"  type="text/css" media="screen"/>
+<head th:replace="fragments/head :: head">
+    <title th:inline="text">[[${title}]]   &lt; [[${org}]]</title>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
+    <meta name="keywords" content="biosamples, europe, EBI" />
+    <!- - Describe what this page is about - ->
+    <meta name="description" content="EMBL-EBI" />
 
-    <link rel="stylesheet" href="../static/css/vis.css" th:href="@{../css/vis.css}" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css" th:href="@{../webjars/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.css}" type="text/css" media="screen"/>
-    <link  rel="stylesheet" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"  type="text/css" media="screen"/>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
-    <link  rel="stylesheet" th:href="@{../webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}" href="/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css"  type="text/css" media="screen"/>
-
-    <!-- for production the above can be replaced with -->
-    <!--
-    <link rel="stylesheet" href="//www.ebi.ac.uk/web_guidelines/css/compliance/mini/ebi-fluid-embl.css">
-    -->
-    <!-- Bootstrap table css -->
-    <!--<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css"/>-->
-
-    <style type="text/css">
-        /* You have the option of setting a maximum width for your page, and making sure everything is centered */
-        /* body { max-width: 1600px; margin: 0 auto; } */
-    </style>
-
-    <style>
-
-        .links line {
-            stroke: #999;
-            stroke-opacity: 0.6;
-        }
-
-        .nodes circle {
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
-
-    </style>
-
-    <!-- end CSS-->
-    <style type="text/css">
-        #mynetwork {
-            width: 100%;
-            height: 400px;
-            /*border: 1px solid lightgray;*/
-        }
-    </style>
-
-
-    <!-- All JavaScript at the bottom, except for Modernizr / Respond.
-         Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
-         For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
-
-    <!-- Full build -->
-    <!-- <script src="//www.ebi.ac.uk/web_guidelines/js/libs/modernizr.minified.2.1.6.js"></script> -->
-
-    <!-- custom build (lacks most of the "advanced" HTML5 support -->
-    <script src="//www.ebi.ac.uk/web_guidelines/js/libs/modernizr.custom.49274.js"></script>
-
+    <meta name="ebi:last-review" content="2016-12-20" />
+    <!- - The last time the content was reviewed - ->
+    <meta name="ebi:expiry" content="2017-12-20" />
+    <!- - When this content is no longer relevant -->
 </head>
+
+
 
 <body class="level2">
 
-<div id="skip-to">
-    <ul>
-        <li><a href="#content">Skip to main content</a></li>
-        <li><a href="#local-nav">Skip to local navigation</a></li>
-        <li><a href="#global-nav">Skip to EBI global navigation menu</a></li>
-        <li><a href="#global-nav-expanded">Skip to expanded EBI global navigation menu (includes all sub-sections)</a></li>
-    </ul>
-</div>
+<th:block th:include="fragments/header :: header"></th:block>
 
-<div id="wrapper" class="container_24">
+<section id="main-content-area" class="row" role="main">
 
-    <header>
-
-        <div id="global-masthead" class="masthead grid_24">
-
-            <!--This has to be one line and no newline characters-->
-            <a href="//www.ebi.ac.uk/" title="Go to the EMBL-EBI homepage"><img src="//www.ebi.ac.uk/web_guidelines/images/logos/EMBL-EBI/EMBL_EBI_Logo_white.png" alt="EMBL European Bioinformatics Institute"/></a>
-
-            <nav>
-                <ul id="global-nav">
-                    <!-- set active class as appropriate -->
-                    <li id="services" class=" first active"><a href="//www.ebi.ac.uk/services" title="Services">Services</a></li>
-                    <li id="research" class=""><a href="//www.ebi.ac.uk/research" title="Research">Research</a></li>
-                    <li id="training" class=""><a href="//www.ebi.ac.uk/training" title="Training">Training</a></li>
-                    <li id="industry" class=""><a href="//www.ebi.ac.uk/industry" title="Industry">Industry</a></li>
-                    <li id="about" class=" last"><a href="//www.ebi.ac.uk/about" title="About us">About us</a></li>
-                </ul>
-            </nav>
-
+        <!--@thymesVar id="message" type="String"-->
+        <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
+            <strong th:text="${message}">Success message goes here</strong>.
         </div>
 
-        <div id="local-masthead" class="masthead grid_24 nomenu">
-
-            <!-- local-title -->
-            <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
-
-            <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Xref Service</h1></span>
-            </div>
-
-            <!-- /local-title -->
-
-            <!-- fix to remove search box -->
-            <div style="visibility: hidden">
-                <form id="local-search">
-                </form>
-            </div>
-            <!-- -->
-
-
-            <nav>
-                <ul class="grid_24" id="local-nav">
-                    <li class="first active"><a href="../index">OxO</a></li>
-                    <li><a href="../docs">Documentation</a></li>
-                    <li class="last" ><a href="../about">About</a></li>
-                    <li th:if="not ${username} and not ${readonly}" class="functional"><a href="../login" class="icon icon-functional" data-icon="l">Login</a></li>
-                    <li th:if="${username} and not ${readonly}" class="functional"><a href="javascript: document.logoutForm.submit()" class="icon icon-functional" data-icon="L">
-                        Logout <span th:text="${username}">user</span>
-                        <form name="logoutForm" th:action="@{../logout}" method="post" th:hidden="true">
-                        </form>
-                    </a></li>
-                    <li th:if="${username} and not ${readonly}" class="functional">
-                        <a href="../myaccount" class="icon icon-functional" data-icon="5">
-                            My mappings
-                        </a>
-                    </li>
-                    <li class="functional last"><a href="../contact" class="icon icon-generic" data-icon="C">Contact Us</a></li>
-                </ul>
-            </nav>
+        <!--@thymesVar id="error" type="String"-->
+        <div style="border-left: 1px solid #ebccd1;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-danger" th:if="${error}">
+            <strong th:text="${error}">Error message goes here</strong>.
         </div>
 
+        <!--@thymesVar id="term" type="uk.ac.ebi.spot.model.Term"-->
 
-    </header>
+        <div class="row">
 
-    <div id="content" role="main" class="grid_24 clearfix">
-        <div class="container">
+            <!--<div  class="grid_12 alpha"> -->
 
-            <div class="grid_24 alpha">
-
-                <div data-icon="" style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-warning" role="alert">
-                    <img src="//www.ebi.ac.uk/web_guidelines/images/icons/EBI-Generic/Generic%20icons/Beta.png"/> This site is still under development
-                </div>
-
-                <!--@thymesVar id="message" type="String"-->
-                <div style="border-left: 1px solid #faebcc;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-success" th:if="${message}">
-                    <strong th:text="${message}">Success message goes here</strong>.
-                </div>
-
-                <!--@thymesVar id="error" type="String"-->
-                <div style="border-left: 1px solid #ebccd1;width: 75%;text-align: center;margin: 0 auto;" class="alert alert-dismissible alert-danger" th:if="${error}">
-                    <strong th:text="${error}">Error message goes here</strong>.
-                </div>
-
-                <!--@thymesVar id="term" type="uk.ac.ebi.spot.model.Term"-->
-
-                <div class="grid_24 alpha">
-
-                    <div  class="grid_12 alpha">
-
-                        <div th:if="${term}" class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Term info</h3>
-                            </div>
-                            <div class="panel-body">
+            <div class="small-4 columns grayBackground">
+                <div th:if="${term}" class="panel">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Term info</h5>
+                    </div>
+                    <div class="panel-body">
 
 
-                                <div style="font-size: large">
-                                    <span class="term-source" th:text="${term.getCurie()}">id...</span>
+                        <div style="font-size: large">
+                            <span class="term-source" th:text="${term.getCurie()}">id...</span>
                                                            <span th:if="${term.getLabel()}">
                                                                 (<span th:text="${term.getLabel()}">id...</span>)
                                                            </span>
 
-                                </div>
-                                <div th:if="${term.getUri()}">
-                                    <span>URI: </span><a target="_blank" th:href="${term.getUri()}" th:text="${term.getUri()}">id...</a>
-                                </div>
-                                <div>
-                                    <span>Datasource: </span>
-                                    <a th:href="@{../datasources/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
-                                    <span class="ontology-source" th:text="${term.getDatasource().getPrefix()}">id...</span>
-                                </div>
-                                <div>
-                                    <span>Type: </span><span th:text="${term.getDatasource().getSource()}">id...</span>
-                                </div>
-                                <!--<div th:if="${term.getDatasource().getIdorgNamespace()}">-->
-                                    <!--<span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>-->
-                                <!--</div>-->
-
-                                <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
-                                    <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}/terms(ontology=${term.getDatasource().getPrefix()},iri=${term.getUri()})} + '\''"  class="btn btn-default">View in OLS</button>
-                                </div>
-
-
-
-
-                            </div>
                         </div>
+                        <div th:if="${term.getUri()}">
+                            <span>URI: </span><a target="_blank" th:href="${term.getUri()}" th:text="${term.getUri()}">id...</a>
+                        </div>
+                        <div>
+                            <span>Datasource: </span>
+                            <a th:href="@{../datasources/{id}(id=${term.getDatasource().getPrefix()})}" th:text="${term.getDatasource().getName()}">id...</a>
+                            <span class="ontology-source" th:text="${term.getDatasource().getPrefix()}">id...</span>
+                        </div>
+                        <div>
+                            <span>Type: </span><span th:text="${term.getDatasource().getSource()}">id...</span>
+                        </div>
+                        <!--<div th:if="${term.getDatasource().getIdorgNamespace()}">-->
+                        <!--<span>External link: </span><a class="nounderline" target="_blank" th:href="@{http://ids.org/{namespace}/{id}(namespace=${term.getDatasource().getIdorgNamespace()},id=${term.getIdentifier()})}" th:text="${term.getCurie()}">id...</a>-->
+                        <!--</div>-->
 
-                        <div th:if="${term} and not ${readonly}" class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Add new Mapping</h3>
-                            </div>
-                            <div class="panel-body">
-
-                                <div>
-
-                                    <!--@thymesVar id="mappingRequest" type="uk.ac.ebi.spot.model.MappingRequest"-->
-
-                                    <form method="post" action="../mappings" th:object="${mappingRequest}">
-
-                                        <div class="form-group">
-                                            <!--<label for="toId" class="col-lg-2 control-label">Mapped id</label>-->
-                                            <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
-                                                <!--<input type="text" class="" id="toId" name="toId" th:field="*{toId}"/>-->
-                                                <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-suggest-header="Select term" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control toId"/>
-                                            </div>
-                                        </div>
-                                        <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
-                                        <input type="hidden" name="scope" th:field="*{scope}"/>
-                                        <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
-
-
-                                        <button onclick="return confirm('Are you sure you want to add this mapping?')" class="btn btn-default" type="submit">Add</button>
-                                    </form>
-                                </div>
-                            </div>
+                        <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
+                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/terms(iri=${term.getUri()})} + '\''"  class="button secondary clickable">View in OLS</button>
                         </div>
 
                     </div>
-
-
-                    <div  class="grid_12 omega">
-
-                        <div th:if="${term}" class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Network</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div id="mapping-vis">
-                                    <div style="   position:absolute;
-                                       top:50%;
-                                       left:50%;
-                                       margin-top:-25px;
-                                       margin-left:-25px;"  id="mapping-vis-spinner">
-                                        <img src="../img/infinity.gif"/>
-                                    </div>
-                                </div>
-                                <div id="mynetwork" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-
                 </div>
 
 
-                <div class="grid_24 alpha">
-                    <div th:if="${term}" class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Mappings</h3>
-                        </div>
-                        <div class="panel-body">
+                <div th:if="${term} and not ${readonly}" class="panel">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Add new Mapping</h5>
+                    </div>
+                    <div class="panel-body">
 
-                            <section>
+                        <div>
 
-                                <div class="grid_24 alpha">
+                            <!--@thymesVar id="mappingRequest" type="uk.ac.ebi.spot.model.MappingRequest"-->
 
-                                    <form>
-                                        <span>Mapping Distance: </span>
-                                        <div style="margin-left: 15px;display: inline;">
-                                            <input id="distance-slider" name="distance" data-slider-id='ex1Slider' th:attr="data-slider-value=${distance}" th:value="${distance}" type="text"/>
-                                        </div>
-                                        <input type="hidden" name="inputSource" th:value="${inputSource}"/>
-                                        <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
-                                        <input type="hidden" name="ids" th:value="${id}"/>
-                                    </form>
+                            <form method="post" action="../mappings" th:object="${mappingRequest}">
 
-
-                                    <div>
-                                        <table  style="border-collapse: collapse;" data-hide-from-col="true" data-hide-table-info="true" data-api-path="../" data-with-progress="false" id="example">
-                                        </table>
+                                <div class="form-group">
+                                    <!--<label for="toId" class="col-lg-2 control-label">Mapped id</label>-->
+                                    <div class="col-lg-6" th:class="${#fields.hasErrors('toId')} ? 'col-lg-6 has-error' : 'col-lg-6'">
+                                        <!--<input type="text" class="" id="toId" name="toId" th:field="*{toId}"/>-->
+                                        <input style="font-weight: normal" size="35" type="text" th:field="*{toId}"  id="toId" name="toId" data-suggest-header="Select term" data-olswidget="select" data-olsontology="" data-selectpath="http://www.ebi.ac.uk/ols/" olstype="" placeholder="Enter an id" class="form-control toId"/>
                                     </div>
-
-                                    <!--<div style="position:absolute;top:50%;left:50%;margin-top:50px;"  id="mapping-vis-spinner"><img src="../img/infinity.gif"/></div>-->
-
                                 </div>
+                                <input type="hidden" name="fromId" th:value="${term.getCurie()}" th:field="*{fromId}"/>
+                                <input type="hidden" name="scope" th:field="*{scope}"/>
+                                <input type="hidden" name="sourceType" th:field="*{sourceType}"/>
 
 
-
-
-                            </section>
-
+                                <button onclick="return confirm('Are you sure you want to add this mapping?')" class="btn btn-default" type="submit">Add</button>
+                            </form>
                         </div>
                     </div>
                 </div>
 
+            </div>
+
+            <div class="small-7 columns grayBackground">
+
+                <div th:if="${term}" class="panel">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Network</h5>
+                    </div>
+                    <div class="panel-body">
+                        <div id="mapping-vis" style="width:100%; text-align:center;">
+                            <div style="position: absolute; display:inline-block; margin-left:350px; margin-top:250px;" id="mapping-vis-spinner">
+                                <img src="../img/infinity.gif"/>
+                            </div>
+                        </div>
+                        <div id="network" th:attr="data-get-mapping-vis=${id},data-api-path='../'"></div>
+                    </div>
+                </div>
 
             </div>
         </div>
-    </div>
 
-    <footer>
-        <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
 
-        <!-- End optional local footer -->
+        <div class="row">
+            <div class="small-12 columns grayBackground">
+            <div th:if="${term}" class="panel">
 
-        <div id="global-footer" class="grid_24 clearfix">
+                <div>
 
-            <nav id="global-nav-expanded">
+                    <th:block th:include="fragments/slider :: slider"></th:block>
 
-                <div class="grid_4 alpha">
-                    <h3 class="embl-ebi"><a href="//www.ebi.ac.uk/" title="EMBL-EBI">EMBL-EBI</a></h3>
+                             <form>
+                                <input type="hidden" name="distance" th:value="1"/>
+                                <input type="hidden" name="inputSource" th:value="${inputSource}"/>
+                                <input th:each="target : ${mappingTarget}" type="hidden" name="mappingTarget" th:value="${target}"/>
+                                <input type="hidden" name="ids" th:value="${id}"/>
+                            </form>
+
+
+                            <div>
+                                <table  style="border-collapse: collapse;" data-hide-from-col="true" data-hide-table-info="true" data-api-path="../" data-with-progress="false" id="example">
+                                </table>
+                            </div>
                 </div>
 
-                <div class="grid_4">
-                    <h3 class="services"><a href="//www.ebi.ac.uk/services">Services</a></h3>
                 </div>
-
-                <div class="grid_4">
-                    <h3 class="research"><a href="//www.ebi.ac.uk/research">Research</a></h3>
-                </div>
-
-                <div class="grid_4">
-                    <h3 class="training"><a href="//www.ebi.ac.uk/training">Training</a></h3>
-                </div>
-
-                <div class="grid_4">
-                    <h3 class="industry"><a href="//www.ebi.ac.uk/industry">Industry</a></h3>
-                </div>
-
-                <div class="grid_4 omega">
-                    <h3 class="about"><a href="//www.ebi.ac.uk/about">About us</a></h3>
-                </div>
-
-            </nav>
-
-            <section id="ebi-footer-meta">
-                <p class="address">EMBL-EBI, Wellcome Trust Genome Campus, Hinxton, Cambridgeshire, CB10 1SD, UK &nbsp; &nbsp; +44 (0)1223 49 44 44</p>
-                <p class="legal">Copyright &copy; EMBL-EBI 2013 | EBI is an outstation of the <a href="http://www.embl.org">European Molecular Biology Laboratory</a> | <a href="/about/privacy">Privacy</a> | <a href="/about/cookies">Cookies</a> | <a href="/about/terms-of-use">Terms of use</a></p>
-            </section>
-
+            </div>
         </div>
 
-    </footer>
-
-</div>
 
 
-<script type="text/javascript" th:src="@{../webjars/jquery/2.1.1/jquery.min.js}" src="/webjars/jquery/2.1.1/jquery.min.js"></script>
-<!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+</section>
 
-<!--<script type="text/javascript" src="../static/js/oxo.js" th:src="@{../js/oxo.js}"></script>-->
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="../static/js/oxo-search-result.js" th:src="@{../js/oxo-search-result.js(v=1)}"></script>
+
+<th:block th:include="fragments/footer :: footer"></th:block>
 
 <script type="text/javascript" src="../static/js/vis.js" th:src="@{../js/vis.js}"></script>
-
-<script type="text/javascript" src="../static/js/oxo-graph.js" th:src="@{../js/oxo-graph.js}"></script>
-
-<script type="text/javascript" src="/webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js" th:src="@{../webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js}"></script>
-<script type="text/javascript" src="/webjars/handlebars/4.0.5/handlebars.min.js" th:src="@{../webjars/handlebars/4.0.5/handlebars.min.js}"></script>
-<script type="text/javascript" src="/webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js" th:src="@{../webjars/ols-autocomplete/0.0.4/build/ols-autocomplete.js}"></script>
-<script type="text/javascript" th:src="@{../webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js}" src="/webjars/bootstrap-slider/5.3.1/bootstrap-slider.min.js"></script>
-
-
-<script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
-<script defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
+ <script type="text/javascript" src="/js/oxo-search-result.js" th:src="@{/js/oxo-search-result.js}"></script>
+<script type="text/javascript" src="/js/oxo-graph.js" th:src="@{/js/oxo-graph.js}"></script>
+<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        var app = require("ols-autocomplete");
-        var instance = new app();
-        options={action : function(relativePath, suggestion_ontology, type, iri, data){
-            console.log(JSON.stringify(data))
-//            var id = iri.substr(iri.lastIndexOf('/') + 1);
-            $('#toId').typeahead('val', data.shortForm);
-        }};
-
-        instance.start(options)
-
-        $('#distance-slider').bootstrapSlider({
-            step: 1, min: 1, max: 3,
-            ticks: [1, 2, 3],
-            ticks_labels: ['1', '2', '3'],
-            ticks_snap_bounds: 50
-        }).on('slideStop', function () {
-            reinitialiseTable()
-            drawGraph()
-
+        //Initialize the table and the graph for the first time
+        reinitialiseTable()
+        //drawGraph()
+        $('.slider').on('moved.zf.slider', function(){
+            if ($("input[name=distance]").val()!==$(".slider input").val()){    //Check if there was a change, if there is, update stuff
+                $("input[name=distance]").val($(".slider input").val())
+                reinitialiseTable()
+                drawGraph()
+            }
         });
-
     });
-
-
-</script>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-69391170-2', 'auto');
-  ga('send', 'pageview');
-
 </script>
 
 </body>

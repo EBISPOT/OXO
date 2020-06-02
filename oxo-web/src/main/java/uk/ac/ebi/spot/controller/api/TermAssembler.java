@@ -28,7 +28,8 @@ public class TermAssembler implements ResourceAssembler<Term, Resource<Term>> {
     @Autowired
     private TermService termService;
 
-    private static String olsBase = "http://www.ebi.ac.uk/ols/api/terms?obo_id=";
+    //private static String olsBase = "https://www.ebi.ac.uk/ols/api/terms?id=";
+    private static String olsBase = "https://www.ebi.ac.uk/ols/api/terms?obo_id=";
     @Override
     public Resource<Term> toResource(Term term) {
         Resource<Term> resource = new Resource<Term>(term);

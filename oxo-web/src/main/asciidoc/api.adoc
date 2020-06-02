@@ -1,0 +1,344 @@
+= Ontology Mappings Service (OxO) API Guide
+:doctype: book
+:toc: left
+:toc-title: OxO API
+:sectanchors:
+:sectlinks:
+:toclevels: 4
+:source-highlighter: highlightjs
+
+[[overview]]
+= Overview
+
+[[overview-http-verbs]]
+== HTTP verbs
+
+This API supports the following HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+| `POST`
+| Used to POST a search request
+|===
+
+[[overview-http-status-codes]]
+== HTTP status codes
+
+This API tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+|===
+
+[[overview-errors]]
+== Errors
+
+Whenever an error response (status code >= 400) is returned, the body will contain a JSON object
+that describes the problem. The error object has the following structure:
+
+include::{snippets}/error-example/response-fields.adoc[]
+
+For example, a request that attempts to apply a non-existent tag to a resource will produce a
+`400 Bad Request` response:
+
+include::{snippets}/error-example/http-response.adoc[]
+
+
+[[overview-hypermedia]]
+== Hypermedia
+
+This API uses hypermedia and resources include links to other resources in their
+responses. Responses are in http://stateless.co/hal_specification.html[Hypertext Application
+Language (HAL)] format. Links can be found benath the `_links` key. Client applications should follow
+the `_links` to access resource URLs wherever possible.
+
+[[overview-pagination]]
+== Listing resources
+
+Requests that return multiple resources will be paginated to 20 items by default. You can change number of items
+returned using the `size` parameter up to a maximum of 500 for a single request. The API also supports the `page`
+parameter for accessing a specific page of items.
+
+=== Paging resources
+
+Links will be provided in the response to navigate the resources.
+
+==== Example request
+
+include::{snippets}/page-example/curl-request.adoc[]
+
+==== Example response
+
+[source,http]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "_links" : {
+    "first" : {
+      "href" : "https://www.ebi.ac.uk/spot/oxo/api/terms?page=0&size=1"
+    },
+    "prev" : {
+      "href" : "https://www.ebi.ac.uk/spot/oxo/api/terms?page=0&size=1"
+    },
+    "self" : {
+      "href" : "https://www.ebi.ac.uk/spot/oxo/api/terms"
+    },
+    "next" : {
+      "href" : "https://www.ebi.ac.uk/spot/oxo/api/terms?page=2&size=1"
+    },
+    "last" : {
+      "href" : "https://www.ebi.ac.uk/spot/oxo/api/terms?page=140&size=1"
+    }
+  },
+  "_embedded" : {
+    ...
+  },
+  "page" : {
+    "size" : 1,
+    "totalElements" : 141,
+    "totalPages" : 141,
+    "number" : 1
+  }
+}
+----
+
+==== Response structure
+
+include::{snippets}/page-example/response-fields.adoc[]
+
+[[resources-page-links]]
+==== Links
+
+include::{snippets}/page-example/links.adoc[]
+
+[[resources]]
+= Resources
+
+
+[[resources-api]]
+== API
+The api endpoint provides the entry point into the service.
+
+
+[[resources-api-access]]
+=== Accessing the API
+
+A `GET` request is used to access the API
+
+==== Example request
+
+include::{snippets}/api-example/curl-request.adoc[]
+
+==== Response structure
+
+include::{snippets}/api-example/response-fields.adoc[]
+
+==== Example response
+
+include::{snippets}/api-example/http-response.adoc[]
+
+[[resources-api-links]]
+==== Links
+
+include::{snippets}/api-example/links.adoc[]
+
+[[resources-terms]]
+== Terms
+
+The Terms resource is used to list terms in OxO
+
+[[resources-terms-list]]
+=== Listing terms
+
+A `GET` request will list all of the OxO terms.
+
+==== Example request
+
+include::{snippets}/terms-list-example/curl-request.adoc[]
+
+==== Response structure
+
+The response is <<overview-pagination,paginated>> where the individual <<resources-term,term resources>>  are in the `_embedded.terms` field.
+
+[[resources-term]]
+== Term
+
+=== Retrieve a term
+
+include::{snippets}/term-example/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/term-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/term-example/http-response.adoc[]
+
+[[resources-term-links]]
+==== Links
+
+include::{snippets}/term-example/links.adoc[]
+
+[[resources-mappings]]
+== Mappings
+
+The mappings resource is used to list mappings in OxO
+
+[[resources-mappings-list]]
+=== Listing term mappings
+
+==== Example request
+
+include::{snippets}/mappings-list-example/curl-request.adoc[]
+
+==== Response structure
+
+The response is <<overview-pagination,paginated>> where the individual <<resources-mapping,mapping resources>>  are in the `_embedded.mappings` field.
+
+[[resources-mapping]]
+== Mapping
+
+=== Retrieve a mapping
+
+==== Example request
+
+include::{snippets}/mapping-example/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/mapping-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/mapping-example/http-response.adoc[]
+
+[[resources-mapping-links]]
+==== Links
+
+include::{snippets}/mapping-example/links.adoc[]
+
+[[resources-datasources]]
+== Datasources
+
+The datasources resource is used to list mappings in OxO. Datasoources can be the source of terms or the source of mappings. E.g. All terms with the EFO prefix
+are from the EFO datasource. The EFO datasource may also provide mappings between terms e.g. EFO includes mappings between Orphanet and the Human Disease Ontology.
+
+==== Example request
+
+include::{snippets}/datasources-list-example/curl-request.adoc[]
+
+==== Response structure
+
+The response is <<overview-pagination,paginated>> where the individual <<resources-datasource,datasource resources>>  are in the `_embedded.datasources` field.
+
+[[resources-datasource]]
+== Datasource
+
+=== Retrieve a datasource
+
+==== Example request
+
+include::{snippets}/datasource-example/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/datasource-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/datasource-example/http-response.adoc[]
+
+[[resources-datasource-links]]
+==== Links
+
+include::{snippets}/datasource-example/links.adoc[]
+
+[[search]]
+= Search
+
+== Search mappings
+
+The OxO search endpoint allows you to retrieve multiple mappings in bulk based on a set of input terms. You can also use the search endpoint
+to take advantage of OxO's unique mapping distance feature. Mapping distance is a how many hops across other mappings you need to go to find this mapping.
+Distance 1 is a direct mapping, the greater the distance the less likely it is that a mapping holds true. You can use the mapping distance to find all potential mappings, but we encourage
+these mappings to be validated through manual curation. The good news is you can contact us to submit your manually curated mapping back to OxO so they can be shared with others.
+
+include::{snippets}/search-by-ids-to-json/curl-request.adoc[]
+
+=== Search parameters
+
+Post a JSON object object with the following properties
+
+|===
+|Property|Description
+
+|`ids`
+| List of term ids that you want to map
+|`inputSource`
+| You can use input source to map all is from a given source rather than provide every id e.g. you can set the input source to `efo` and you will get mappings for every EFO term.
+|`mappingTarget`
+| Restrict your search to only inlclude mappings to set of target datasources. You can list the datasources by id.
+|`mappingSource`
+| Restrict the search to only include mappings from a certain datasource.
+|`distance`
+| Set the max mapping distance allowed. By default this is 2. Use distance 1 for direct asserted mappings.
+|===
+
+==== Response format
+
+You can get the search result in JSON, CSV or TSV format. Simply add a `format` parameter to the search URL to set the response type.
+
+----
+$ curl 'https://www.ebi.ac.uk/spot/oxo/api/search?format=csv' -i -X POST -H 'Content-Type: application/json'
+----
+
+You can also set the response format using HTTP headers of either `Accept: text/csv` or `Accept: text/tsv`
+
+
+==== Example response
+
+include::{snippets}/search-by-ids-to-json/http-response.adoc[]
+
+
+include::{snippets}/api-example/http-response.adoc[]
+
+
+
+
+=== Datasource
+Example request
+include::{snippets}/datasources-list-example/curl-request.adoc[]
+include::{snippets}/datasources-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/datasources-list-example/http-response.adoc[]
+
+
+=== mappings
+Example request
+include::{snippets}/mappings-list-example/curl-request.adoc[]
+include::{snippets}/mappings-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/mappings-list-example/http-response.adoc[]
+
+=== terms
+Example request
+include::{snippets}/terms-list-example/curl-request.adoc[]
+include::{snippets}/terms-list-example/http-request.adoc[]
+Example reply
+include::{snippets}/terms-list-example/http-response.adoc[]

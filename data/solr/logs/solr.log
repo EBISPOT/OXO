@@ -1,0 +1,180 @@
+2020-05-11 20:32:18.584 INFO  (main) [   ] o.e.j.u.log Logging initialized @367ms
+2020-05-11 20:32:18.769 INFO  (main) [   ] o.e.j.s.Server jetty-9.2.13.v20150730
+2020-05-11 20:32:18.787 WARN  (main) [   ] o.e.j.s.h.RequestLogHandler !RequestLog
+2020-05-11 20:32:18.792 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:/opt/solr/server/contexts/] at interval 0
+2020-05-11 20:32:19.235 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2020-05-11 20:32:19.247 WARN  (main) [   ] o.e.j.s.SecurityHandler ServletContext@o.e.j.w.WebAppContext@146ba0ac{/solr,file:/opt/solr/server/solr-webapp/webapp/,STARTING}{/opt/solr/server/solr-webapp/webapp} has uncovered http methods for path: /
+2020-05-11 20:32:19.258 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter SolrDispatchFilter.init(): WebAppClassLoader=239465106@e45f292
+2020-05-11 20:32:19.274 INFO  (main) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:19.274 INFO  (main) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:19.275 INFO  (main) [   ] o.a.s.c.SolrResourceLoader new SolrResourceLoader for directory: '/mnt/solr-config'
+2020-05-11 20:32:19.275 INFO  (main) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:19.275 INFO  (main) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:19.282 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /mnt/solr-config/solr.xml
+2020-05-11 20:32:19.364 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Config-defined core root directory: /mnt/solr-config
+2020-05-11 20:32:19.389 INFO  (main) [   ] o.a.s.c.CoreContainer New CoreContainer 1027591600
+2020-05-11 20:32:19.389 INFO  (main) [   ] o.a.s.c.CoreContainer Loading cores into CoreContainer [instanceDir=/mnt/solr-config]
+2020-05-11 20:32:19.389 WARN  (main) [   ] o.a.s.c.CoreContainer Couldn't add files from /mnt/solr-config/lib to classpath: /mnt/solr-config/lib
+2020-05-11 20:32:19.400 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory created with socketTimeout : 600000,connTimeout : 60000,maxConnectionsPerHost : 20,maxConnections : 10000,corePoolSize : 0,maximumPoolSize : 2147483647,maxThreadIdleTime : 5,sizeOfQueue : -1,fairnessPolicy : false,useRetries : false,connectionsEvictorSleepDelay : 5000,maxConnectionIdleTime : 40000,
+2020-05-11 20:32:19.609 INFO  (main) [   ] o.a.s.u.UpdateShardHandler Creating UpdateShardHandler HTTP client with params: socketTimeout=600000&connTimeout=60000&retry=true
+2020-05-11 20:32:19.612 INFO  (main) [   ] o.a.s.l.LogWatcher SLF4J impl is org.slf4j.impl.Log4jLoggerFactory
+2020-05-11 20:32:19.613 INFO  (main) [   ] o.a.s.l.LogWatcher Registering Log Listener [Log4j (org.slf4j.impl.Log4jLoggerFactory)]
+2020-05-11 20:32:19.614 INFO  (main) [   ] o.a.s.c.CoreContainer Security conf doesn't exist. Skipping setup for authorization module.
+2020-05-11 20:32:19.614 INFO  (main) [   ] o.a.s.c.CoreContainer No authentication plugin used.
+2020-05-11 20:32:19.646 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Looking for core definitions underneath /mnt/solr-config
+2020-05-11 20:32:19.650 INFO  (main) [   ] o.a.s.c.CoreDescriptor Created CoreDescriptor: {name=mapping, config=solrconfig.xml, loadOnStartup=true, schema=schema.xml, configSetProperties=configsetprops.json, transient=false, dataDir=/mnt/solr-data/data}
+2020-05-11 20:32:19.651 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found core mapping in /mnt/solr-config/mapping
+2020-05-11 20:32:19.651 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions
+2020-05-11 20:32:19.654 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter user.dir=/opt/solr/server
+2020-05-11 20:32:19.654 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter SolrDispatchFilter.init() done
+2020-05-11 20:32:19.657 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader new SolrResourceLoader for directory: '/mnt/solr-config/mapping'
+2020-05-11 20:32:19.657 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:19.657 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:19.664 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@146ba0ac{/solr,file:/opt/solr/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr/server/solr-webapp/webapp}
+2020-05-11 20:32:19.675 INFO  (main) [   ] o.e.j.s.ServerConnector Started ServerConnector@223d2c72{HTTP/1.1}{0.0.0.0:8983}
+2020-05-11 20:32:19.676 INFO  (main) [   ] o.e.j.s.Server Started @1460ms
+2020-05-11 20:32:19.698 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig current version of requestparams : -1
+2020-05-11 20:32:19.724 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.u.SolrIndexConfig IndexWriter infoStream solr logging is enabled
+2020-05-11 20:32:19.729 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig Using Lucene MatchVersion: 5.2.1
+2020-05-11 20:32:19.802 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig Loaded SolrConfig: solrconfig.xml
+2020-05-11 20:32:19.855 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.s.IndexSchema [mapping] Schema name=mapping
+2020-05-11 20:32:20.050 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.s.IndexSchema unique key field: id
+2020-05-11 20:32:20.159 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.ConfigSetProperties Did not find ConfigSet properties, assuming default properties: Can't find resource 'configsetprops.json' in classpath or '/mnt/solr-config/mapping'
+2020-05-11 20:32:20.159 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.CoreContainer Creating SolrCore 'mapping' using configuration from instancedir /mnt/solr-config/mapping
+2020-05-11 20:32:20.174 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore solr.NRTCachingDirectoryFactory
+2020-05-11 20:32:20.183 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore [[mapping] ] Opening new SolrCore at [/mnt/solr-config/mapping], dataDir=[/mnt/solr-data/data/]
+2020-05-11 20:32:20.185 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.JmxMonitoredMap No JMX servers found, not exposing Solr information with JMX.
+2020-05-11 20:32:20.188 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SchemaCodecFactory Using default compressionMode: BEST_SPEED
+2020-05-11 20:32:20.248 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory return new directory for /mnt/solr-data/data
+2020-05-11 20:32:20.249 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore New index directory detected: old=null new=/mnt/solr-data/data/index/
+2020-05-11 20:32:20.249 WARN  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore [mapping] Solr index directory '/mnt/solr-data/data/index' doesn't exist. Creating new index...
+2020-05-11 20:32:20.260 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory return new directory for /mnt/solr-data/data/index
+2020-05-11 20:32:20.377 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy SolrDeletionPolicy.onCommit: commits: num=1
+	commit{dir=NRTCachingDirectory(MMapDirectory@/mnt/solr-data/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@44406a25; maxCacheMB=48.0 maxMergeSizeMB=4.0),segFN=segments_1,generation=1}
+2020-05-11 20:32:20.378 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy newest commit generation = 1
+2020-05-11 20:32:20.380 INFO  (OldIndexDirectoryCleanupThreadForCore-mapping) [   x:mapping] o.a.s.c.SolrCore Looking for old index directories to cleanup for core mapping in /mnt/solr-data/data/
+2020-05-11 20:32:20.544 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore no updateRequestProcessorChain defined as default, creating implicit default
+2020-05-11 20:32:20.614 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:20.617 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:20.618 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:20.620 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:20.633 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/analysis/field' created with startup=lazy 
+2020-05-11 20:32:20.633 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/analysis/document' created with startup=lazy 
+2020-05-11 20:32:20.634 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/terms' created with startup=lazy 
+2020-05-11 20:32:20.634 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.RequestHandlers Registered paths: /admin/mbeans,/update/json/docs,/admin/luke,/export,/get,/admin/properties,/update/json,/admin/threads,/query,/analysis/field,/analysis/document,/update/csv,/select,/admin/segments,/admin/system,/replication,/config,/schema,/admin/plugins,/admin/logging,/admin/ping,/update,/admin/file,/debug/dump,/terms
+2020-05-11 20:32:20.635 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore Using default statsCache cache: org.apache.solr.search.stats.LocalStatsCache
+2020-05-11 20:32:20.654 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2020-05-11 20:32:20.654 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2020-05-11 20:32:20.664 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.CommitTracker Hard AutoCommit: if uncommited for 15000ms; 
+2020-05-11 20:32:20.664 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.CommitTracker Soft AutoCommit: disabled
+2020-05-11 20:32:20.670 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy SolrDeletionPolicy.onInit: commits: num=1
+	commit{dir=NRTCachingDirectory(MMapDirectory@/mnt/solr-data/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@44406a25; maxCacheMB=48.0 maxMergeSizeMB=4.0),segFN=segments_1,generation=1}
+2020-05-11 20:32:20.670 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy newest commit generation = 1
+2020-05-11 20:32:20.680 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.s.SolrIndexSearcher Opening Searcher@6520b34a[mapping] main
+2020-05-11 20:32:20.688 WARN  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.ManagedResourceStorage Cannot write to config directory /mnt/solr-config/mapping/conf; switching to use InMemory storage instead.
+2020-05-11 20:32:20.689 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.RestManager Initializing RestManager with initArgs: {}
+2020-05-11 20:32:20.707 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.ManagedResourceStorage Reading _rest_managed.json using InMemoryStorage
+2020-05-11 20:32:20.707 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.RestManager Initializing 0 registered ManagedResources
+2020-05-11 20:32:20.718 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.ReplicationHandler Commits will be reserved for  10000
+2020-05-11 20:32:20.720 INFO  (searcherExecutor-7-thread-1-processing-x:mapping) [   x:mapping] o.a.s.c.SolrCore [mapping] Registered new searcher Searcher@6520b34a[mapping] main{ExitableDirectoryReader(UninvertingDirectoryReader())}
+2020-05-11 20:32:20.720 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Looking up max value of version field to seed version buckets
+2020-05-11 20:32:20.721 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.VersionInfo Refreshing highest value of _version_ for 65536 version buckets from index
+2020-05-11 20:32:20.721 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.VersionInfo No terms found for _version_, cannot seed version bucket highest value from index
+2020-05-11 20:32:20.721 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Could not find max version in index or recent updates, using new clock 1666427535460663296
+2020-05-11 20:32:20.727 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Took 6.0ms to seed version buckets with highest version 1666427535460663296
+2020-05-11 20:32:20.727 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CoreContainer registering core: mapping
+2020-05-11 20:32:25.965 INFO  (Thread-0) [   ] o.e.j.s.ServerConnector Stopped ServerConnector@223d2c72{HTTP/1.1}{0.0.0.0:8983}
+2020-05-11 20:32:25.965 INFO  (Thread-0) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1027591600
+2020-05-11 20:32:25.967 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.SolrCore [mapping]  CLOSING SolrCore org.apache.solr.core.SolrCore@91c6759
+2020-05-11 20:32:25.968 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.u.DirectUpdateHandler2 closing DirectUpdateHandler2{commits=0,autocommit maxTime=15000ms,autocommits=0,soft autocommits=0,optimizes=0,rollbacks=0,expungeDeletes=0,docsPending=0,adds=0,deletesById=0,deletesByQuery=0,errors=0,cumulative_adds=0,cumulative_deletesById=0,cumulative_deletesByQuery=0,cumulative_errors=0,transaction_logs_total_size=0,transaction_logs_total_number=0}
+2020-05-11 20:32:25.968 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.u.SolrCoreState Closing SolrCoreState
+2020-05-11 20:32:25.969 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.u.DefaultSolrCoreState SolrCoreState ref count has reached 0 - closing IndexWriter
+2020-05-11 20:32:25.969 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.u.DefaultSolrCoreState closing IndexWriter with IndexWriterCloser
+2020-05-11 20:32:25.975 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.SolrCore [mapping] Closing main searcher on request.
+2020-05-11 20:32:25.976 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory Closing NRTCachingDirectoryFactory - 2 directories currently being tracked
+2020-05-11 20:32:25.976 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory looking to close /mnt/solr-data/data [CachedDir<<refCount=0;path=/mnt/solr-data/data;done=false>>]
+2020-05-11 20:32:25.976 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory Closing directory: /mnt/solr-data/data
+2020-05-11 20:32:25.977 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory looking to close /mnt/solr-data/data/index [CachedDir<<refCount=0;path=/mnt/solr-data/data/index;done=false>>]
+2020-05-11 20:32:25.977 INFO  (coreCloseExecutor-12-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory Closing directory: /mnt/solr-data/data/index
+2020-05-11 20:32:25.979 INFO  (Thread-0) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@146ba0ac{/solr,file:/opt/solr/server/solr-webapp/webapp/,UNAVAILABLE}{/opt/solr/server/solr-webapp/webapp}
+2020-05-11 20:32:32.989 INFO  (main) [   ] o.e.j.u.log Logging initialized @415ms
+2020-05-11 20:32:33.190 INFO  (main) [   ] o.e.j.s.Server jetty-9.2.13.v20150730
+2020-05-11 20:32:33.210 WARN  (main) [   ] o.e.j.s.h.RequestLogHandler !RequestLog
+2020-05-11 20:32:33.212 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:/opt/solr/server/contexts/] at interval 0
+2020-05-11 20:32:33.664 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2020-05-11 20:32:33.677 WARN  (main) [   ] o.e.j.s.SecurityHandler ServletContext@o.e.j.w.WebAppContext@146ba0ac{/solr,file:/opt/solr/server/solr-webapp/webapp/,STARTING}{/opt/solr/server/solr-webapp/webapp} has uncovered http methods for path: /
+2020-05-11 20:32:33.689 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter SolrDispatchFilter.init(): WebAppClassLoader=239465106@e45f292
+2020-05-11 20:32:33.709 INFO  (main) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:33.709 INFO  (main) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:33.710 INFO  (main) [   ] o.a.s.c.SolrResourceLoader new SolrResourceLoader for directory: '/mnt/solr-config'
+2020-05-11 20:32:33.710 INFO  (main) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:33.710 INFO  (main) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:33.717 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /mnt/solr-config/solr.xml
+2020-05-11 20:32:33.803 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Config-defined core root directory: /mnt/solr-config
+2020-05-11 20:32:33.825 INFO  (main) [   ] o.a.s.c.CoreContainer New CoreContainer 1027591600
+2020-05-11 20:32:33.825 INFO  (main) [   ] o.a.s.c.CoreContainer Loading cores into CoreContainer [instanceDir=/mnt/solr-config]
+2020-05-11 20:32:33.826 WARN  (main) [   ] o.a.s.c.CoreContainer Couldn't add files from /mnt/solr-config/lib to classpath: /mnt/solr-config/lib
+2020-05-11 20:32:33.837 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory created with socketTimeout : 600000,connTimeout : 60000,maxConnectionsPerHost : 20,maxConnections : 10000,corePoolSize : 0,maximumPoolSize : 2147483647,maxThreadIdleTime : 5,sizeOfQueue : -1,fairnessPolicy : false,useRetries : false,connectionsEvictorSleepDelay : 5000,maxConnectionIdleTime : 40000,
+2020-05-11 20:32:34.050 INFO  (main) [   ] o.a.s.u.UpdateShardHandler Creating UpdateShardHandler HTTP client with params: socketTimeout=600000&connTimeout=60000&retry=true
+2020-05-11 20:32:34.053 INFO  (main) [   ] o.a.s.l.LogWatcher SLF4J impl is org.slf4j.impl.Log4jLoggerFactory
+2020-05-11 20:32:34.053 INFO  (main) [   ] o.a.s.l.LogWatcher Registering Log Listener [Log4j (org.slf4j.impl.Log4jLoggerFactory)]
+2020-05-11 20:32:34.055 INFO  (main) [   ] o.a.s.c.CoreContainer Security conf doesn't exist. Skipping setup for authorization module.
+2020-05-11 20:32:34.055 INFO  (main) [   ] o.a.s.c.CoreContainer No authentication plugin used.
+2020-05-11 20:32:34.088 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Looking for core definitions underneath /mnt/solr-config
+2020-05-11 20:32:34.092 INFO  (main) [   ] o.a.s.c.CoreDescriptor Created CoreDescriptor: {name=mapping, config=solrconfig.xml, loadOnStartup=true, schema=schema.xml, configSetProperties=configsetprops.json, transient=false, dataDir=/mnt/solr-data/data}
+2020-05-11 20:32:34.093 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found core mapping in /mnt/solr-config/mapping
+2020-05-11 20:32:34.093 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 1 core definitions
+2020-05-11 20:32:34.097 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter user.dir=/opt/solr/server
+2020-05-11 20:32:34.097 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter SolrDispatchFilter.init() done
+2020-05-11 20:32:34.097 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader new SolrResourceLoader for directory: '/mnt/solr-config/mapping'
+2020-05-11 20:32:34.098 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader JNDI not configured for solr (NoInitialContextEx)
+2020-05-11 20:32:34.098 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrResourceLoader using system property solr.solr.home: /mnt/solr-config
+2020-05-11 20:32:34.111 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@146ba0ac{/solr,file:/opt/solr/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr/server/solr-webapp/webapp}
+2020-05-11 20:32:34.123 INFO  (main) [   ] o.e.j.s.ServerConnector Started ServerConnector@223d2c72{HTTP/1.1}{0.0.0.0:8983}
+2020-05-11 20:32:34.124 INFO  (main) [   ] o.e.j.s.Server Started @1553ms
+2020-05-11 20:32:34.152 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig current version of requestparams : -1
+2020-05-11 20:32:34.183 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.u.SolrIndexConfig IndexWriter infoStream solr logging is enabled
+2020-05-11 20:32:34.189 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig Using Lucene MatchVersion: 5.2.1
+2020-05-11 20:32:34.305 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.SolrConfig Loaded SolrConfig: solrconfig.xml
+2020-05-11 20:32:34.352 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.s.IndexSchema [mapping] Schema name=mapping
+2020-05-11 20:32:34.607 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.s.IndexSchema unique key field: id
+2020-05-11 20:32:34.754 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.ConfigSetProperties Did not find ConfigSet properties, assuming default properties: Can't find resource 'configsetprops.json' in classpath or '/mnt/solr-config/mapping'
+2020-05-11 20:32:34.754 INFO  (coreLoadExecutor-6-thread-1) [   ] o.a.s.c.CoreContainer Creating SolrCore 'mapping' using configuration from instancedir /mnt/solr-config/mapping
+2020-05-11 20:32:34.774 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore solr.NRTCachingDirectoryFactory
+2020-05-11 20:32:34.786 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore [[mapping] ] Opening new SolrCore at [/mnt/solr-config/mapping], dataDir=[/mnt/solr-data/data/]
+2020-05-11 20:32:34.788 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.JmxMonitoredMap No JMX servers found, not exposing Solr information with JMX.
+2020-05-11 20:32:34.792 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SchemaCodecFactory Using default compressionMode: BEST_SPEED
+2020-05-11 20:32:34.859 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory return new directory for /mnt/solr-data/data
+2020-05-11 20:32:34.860 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore New index directory detected: old=null new=/mnt/solr-data/data/index/
+2020-05-11 20:32:34.861 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CachingDirectoryFactory return new directory for /mnt/solr-data/data/index
+2020-05-11 20:32:34.877 INFO  (OldIndexDirectoryCleanupThreadForCore-mapping) [   x:mapping] o.a.s.c.SolrCore Looking for old index directories to cleanup for core mapping in /mnt/solr-data/data/
+2020-05-11 20:32:34.957 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore no updateRequestProcessorChain defined as default, creating implicit default
+2020-05-11 20:32:34.993 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:34.995 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:35.043 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:35.045 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.l.XMLLoader xsltCacheLifetimeSeconds=60
+2020-05-11 20:32:35.062 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/analysis/field' created with startup=lazy 
+2020-05-11 20:32:35.063 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/analysis/document' created with startup=lazy 
+2020-05-11 20:32:35.065 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.PluginBag requestHandler : '/terms' created with startup=lazy 
+2020-05-11 20:32:35.066 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.RequestHandlers Registered paths: /admin/mbeans,/update/json/docs,/admin/luke,/export,/get,/admin/properties,/update/json,/admin/threads,/query,/analysis/field,/analysis/document,/update/csv,/select,/admin/segments,/admin/system,/replication,/config,/schema,/admin/plugins,/admin/logging,/admin/ping,/update,/admin/file,/debug/dump,/terms
+2020-05-11 20:32:35.067 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrCore Using default statsCache cache: org.apache.solr.search.stats.LocalStatsCache
+2020-05-11 20:32:35.077 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2020-05-11 20:32:35.077 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2020-05-11 20:32:35.087 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.CommitTracker Hard AutoCommit: if uncommited for 15000ms; 
+2020-05-11 20:32:35.087 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.CommitTracker Soft AutoCommit: disabled
+2020-05-11 20:32:35.156 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy SolrDeletionPolicy.onInit: commits: num=1
+	commit{dir=NRTCachingDirectory(MMapDirectory@/mnt/solr-data/data/index lockFactory=org.apache.lucene.store.NativeFSLockFactory@47c3b848; maxCacheMB=48.0 maxMergeSizeMB=4.0),segFN=segments_1,generation=1}
+2020-05-11 20:32:35.156 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.SolrDeletionPolicy newest commit generation = 1
+2020-05-11 20:32:35.168 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.s.SolrIndexSearcher Opening Searcher@513eaa4b[mapping] main
+2020-05-11 20:32:35.175 WARN  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.ManagedResourceStorage Cannot write to config directory /mnt/solr-config/mapping/conf; switching to use InMemory storage instead.
+2020-05-11 20:32:35.176 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.RestManager Initializing RestManager with initArgs: {}
+2020-05-11 20:32:35.186 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.ManagedResourceStorage Reading _rest_managed.json using InMemoryStorage
+2020-05-11 20:32:35.186 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.r.RestManager Initializing 0 registered ManagedResources
+2020-05-11 20:32:35.193 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.h.ReplicationHandler Commits will be reserved for  10000
+2020-05-11 20:32:35.194 INFO  (searcherExecutor-7-thread-1-processing-x:mapping) [   x:mapping] o.a.s.c.SolrCore [mapping] Registered new searcher Searcher@513eaa4b[mapping] main{ExitableDirectoryReader(UninvertingDirectoryReader())}
+2020-05-11 20:32:35.195 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Looking up max value of version field to seed version buckets
+2020-05-11 20:32:35.196 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.VersionInfo Refreshing highest value of _version_ for 65536 version buckets from index
+2020-05-11 20:32:35.196 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.VersionInfo No terms found for _version_, cannot seed version bucket highest value from index
+2020-05-11 20:32:35.196 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Could not find max version in index or recent updates, using new clock 1666427550638800896
+2020-05-11 20:32:35.202 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.u.UpdateLog Took 5.0ms to seed version buckets with highest version 1666427550638800896
+2020-05-11 20:32:35.202 INFO  (coreLoadExecutor-6-thread-1) [   x:mapping] o.a.s.c.CoreContainer registering core: mapping

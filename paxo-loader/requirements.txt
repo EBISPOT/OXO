@@ -1,0 +1,5 @@
+pyyaml
+requests
+python-levenshtein
+flask
+neo4j-driver

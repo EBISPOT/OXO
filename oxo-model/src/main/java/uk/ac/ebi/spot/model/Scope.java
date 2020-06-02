@@ -7,8 +7,10 @@ package uk.ac.ebi.spot.model;
  */
 public enum Scope {
     EXACT,
-    NARROW,
-    BROAD,
+    // NARROW,
+    // BROAD,
+    NARROWER,
+    BROADER,
     RELATED,
     PREDICTED
 }

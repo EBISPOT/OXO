@@ -12,7 +12,7 @@
          More info: h5bp.com/b/378 -->
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> --> <!-- Not yet implemented -->
 
-    <title>Home &lt; Ontology Xref Service &lt; EMBL-EBI</title>
+    <title th:inline="text">Home &lt; [[${title}]] &lt; [[${org}]]</title>
     <meta name="description" content="EMBL-EBI Ontology Lookup Service is a repository of bio-medical ontologies and provides a powerful REST API for searching and accessing ontology term information"/><!-- Describe what this page is about -->
     <meta name="keywords" content="ontology, ontologies, bioinformatics, europe, institute"/><!-- A few keywords that relate to the content of THIS PAGE (not the whol project) -->
     <meta name="author" content="Samples Phenotypes and Ontologies Team, EMBL-EBI"/><!-- Your [project-name] here -->
@@ -108,7 +108,7 @@
             <!-- NB: for additional title style patterns, see http://frontier.ebi.ac.uk/web/style/patterns -->
 
             <div id="local-title" class="alpha logo-title">
-                <span><h1>Ontology Xref Service</h1></span>
+                <span><h1 th:inline="text">[[${title}]]</h1></span>
             </div>
 
             <!-- /local-title -->
@@ -123,7 +123,7 @@
 
             <nav>
                 <ul class="grid_24" id="local-nav">
-                    <li class="first"><a href="index">OxO</a></li>
+                    <li class="first"><a href="index" th:inline="text">[[${shortTitle}]]</a></li>
                     <li><a href="docs">Documentation</a></li>
                     <li class="last" ><a href="about">About</a></li>
                     <li th:if="not ${username} and not ${readonly}" class="functional"><a href="login" class="icon icon-functional" data-icon="l">Login</a></li>
@@ -162,8 +162,8 @@
 
             <h1>Hello <span th:text="${username}">you</span></h1>
             <p>
-                <a href="http://orcid.org"><img alt="ORCID logo" src="http://orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
-                <a th:text="'http://orcid.org/'+${orcid}" th:href="'http://orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
+                <a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a>
+                <a th:text="'http://orcid.org/'+${orcid}" th:href="'//orcid.org/'+${orcid}" href="http://orcid.org/0000-0001-5727-2427">http://orcid.org/0000-0001-5727-2427</a>
             </p>
             <p>ApiKey: <span th:text="${apikey}">you</span></p>
             <p>Role: <span th:text="${role}">you</span></p>
@@ -172,7 +172,7 @@
         <div th:unless="${username}">
             <p>You must have a ORCID iD to login and add mappings.</p>
             <a id="connect-orcid-button" href="/user">
-                <img id="orcid-id-logo" src="http://orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
+                <img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>
                 Login with your ORCID iD or create an account
             </a>
         </div>

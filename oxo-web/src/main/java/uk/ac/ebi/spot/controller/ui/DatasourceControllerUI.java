@@ -42,6 +42,9 @@ public class DatasourceControllerUI {
     @Autowired
     TermService termService;
 
+    @Autowired
+    CustomisationProperties customisationProperties;
+
     @RequestMapping(path = "/{prefix}", produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
     public String getDatasource (@PathVariable("prefix") String prefix, Model model, Pageable pageable) {
 
@@ -65,7 +68,7 @@ public class DatasourceControllerUI {
             model.addAttribute("distance", MappingDistance.DEFAULT_MAPPING_DISTANCE);
         }
 
-
+        customisationProperties.setCustomisationModelAttributes(model);
 
         return "datasource";
 
