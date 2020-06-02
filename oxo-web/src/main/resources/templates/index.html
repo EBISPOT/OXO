@@ -33,7 +33,7 @@
     <div class="row">
         <div class="grayBackground">
             <h4 th:inline="text">Welcome to the [[${org}]] [[${title}]] ([[${shortTitle}]]).</h4>
-            <p th:unless="debrand" style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mappings from a variety of sources including the
+            <p th:unless="${debrand}" style="font-size: 16px;">OxO is a service for finding mappings (or cross-references) between terms from ontologies, vocabularies and coding standards. OxO imports mappings from a variety of sources including the
         <a href="http://www.ebi.ac.uk/ols">Ontology Lookup Service</a> and a subset of mappings provided by the <a href="https://www.nlm.nih.gov/research/umls/">UMLS</a>. We're still developing the service so please <a href="contact">get in touch</a> if you have any feedback.</p>
     </div>
     </div>

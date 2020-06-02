@@ -21,7 +21,7 @@
     <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html
     <div id="elixir-banner" data-color="none" data-name="This service" data-description="I am a super cool service" data-more-information-link="https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi" data-use-basic-styles="true"></div>
     -->
-        <div th:unless="debrand" id="global-footer" class="global-footer">
+        <div th:unless="${debrand}" id="global-footer" class="global-footer">
             <nav id="global-nav-expanded" class="global-nav-expanded row">
                 <!-- Footer will be automatically inserted by footer.js -->
             </nav>
@@ -32,7 +32,7 @@
 </footer>
 
 
-    <script th:unless="debrand" defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
+    <script th:unless="${debrand}" defer="defer" src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
 
 
 
