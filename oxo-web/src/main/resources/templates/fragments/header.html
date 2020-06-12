@@ -32,7 +32,7 @@
                             data-description="navigational">
                             <li class=""><a th:href="@{/index}">Home</a></li>
                             <li class=""><a th:href="@{/docs}">Documentation</a></li>
-                            <li th:unless="debrand" class=""><a th:href="@{/about}">About</a></li>
+                            <li th:unless="${debrand}" class=""><a th:href="@{/about}">About</a></li>
 
                             <!-- This has to be revisted!-->
                             <li th:if="not ${username} and not ${readonly}" class="functional"><a th:href="@{/login}" class="icon icon-functional" data-icon="l">Login</a></li>
