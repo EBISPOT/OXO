@@ -6,6 +6,6 @@ build:
     - docker:19.03.11-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $CI_REGISTRY/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
-    - docker push $CI_REGISTRY/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+    - docker build -t $CI_REGISTRY/ontotools/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
+    - docker push $CI_REGISTRY/ontotools/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
 
