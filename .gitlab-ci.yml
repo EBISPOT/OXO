@@ -1,0 +1,11 @@
+
+build:
+  image: docker:18-git
+  stage: build
+  services:
+    - docker:18-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/ontotools/oxo/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
+    - docker push $CI_REGISTRY/ontotools/oxo/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+
