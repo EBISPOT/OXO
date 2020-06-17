@@ -6,6 +6,16 @@ build:
     - docker:18-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $CI_REGISTRY/ontotools/oxo/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
-    - docker push $CI_REGISTRY/ontotools/oxo/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-loader/Dockerfile .
+    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-indexer/Dockerfile .
+    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
+    - docker tag ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME
+    - docker tag ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME
+    - docker tag ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
+    - docker push ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME
 
