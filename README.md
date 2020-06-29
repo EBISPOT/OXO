@@ -11,11 +11,19 @@ OxO is comprised of three components:
 * The indexer (oxo-indexer/), which indexes terms and mappings found in neo4j in solr
 * The Web application (oxo-web/), which provides the user interface
 
-The OxO Web application, solr, and neo4j can be started using docker-compose:
+The preferred method of deployment for OxO is using Docker. First, create the necessary volumes:
+
+    docker volume create --name=oxo-neo4j-data
+    docker volume create --name=oxo-neo4j-import
+    docker volume create --name=oxo-mongo-data
+    docker volume create --name=oxo-solr-data
+    docker volume create --name=oxo-hsqldb
+
+Then, start OxO:
 
     docker-compose up
 
-The docker-compose configuration, by default, stores all persistent data (the hsqldb, neo4j, and solr data files) in the data/ directory by mounting volumes.  However, these datasets are empty until the loader and indexer have been executed.
+The OxO instance will be empty until the loader and indexer have been executed.
 
 ## Running the loader
 
@@ -26,8 +34,7 @@ The loader scripts are documented in the README of the oxo-loader/ directory.
 After using the loader to load data into neo4j, the indexer can be executed
 using Docker:
 
-    docker build -f oxo-indexer/Dockerfile -t oxo-indexer .
-    docker run --net=host oxo-indexer
+    docker run --net=host EBISPOT/oxo-indexer:stable
 
 
 # OxO without Docker

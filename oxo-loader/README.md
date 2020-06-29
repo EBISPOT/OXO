@@ -5,6 +5,8 @@ These Python scripts are used to
 3. To pull terms mappings from OLS and UMLS and generate CSV files (`OlsMappingExtractor.py`, `UmlsMappingExtractor.py`)
 2. To load these terms and mappings into the neo4j database used by OxO (`OxoNeo4jLoader.py`)
 
+<img src="loader.png"></img>
+
 They are configured by a config.ini file, an example of which is provided as
 config.sample.ini.  The path to the config is passed using to each script using
 the `-c` option.
@@ -24,9 +26,12 @@ registered in OLS, identifiers.org and OBO xrefs, and generates a CSV file.
 The CSV file is exported to the filename specified in the `exportFileDatasources` configuration option, or the -d command line option.
 If specified, the command line option takes precedence over the config.ini option.
 
-Example command:
+Example command (first, make sure neo4j is running with `docker-compose up -d neo4j`):
 
-    python OlsDatasetExtractor.py -c config.ini -i idorg.xml -d datasources.csv
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini -v $(pwd)/idorg.xml:/mnt/idorg.xml \
+        -v oxo-neo4j-import:/mnt/neo4j -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/OlsDatasetExtractor.py \
+                -c /mnt/config.ini -i /mnt/idorg.xml -d /mnt/neo4j/datasources.csv
 
 The output CSV file has the form:
 
@@ -36,11 +41,12 @@ For example:
 
     "DrugBank","drugbank","DrugBank","The DrugBank database is a bioinformatics and chemoinformatics resource that combines detailed drug (i.e. chemical, pharmacological and pharmaceutical) data with comprehensive drug target (i.e. sequence, structure, and pathway) information. This collection references drug information.","DATABASE","","drugbank,DRUGBANK,DrugBank","None","None"
 
-This metadata can then be loaded into the OxO neo4j database using the `OxoNeo4jLoader.py` script.  If using the provided
-docker-compose neo4j, first copy datasources.csv to the data/neo4jimport directory.
+This metadata can then be loaded into the OxO neo4j database using the `OxoNeo4jLoader.py` script.
 
-    cp datasources.csv ../data/neo4jimport
-    python OxoNeo4jLoader.py -c config.ini -W -d datasources.csv
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini \
+        -v oxo-neo4j-import:/var/lib/neo4j/import -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/OxoNeo4jLoader.py \
+                -c /mnt/config.ini -W -d datasources.csv
 
 # OlsMappingExtractor
 
@@ -61,34 +67,37 @@ For example:
 
     "MONDO:0012920","DOID:0110758","MONDO","{\"alternateIris\": [], \"name\": \"MONDO: Monarch Disease Ontology\", \"source\": \"ONTOLOGY\", \"idorgNamespace\": \"\", \"alternatePrefix\": [\"mondo\", \"MONDO\"], \"prefix\": \"MONDO\", \"licence\": \"https://creativecommons.org/licenses/by/4.0/\", \"orcid\": null, \"versionInfo\": \"Last updated in the ontology lookup service on 2019-05-27T04:26:17.673+0000\", \"preferredPrefix\": \"MONDO\"}","ONTOLOGY","RELATED","19-06-01"
 
-OlsMappingExtractor uses the OxO API.  Therefore, OxO and neo4j must be running.
-OlsMappingExtractor also requires access to a running OLS Solr instance (not the OxO Solr instance) configured with the olsSolrBaseUrl option.
+OlsMappingExtractor uses the OxO API.  Therefore, both OxO and neo4j must be running.
+
+    docker-compose up -d neo4j oxo-web
+
+OlsMappingExtractor also requires access to a running **OLS** Solr instance (not the **OxO** Solr instance) configured with the olsSolrBaseUrl option. Note that this is different from the OLS API.  OlsMappingExtractor bypasses the OLS API and uses Solr directly, therefore making it impossible to use with the public OLS instance.
     
-    python OlsMappingExtractor.py -c config.ini -t ols_terms.csv -m ols_mappings.csv
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini \
+        -v oxo-neo4j-import:/mnt/neo4j -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/OlsMappingExtractor.py \
+                -c /mnt/config.ini -t /mnt/neo4j/ols_terms.csv -m /mnt/neo4j/ols_mappings.csv
 
 These terms and mappings can then be loaded into neo4j using the `OxoNeo4jLoader.py` script:
 
-    python OxoNeo4jLoader.py -c config.ini -t ols_terms.csv -m ols_mappings.csv
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini \
+        -v oxo-neo4j-import:/var/lib/neo4j/import -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/OxoNeo4jLoader.py \
+                -c /mnt/config.ini -t ols_terms.csv -m ols_mappings.csv
 
 # UmlsMappingExtractor
 
 Like the OlsMappingExtractor, the UmlsMappingExtractor is used to pull mappings from UMLS and generate
-CSV files.
+CSV files.  The UMLS MySQL database must be configured in config.ini.
 
-    python UmlsMappingExtractor.py -c config.ini -t umls_terms.csv -m umls_mappings.csv
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini \
+        -v oxo-neo4j-import:/var/lib/neo4j/import -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/UmlsMappingExtractor.py \
+                -c /mnt/config.ini -t umls_terms.csv -m umls_mappings.csv
 
 These terms and mappings can then be loaded into neo4j using the `OxoNeo4jLoader.py` script:
 
-    python OxoNeo4jLoader.py -c config.ini -t umls_terms.csv -m umls_mappings.csv
-
-# Docker
-
-These scripts can also be executed using Docker for convenience.  For example,
-having prepared a host directory `mydir` with the config.ini and idorg.xml, the
-OlsDatasetExtractor can be executed as follows:
-
-    docker build -t oxo-loader .
-
-    docker run -v ./mydir:/mnt -it oxo-loader python OlsDatasetExtractor.py
-        -c /mnt/config.ini -i /mnt/idorg.xml -d /mnt/datasources.csv
-
+    docker run --net=host -v $(pwd)/config.ini:/mnt/config.ini \
+        -v oxo-neo4j-import:/var/lib/neo4j/import -it ebispot/oxo-loader:stable \
+            python /opt/oxo-loader/OxoNeo4jLoader.py \
+                -c /mnt/config.ini -t umls_terms.csv -m umls_mappings.csv
