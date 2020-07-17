@@ -1,0 +1,10 @@
+
+image:
+  name: ebispot/oxo-indexer
+  tag: stable
+
+
+oxoRelease: dev
+
+
+

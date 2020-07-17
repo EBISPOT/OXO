@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-web
+  labels:
+    app: {{ .Release.Name }}-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-web
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-web
+    spec:
+      containers:
+        - name: web
+          image: {{.Values.image.name}}:{{.Values.image.tag}}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: spring.datasource.url
+              value: jdbc:hsqldb:file:/mnt/hsqldb
+            - name: oxo.neo.driver
+              value: org.neo4j.ogm.drivers.http.driver.HttpDriver
+            - name: oxo.neo.uri
+              value: http://neo4j:dba@{{ .Release.Name }}-neo4j:7474
+            - name: spring.data.solr.host
+              value: http://{{ .Release.Name }}-solr:8983/solr
