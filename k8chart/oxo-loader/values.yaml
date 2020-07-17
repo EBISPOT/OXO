@@ -1,0 +1,10 @@
+
+image:
+  name: ebispot/oxo-loader
+  tag: stable
+
+
+oxoRelease: dev
+
+
+
