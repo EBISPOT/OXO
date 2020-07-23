@@ -24,6 +24,7 @@ spec:
       containers:
         - name: solr
           image: solr:5.5.3-alpine
+          imagePullPolicy: Always
           command: ['solr-precreate', 'mapping']
           ports:
             - containerPort: 8983

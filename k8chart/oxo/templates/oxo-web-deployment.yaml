@@ -17,6 +17,7 @@ spec:
       containers:
         - name: web
           image: {{.Values.image.name}}:{{.Values.image.tag}}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

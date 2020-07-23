@@ -5,11 +5,11 @@ metadata:
 data:
   config.ini: |-
     [Basics]
-    oxoUrl=http://oxo-{{ .Values.oxoRelease }}-web:8080
+    oxoUrl=http://oxo-{{ .Values.oxoRelease }}-web.oxo.svc.cluster.local:8080
     oxoAPIkey=key
-    olsSolrBaseUrl=http://ves-hx-7e:8993/solr
+    olsSolrBaseUrl=http://ves-hx-7e.ebi.ac.uk:8993/solr
     solrChunks=5000
-    neoURL=bolt://oxo-{{ .Values.oxoRelease }}-neo4j:7687
+    neoURL=bolt://oxo-{{ .Values.oxoRelease }}-neo4j.oxo.svc.cluster.local:7687
     neoUser=neo4j
     neoPass=dba
     olsurl=https://www.ebi.ac.uk/ols/api
