@@ -63,7 +63,7 @@ runLoader:
     - sleep 10
     # - helm install --namespace oxo --debug --set image.tag=$CI_COMMIT_SHA,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-loader-$CI_COMMIT_REF_NAME ./k8chart/oxo-loader --wait
     - helm install --namespace oxo --debug --set image.tag=dev,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-loader-$CI_COMMIT_REF_NAME ./k8chart/oxo-loader --wait
-    - kubectl wait --for=condition=complete --timeout=24h --namespace oxo job/oxo-loader-$CI_COMMIT_REF_NAME-job
+    - ./job_wait.sh oxo job/oxo-loader-$CI_COMMIT_REF_NAME-job
 
 runIndexer:
   image: dtzar/helm-kubectl:2.13.1
@@ -77,5 +77,5 @@ runIndexer:
     - helm delete --purge oxo-indexer-$CI_COMMIT_REF_NAME || true
     - sleep 10
     - helm install --namespace oxo --debug --set image.tag=dev,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-indexer-$CI_COMMIT_REF_NAME ./k8chart/oxo-indexer --wait
-    - kubectl wait --for=condition=complete --timeout=24h --namespace oxo job/oxo-indexer-$CI_COMMIT_REF_NAME-job
+    - ./job_wait.sh oxo job/oxo-indexer-$CI_COMMIT_REF_NAME-job
 
