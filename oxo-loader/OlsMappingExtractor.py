@@ -182,7 +182,7 @@ def processSolrDocs(url):
                         if ":" in xref or "_" in xref:
                             toPrefix = OXO.getPrefixFromCui(xref)
                             toId = OXO.getIdFromCui(xref)
-                            
+
                             if not toPrefix or not toId:
                                 print("Can't get prefix or id for " + xref)
                                 continue
@@ -282,7 +282,7 @@ for key, term in terms.items():
 print("Finished, here are all the unknown sources")
 for key, value in unknownSource.items() :
     # see if we can match prefix to db
-    print(key.encode('utf-8', 'ignore'))
+    print(key)
 
 print("Generating CSV files for neo loading...")
 
