@@ -47,11 +47,9 @@ class Builder:
                 label = None
                 uri = None
 
-                try:
-                    if term["label"] is not None:
-                        label = term["label"].encode('utf-8', errors="ignore")
-                except:
-                    pass
+                if term["label"] is not None:
+                    #https://docs.python.org/release/3.0.1/whatsnew/3.0.html#text-vs-data-instead-of-unicode-vs-8-bit
+                    label = term["label"]
 
                 if term["uri"] is not None:
                     uri = term["uri"]
