@@ -139,6 +139,11 @@ def processSolrDocs(url):
                 fromPrefix = OXO.getPrefixFromCui(fromOboId)
                 fromId = OXO.getIdFromCui(fromOboId)
 
+            # Terrible hack for this case, why does it not work from the base_uri?
+            if fromIri.startswith("https://purl.ihccglobal.org/"):
+                iri = fromIri.replace("https://purl.ihccglobal.org/", "")
+                fromPrefix, fromId = iri.split("_", 1)
+
             if not fromPrefix and not fromId:
                 fromPrefix = OXO.getPrefixFromCui(fromShortForm)
                 fromId = OXO.getIdFromCui(fromShortForm)
@@ -177,6 +182,10 @@ def processSolrDocs(url):
                         if ":" in xref or "_" in xref:
                             toPrefix = OXO.getPrefixFromCui(xref)
                             toId = OXO.getIdFromCui(xref)
+
+                            if xref.startswith("https://purl.ihccglobal.org/"):
+                                iri = xref.replace("https://purl.ihccglobal.org/", "")
+                                toPrefix, toId = iri.split("_", 1)
 
                             if not toPrefix or not toId:
                                 print("Can't get prefix or id for " + xref)

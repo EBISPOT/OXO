@@ -60,6 +60,7 @@ datasources = {}
 for ontology in ontologies:
     namespace = ontology["config"]["namespace"]
     version = ontology["updated"]
+    prefPrefix = ontology["config"]["preferredPrefix"]
 
     altPrefixes = [namespace]
     if namespace == 'ordo':
@@ -72,8 +73,6 @@ for ontology in ontologies:
     elif namespace == "ncit":
         prefPrefix = "NCIT"
         altPrefixes = [namespace, "NCI_Thesaurus", "NCI", "ncithesaurus", "NCI2009_04D"]
-    else:
-        prefPrefix = ontology["config"]["preferredPrefix"]
 
     title = ontology["config"]["title"]
     desc = ontology["config"]["description"]
