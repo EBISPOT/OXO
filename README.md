@@ -34,7 +34,7 @@ The loader scripts are documented in the README of the oxo-loader/ directory.
 After using the loader to load data into neo4j, the indexer can be executed
 using Docker:
 
-    docker run --net=host EBISPOT/oxo-indexer:stable
+    docker run --net=host ebispot/oxo-indexer:dev
 
 
 # OxO without Docker
