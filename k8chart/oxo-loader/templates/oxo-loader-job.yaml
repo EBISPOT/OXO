@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-job
+backoffLimit: 0
+concurrencyPolicy: Forbid
+failedJobsHistoryLimit: 1
+restartPolicy: Never
+spec:
+  restartPolicy: Never
+  template:
+    metadata:
+      name: {{ .Release.Name }}-job
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: oxo-loader
+        image:  {{.Values.image.name}}:{{.Values.image.tag}}
+        imagePullPolicy: Always
+        command: ['bash', '/opt/oxo-loader/load_all.sh']
+        volumeMounts:
+        - name: oxoloader-config
+          mountPath: "/opt/oxo-config"
+          readOnly: true
+        - name: oxo-{{.Values.oxoRelease}}-neo4jimport
+          mountPath: "/mnt/neo4jimport"
+        env:
+        - name: NEO4JIMPORT
+          value: '/mnt/neo4jimport'
+        - name: CONFIG_INI
+          value: '/opt/oxo-config/config.ini'
+        - name: IDORG_XML
+          value: '/opt/oxo-loader/idorg.xml'
+        envFrom:
+          - configMapRef:
+              name: oxo-{{ .Values.oxoRelease }}-proxy-configmap
+      volumes:
+      - name: oxoloader-config
+        configMap:
+          name: {{ .Release.Name }}-configmap
+      - name: oxo-{{.Values.oxoRelease}}-neo4jimport
+        persistentVolumeClaim:
+          claimName: oxo-{{.Values.oxoRelease}}-neo4jimport

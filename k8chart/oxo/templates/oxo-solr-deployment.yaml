@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-solr
+  labels:
+    app: {{ .Release.Name }}-solr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-solr
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-solr
+    spec:
+      # initContainers:
+      #   - name: init-solr
+      #     image: solr:5.5.3-alpine
+      #     command: ['solr', 'create_core', '-c', 'mapping']
+      #     volumeMounts:
+      #       - name: {{.Release.Name}}-solr-data
+      #         mountPath: "/var/solr"
+      containers:
+        - name: solr
+          image: solr:5.5.3-alpine
+          imagePullPolicy: Always
+          command: ['solr-precreate', 'mapping']
+          ports:
+            - containerPort: 8983
+          volumeMounts:
+            - name: {{.Release.Name}}-solr-data
+              mountPath: "/var/solr"
+      volumes:
+      - name: {{.Release.Name}}-solr-data
+        persistentVolumeClaim:
+          claimName: {{.Release.Name}}-solr-data
+

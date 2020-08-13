@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  config.ini: |-
+    [Basics]
+    oxoUrl=http://oxo-{{ .Values.oxoRelease }}-web.oxo.svc.cluster.local:8080
+    oxoAPIkey=key
+    olsSolrBaseUrl=http://ves-hx-7e.ebi.ac.uk:8993/solr
+    solrChunks=5000
+    neoURL=bolt://oxo-{{ .Values.oxoRelease }}-neo4j.oxo.svc.cluster.local:7687
+    neoUser=neo4j
+    neoPass=dba
+    olsurl=https://www.ebi.ac.uk/ols/api
+    oboDbxrefUrl=https://raw.githubusercontent.com/geneontology/go-site/master/metadata/db-xrefs.yaml
+
+    [Paths]
+    exportFileDatasources=datasources.csv
+    exportFileTerms=/path/terms.csv
+    exportFileMappings=/path/mappings.csv
+    idorgDataLocation = /path/idorg.xml
+
+    [SQLumls]
+    user=username
+    password=password
+    host=mysql-name
+    db=dbName
+    port=4570
+
+    [LOINC]
+    Part=/path/Part.csv
+    PartRelatedCodeMapping=/path/PartRelatedCodeMapping.csv

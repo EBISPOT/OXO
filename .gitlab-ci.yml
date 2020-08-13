@@ -1,6 +1,13 @@
 
+stages:
+  - build
+  - deploy
+  - dataload
+  - indexing
+
 build:
   image: docker:18-git
+  when: manual
   stage: build
   only:
     - dev
@@ -9,17 +16,66 @@ build:
   services:
     - docker:18-dind
   script:
+    - echo docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-loader/Dockerfile .
-    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-indexer/Dockerfile .
-    - docker build -t ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID -f  ./oxo-web/Dockerfile .
-    - docker tag ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME
-    - docker tag ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME
-    - docker tag ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-loader:$CI_COMMIT_REF_NAME
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-indexer:$CI_COMMIT_REF_NAME
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME-$CI_BUILD_ID
-    - docker push ${OXO_IMAGE_PREFIX}/oxo-web:$CI_COMMIT_REF_NAME
+    - docker build -t $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-loader:$CI_COMMIT_SHA -f  ./oxo-loader/Dockerfile .
+    - docker build -t $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-indexer:$CI_COMMIT_SHA -f  ./oxo-indexer/Dockerfile .
+    - docker build -t $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-web:$CI_COMMIT_SHA -f  ./oxo-web/Dockerfile .
+    - docker tag $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-loader:$CI_COMMIT_SHA $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-loader:$CI_COMMIT_REF_NAME
+    - docker tag $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-indexer:$CI_COMMIT_SHA $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-indexer:$CI_COMMIT_REF_NAME
+    - docker tag $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-web:$CI_COMMIT_SHA $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-web:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-loader:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-loader:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-indexer:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-indexer:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-web:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$OXO_IMAGE_PREFIX/oxo-web:$CI_COMMIT_REF_NAME
+
+deploy:
+  image: dtzar/helm-kubectl:2.13.1
+  when: manual
+  stage: deploy
+  only:
+    - dev
+  script:
+    - echo "Deploy to $CI_COMMIT_REF_NAME server"
+    - mkdir -p /root/.kube
+    - echo ${KUBECONF_DEV} | base64 -d > /root/.kube/config
+    - helm init
+    - helm delete --purge oxo-$CI_COMMIT_REF_NAME || true
+    - sleep 10
+    - helm install --namespace oxo --debug --name oxo-$CI_COMMIT_REF_NAME-pvcs ./k8chart/pvcs --wait || true
+    # - helm install --namespace oxo --debug --set image.tag=$CI_COMMIT_SHA --name oxo-$CI_COMMIT_REF_NAME ./k8chart/oxo --wait
+    - helm install --namespace oxo --debug --set image.tag=dev --name oxo-$CI_COMMIT_REF_NAME ./k8chart/oxo --wait
+  environment:
+    name: dev
+
+runLoader:
+  image: dtzar/helm-kubectl:2.13.1
+  when: manual
+  stage: dataload
+  script:
+    - echo "Run $CI_COMMIT_REF_NAME loader"
+    - mkdir -p /root/.kube
+    - echo ${KUBECONF_DEV} | base64 -d > /root/.kube/config
+    - helm init
+    - helm delete --purge oxo-loader-$CI_COMMIT_REF_NAME || true
+    - sleep 10
+    # - helm install --namespace oxo --debug --set image.tag=$CI_COMMIT_SHA,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-loader-$CI_COMMIT_REF_NAME ./k8chart/oxo-loader --wait
+    - helm install --namespace oxo --debug --set image.tag=dev,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-loader-$CI_COMMIT_REF_NAME ./k8chart/oxo-loader --wait
+    - ./job_wait.sh oxo job/oxo-loader-$CI_COMMIT_REF_NAME-job
+
+runIndexer:
+  image: dtzar/helm-kubectl:2.13.1
+  when: manual
+  stage: indexing
+  script:
+    - echo "Run $CI_COMMIT_REF_NAME indexer"
+    - mkdir -p /root/.kube
+    - echo ${KUBECONF_DEV} | base64 -d > /root/.kube/config
+    - helm init
+    - helm delete --purge oxo-indexer-$CI_COMMIT_REF_NAME || true
+    - sleep 10
+    - helm install --namespace oxo --debug --set image.tag=dev,oxoRelease=$CI_COMMIT_REF_NAME --name oxo-indexer-$CI_COMMIT_REF_NAME ./k8chart/oxo-indexer --wait
+    - ./job_wait.sh oxo job/oxo-indexer-$CI_COMMIT_REF_NAME-job
 

@@ -156,3 +156,11 @@ a .ontology-source {
     white-space: pre !important;
 
 }
+
+#mapping-vis .link {
+    stroke: red;
+}
+
+#docs-content h1 {
+    color: black !important;
+}

@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-job
+spec:
+  backoffLimit: 0
+  restartPolicy: Never
+  template:
+    metadata:
+      name: {{ .Release.Name }}-job
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: oxo-indexer
+        image: {{.Values.image.name}}:{{.Values.image.tag}}
+        command: [ 'java', '-Xmx10g', '-jar', 'oxo-indexer.jar' ]
+        resources:
+          limits:
+            memory: "15Gi"
+          requests:
+            memory: "15Gi"
+        env:
+        - name: OXO_NEO_DRIVER
+          value: "org.neo4j.ogm.drivers.http.driver.HttpDriver"
+        - name: OXO_NEO_URI
+          value: "http://neo4j:dba@oxo-{{.Values.oxoRelease}}-neo4j:7474"
+        - name: SPRING_DATA_SOLR_HOST
+          value: "http://oxo-{{.Values.oxoRelease}}-solr:8983/solr"
+        - name: OXO_INDEXER_CHUNKS
+          value: "5000"
