@@ -37,6 +37,9 @@ public class OxOWebMvcConfig extends WebMvcConfigurerAdapter {
     }
     
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/custom/**").addResourceLocations("file:" + System.getProperty("oxo.custom")+"/");
+        if(System.getenv("OXO_CUSTOM")!=null) {
+            String resource = "file:" + System.getenv("OXO_CUSTOM")+"/";
+            registry.addResourceHandler("/custom/**").addResourceLocations(resource);
+        }
     }
 }
