@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
+
 
 /**
  * @author Simon Jupp
@@ -32,5 +34,9 @@ public class OxOWebMvcConfig extends WebMvcConfigurerAdapter {
             .setUseSuffixPatternMatch(false);
 
 
+    }
+    
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/custom/**").addResourceLocations("file:" + System.getProperty("oxo.custom")+"/");
     }
 }
