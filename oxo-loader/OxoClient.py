@@ -36,6 +36,7 @@ class OXO:
         self.alreadyScoped = {}
         self.olsLabel = {}
         self.olsIri = {}
+        self.olsBaseUri = {}
 
     def saveDatasource (self, prefix, idorgNamespace, title, description, sourceType, baseUri, alternatePrefixes, licence, versionInfo):
         #print "saving new datasource: {},{},{},{},{},{}".format(prefix, idorgNamespace, title, sourceType, baseUri, alternatePrefixes)
@@ -151,6 +152,22 @@ class OXO:
                     self.olsIri[curie] = uri
                     return {'uri': uri, 'label': label}
         return None
+
+    def getBaseUrisByPrefixFromOls(self, prefix):
+        if not self.olsBaseUri:
+            olsurl = self.olsurl+"/ontologies"
+            reply = urllib.request.urlopen(olsurl)
+            if reply.getcode() == 200:
+                anwser = json.load(reply)
+                if "_embedded" in list(anwser.keys()):
+                    ontologies = anwser["_embedded"]["ontologies"]
+                    for ontology in ontologies:
+                        if 'config' in ontology:
+                            if 'preferredPrefix' in ontology['config']:
+                                if 'baseUris' in ontology:
+                                    self.olsBaseUri[ontology['config']['preferredPrefix']] = ontology['baseUris']
+
+        return self.olsBaseUri.get(prefix)
 
     def getLabelFromOls(self, curie):
 
