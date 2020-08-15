@@ -88,6 +88,7 @@ for data in OXO.getOxODatasets():
     prefixToBaseUri[prefix] = OXO.getBaseUrisByPrefixFromOls(prefix)
     prefixToDatasource[prefix] = data
     prefixToPreferred[prefix] = prefix
+    prefixToPreferred[prefix] = prefix.lower() # Hack to get the 'ontogy id' in here as well.
     for altPrefix in data["alternatePrefix"]:
         prefixToPreferred[altPrefix] = prefix
         if "idorgNamespace" in data and data["idorgNamespace"] != '':
@@ -153,8 +154,8 @@ def processSolrDocs(url):
                 baseUris = prefixToBaseUri[fromPrefix]
                 if isinstance(baseUris, list):
                     for baseUri in baseUris:
-                        if fromIri.startwith(baseUri):
-                            fromId = fromIri.replace(baseUri)
+                        if fromIri.startswith(baseUri):
+                            fromId = fromIri.replace(baseUri,"")
 
             if "obo_id" in docs:
                 fromOboId = docs["obo_id"]
@@ -163,8 +164,10 @@ def processSolrDocs(url):
                 if not fromId:
                     fromId = OXO.getIdFromCui(fromOboId)
 
-            if not fromPrefix and not fromId:
+            if not fromPrefix:
                 fromPrefix = OXO.getPrefixFromCui(fromShortForm)
+
+            if not fromId:
                 fromId = OXO.getIdFromCui(fromShortForm)
 
             if not fromPrefix:
@@ -266,13 +269,14 @@ def processSolrDocs(url):
                                 idorgUri = "http://identifiers.org/" + toCurie
                                 terms[toCurie]["uri"] = idorgUri
 
-        print(str(x))
         initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
         with urllib.request.urlopen(initUrl) as reply:
             json_terms = json.loads(reply.read().decode())
 
 
 # do the query to get docs from solr and process
+#print(str(prefixToPreferred))
+#print(str(prefixToBaseUri))
 
 if not skipEfo:
     processSolrDocs(efoSolrQueryUrl)

@@ -164,8 +164,8 @@ class OXO:
                     for ontology in ontologies:
                         if 'config' in ontology:
                             if 'preferredPrefix' in ontology['config']:
-                                if 'baseUris' in ontology:
-                                    self.olsBaseUri[ontology['config']['preferredPrefix']] = ontology['baseUris']
+                                if 'baseUris' in ontology['config']:
+                                    self.olsBaseUri[ontology['config']['preferredPrefix']] = ontology['config']['baseUris']
 
         return self.olsBaseUri.get(prefix)
 
