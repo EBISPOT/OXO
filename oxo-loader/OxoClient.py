@@ -205,6 +205,7 @@ class OXO:
                                         scope = "BROADER"
                                     self.alreadyScoped[target] = scope
                                     return scope
+        return "RELATED"
 
 
     def getOxODatasets(self):
