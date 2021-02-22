@@ -6,6 +6,7 @@ Python client to the OxO REST API
 import urllib.request, urllib.parse, urllib.error
 import requests
 import json
+import urllib.parse
 #from ConfigParser import SafeConfigParser
 
 class Datasource:
@@ -132,7 +133,7 @@ class OXO:
         if curie in self.olsIri:
             return {"uri" : self.olsIri[curie], "label": self.olsLabel[curie]}
         else:
-            query = self.olsurl+"/terms?obo_id="+curie
+            query = self.olsurl+"/terms?obo_id="+urllib.parse.quote(curie)
             reply = urllib.request.urlopen(query)
             if reply.getcode() == 200:
                 anwser = json.load(reply)
@@ -222,6 +223,7 @@ class OXO:
                                         scope = "BROADER"
                                     self.alreadyScoped[target] = scope
                                     return scope
+        return "RELATED"
 
 
     def getOxODatasets(self):
