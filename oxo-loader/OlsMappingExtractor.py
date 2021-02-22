@@ -137,6 +137,11 @@ def processSolrDocs(url):
     size = json_terms["response"]["numFound"]
 
     for x in range(0, size, rows):
+        initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
+        print(initUrl)
+        with urllib.request.urlopen(initUrl) as reply:
+            json_terms = json.loads(reply.read().decode())
+
         for docs in json_terms["response"]["docs"]:
             fromPrefix = None
             fromId = None
@@ -268,10 +273,6 @@ def processSolrDocs(url):
                             if toPrefix.lower() in idorgNamespace:
                                 idorgUri = "http://identifiers.org/" + toCurie
                                 terms[toCurie]["uri"] = idorgUri
-
-        initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
-        with urllib.request.urlopen(initUrl) as reply:
-            json_terms = json.loads(reply.read().decode())
 
 
 # do the query to get docs from solr and process
