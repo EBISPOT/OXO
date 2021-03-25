@@ -4,6 +4,6 @@ configparser==3.5.0
 idna==2.6
 pymysql==0.9.3
 neo4j-driver==1.7.6
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.18.4
 urllib3==1.22
