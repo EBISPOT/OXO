@@ -10,8 +10,7 @@ build:
   when: manual
   stage: build
   only:
-    - dev
-    - test
+    - main
     - stable
   services:
     - docker:18-dind
