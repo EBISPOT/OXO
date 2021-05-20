@@ -7,7 +7,6 @@ stages:
 
 build:
   image: docker:18-git
-  when: manual
   stage: build
   only:
     - main
