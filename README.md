@@ -11,7 +11,9 @@ OxO is comprised of three components:
 * The indexer (oxo-indexer/), which indexes terms and mappings found in neo4j in solr
 * The Web application (oxo-web/), which provides the user interface
 
-The preferred method of deployment for OxO is using Docker. First, create the necessary volumes:
+The preferred method of deployment for OxO is using Docker.  If you would like to deploy **the entire OntoTools stack** (OLS, OxO, and ZOOMA), check out the [OntoTools Docker Config](https://github.com/EBISPOT/ontotools-docker-config) repository. If you would like to deploy **OxO only**, read on.
+
+First, create the necessary volumes:
 
     docker volume create --name=oxo-neo4j-data
     docker volume create --name=oxo-neo4j-import
