@@ -61,4 +61,16 @@ Then run the indexer:
 
 The Web application is a standard WAR and can be deployed using e.g. Tomcat.
 
+## Customisation
+
+It is possible to customise several branding options in `oxo-web/src/main/resources/application.properties`:
+
+* `oxo.customisation.debrand` — If set to true, removes the EBI header and footer, documentation, and about page
+* `oxo.customisation.title` — A custom title for your instance, e.g. "My OxO Instance"
+* `oxo.customisation.short-title` — A shorter version of the custom title, e.g. "MYOxO"
+* `oxo.customisation.description` — A description of the instance
+* `oxo.customisation.org` — The organisation hosting your instance
+
+
+
 
