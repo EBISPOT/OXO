@@ -72,7 +72,7 @@
                             <span>
                                  <button th:if="${datasource.getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}"
                                          style="display: inline-block;"
-                                         th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"
+					 th:onclick="'window.location.href=\'' + ${olsUrl}+@{/ontologies/{ontology}(ontology=${datasource.getPrefix()})} + '\''"
                                          class="button secondary clickable">View in OLS</button>
                             </span>
                     </div>

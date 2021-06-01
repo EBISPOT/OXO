@@ -75,7 +75,7 @@
                         <!--</div>-->
 
                         <div  th:if="${term.getDatasource().getSource() == T(uk.ac.ebi.spot.model.SourceType).ONTOLOGY}" style="padding-top: 5px;">
-                            <button th:onclick="'window.location.href=\'' + @{//www.ebi.ac.uk/ols/terms(iri=${term.getUri()})} + '\''"  class="button secondary clickable">View in OLS</button>
+				<button th:onclick="'window.location.href=\'' + ${olsUrl}+@{/terms(iri=${term.getUri()})} + '\''"  class="button secondary clickable">View in OLS</button>
                         </div>
 
                     </div>
