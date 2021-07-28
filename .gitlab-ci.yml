@@ -11,6 +11,7 @@ build:
   only:
     - main
     - stable
+    - snomed-hacks-merged
   services:
     - docker:18-dind
   script:
