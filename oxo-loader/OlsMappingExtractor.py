@@ -156,7 +156,11 @@ def processSolrDocs(url):
                 print("unknown prefix " + fromPrefix + " so skipping")
                 continue
 
-            fromPrefix = prefixToPreferred[fromPrefix]
+            if fromOntology == "snomed":
+                fromPrefix = "SNOMED"
+            else:
+                fromPrefix = prefixToPreferred[fromPrefix]
+
             fromCurie = fromPrefix + ":" + fromId
 
             if fromCurie not in terms:
@@ -174,7 +178,7 @@ def processSolrDocs(url):
             for anno in knownAnnotations:
                 if anno in docs:
                     for xref in docs[anno]:
-                        if ":" in xref or "_" in xref:
+                        if fromOntology == "snomed" or ":" in xref or "_" in xref:
                             toPrefix = OXO.getPrefixFromCui(xref)
                             toId = OXO.getIdFromCui(xref)
 
@@ -187,7 +191,7 @@ def processSolrDocs(url):
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1
-                                # print "Unknown prefix source for "+toPrefix+" so skipping"
+                                print("Unknown prefix source for "+toPrefix+" so skipping")
                                 continue
 
 
