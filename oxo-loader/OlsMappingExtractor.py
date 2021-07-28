@@ -191,7 +191,7 @@ def processSolrDocs(url):
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1
-                                print "Unknown prefix source for "+toPrefix+" so skipping"
+                                print("Unknown prefix source for "+toPrefix+" so skipping")
                                 continue
 
 
