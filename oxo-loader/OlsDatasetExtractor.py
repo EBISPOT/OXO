@@ -53,6 +53,9 @@ if options.datasources:
 reply = urllib.request.urlopen(olsurl)
 anwser = json.load(reply)
 
+print("olsurl = " + olsurl)
+print("json dump" + json.dumps(anwser))
+
 ontologies  = anwser["_embedded"]["ontologies"]
 
 datasources = {}
@@ -191,6 +194,43 @@ versionInfo=1
 datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
 
 
+print("Adding ctv3 as datasource")
+prefPrefix="CTV3"
+namespace=None
+title="CTV3"
+desc="CTV3"
+sourceType="DATABASE"
+urlSyntax=None
+altPrefixes=["ctv3", "CTV3"]
+licence=None
+versionInfo=1
+datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
+
+
+print("Adding ICD10CM as datasource")
+prefPrefix="ICD10CM"
+namespace=None
+title="ICD10CM"
+desc="ICD10CM"
+sourceType="DATABASE"
+urlSyntax=None
+altPrefixes=["icd10cm", "ICD10CM"]
+licence=None
+versionInfo=1
+datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
+
+
+print("Adding ICDO as datasource")
+prefPrefix="ICDO"
+namespace=None
+title="ICDO"
+desc="ICDO"
+sourceType="DATABASE"
+urlSyntax=None
+altPrefixes=["icdo", "ICDO"]
+licence=None
+versionInfo=1
+datasources[prefPrefix] = OxoClient.Datasource(prefPrefix, namespace, title, desc, sourceType, urlSyntax, altPrefixes, licence, versionInfo)
 
 # print OxO loading csv file
 import OxoCsvBuilder

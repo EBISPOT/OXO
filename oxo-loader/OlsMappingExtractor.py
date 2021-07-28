@@ -134,29 +134,12 @@ def processSolrDocs(url):
             fromOntology = docs["ontology_name"]
             fromLabel = docs["label"]
 
-            if "obo_id" in docs:
-                fromOboId = docs["obo_id"]
-                fromPrefix = OXO.getPrefixFromCui(fromOboId)
-                fromId = OXO.getIdFromCui(fromOboId)
+            print("fromIri = " + fromIri)
+            print("fromShortForm = " + fromShortForm)
+            fromId = fromShortForm
 
-            if not fromPrefix and not fromId:
-                fromPrefix = OXO.getPrefixFromCui(fromShortForm)
-                fromId = OXO.getIdFromCui(fromShortForm)
 
-            if not fromPrefix:
-                print("Can't determine prefix for " + fromShortForm + " so skipping")
-                continue
-
-            if not fromId:
-                print("Can't determine id for " + fromShortForm + " so skipping")
-                continue
-            # do we know the source term from the prefix?
-
-            if fromPrefix not in prefixToPreferred:
-                print("unknown prefix " + fromPrefix + " so skipping")
-                continue
-
-            fromPrefix = prefixToPreferred[fromPrefix]
+            fromPrefix ="SNOMED" 
             fromCurie = fromPrefix + ":" + fromId
 
             if fromCurie not in terms:
@@ -174,7 +157,7 @@ def processSolrDocs(url):
             for anno in knownAnnotations:
                 if anno in docs:
                     for xref in docs[anno]:
-                        if ":" in xref or "_" in xref:
+                        if True:
                             toPrefix = OXO.getPrefixFromCui(xref)
                             toId = OXO.getIdFromCui(xref)
 
@@ -187,7 +170,7 @@ def processSolrDocs(url):
                                 continue
                             if toPrefix.lower() not in prefixToPreferred:
                                 unknownSource[toPrefix] = 1
-                                # print "Unknown prefix source for "+toPrefix+" so skipping"
+                                print("Unknown prefix source for "+toPrefix+" so skipping")
                                 continue
 
 
