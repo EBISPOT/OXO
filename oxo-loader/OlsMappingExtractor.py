@@ -31,6 +31,7 @@ OXO.oxoUrl=config.get("Basics","oxoUrl")
 OXO.olsurl=config.get("Basics","olsurl")
 
 solrBaseUrl=config.get("Basics","olsSolrBaseUrl")
+skipEfo=config.get("Basics","skipEfo")
 
 exportFileTerms= config.get("Paths","exportFileTerms")
 if options.terms:
@@ -69,6 +70,7 @@ solrChunks=config.getint("Basics","solrChunks")
 
 # OLS loader
 # get prefix data from OLS
+prefixToBaseUri = {}
 prefixToPreferred = {}
 termToIri = {}
 termToLabel = {}
@@ -79,14 +81,20 @@ print("Reading datasources from OxO...")
 for data in OXO.getOxODatasets():
     del data['_links']
     del data['description']
-    prefix = data["prefix"]
+    if "preferredPrefix" in data:
+        prefix = data["preferredPrefix"]
+    else:
+        prefix = data["prefix"]
+    prefixToBaseUri[prefix] = OXO.getBaseUrisByPrefixFromOls(prefix)
     prefixToDatasource[prefix] = data
     prefixToPreferred[prefix] = prefix
+    prefixToPreferred[prefix] = prefix.lower() # Hack to get the 'ontogy id' in here as well.
     for altPrefix in data["alternatePrefix"]:
         prefixToPreferred[altPrefix] = prefix
-        if "idorgNamespace" in data and  data["idorgNamespace"] != '':
+        if "idorgNamespace" in data and data["idorgNamespace"] != '':
             idorgNamespace[altPrefix.lower()] = data["idorgNamespace"]
             idorgNamespace[prefix.lower()] = data["idorgNamespace"]
+
 print("Reading datasources from OxO done")
 
 # these are the annotation properties where we look for xrefs
@@ -98,14 +106,15 @@ knownAnnotations = [
 # find all the EFO xref annotation propertied
 # note EFO does xrefs in a different way to all the other OBO ontologies so
 # give it special consideration
-response = urllib.request.urlopen(getEfoAnnotationsUrl)
-print(getEfoAnnotationsUrl)
-print(response)
-cr = csv.reader(response.read().decode('utf-8'))
-for row in cr:
-    for p in row:
-        if 'definition_citation' in p:
-            knownAnnotations.append(p)
+if not skipEfo:
+    response = urllib.request.urlopen(getEfoAnnotationsUrl)
+    print(getEfoAnnotationsUrl)
+    print(response)
+    cr = csv.reader(response.read().decode('utf-8'))
+    for row in cr:
+        for p in row:
+            if 'definition_citation' in p:
+                knownAnnotations.append(p)
 
 unknownSource = {}
 
@@ -116,16 +125,19 @@ postMappings = []
 # main function that gets crawls the OLS Solr documents for xrefs
 # We use the Solr endpoint directly instead of the OLS API as we can restrict the query
 # to only terms that have an xref. In the future we may add this functionality to the OLS API
+
+
 def processSolrDocs(url):
     rows = solrChunks
     initUrl = url + "&start=0&rows=" + str(rows)
-    reply = urllib.request.urlopen(initUrl)
-    anwser = json.load(reply)
+    print(initUrl)
+    with urllib.request.urlopen(initUrl) as reply:
+        json_terms = json.loads(reply.read().decode())
 
-    size = anwser["response"]["numFound"]
+    size = json_terms["response"]["numFound"]
 
-    for x in range(rows, size, rows):
-        for docs in anwser["response"]["docs"]:
+    for x in range(0, size, rows):
+        for docs in json_terms["response"]["docs"]:
             fromPrefix = None
             fromId = None
 
@@ -134,13 +146,28 @@ def processSolrDocs(url):
             fromOntology = docs["ontology_name"]
             fromLabel = docs["label"]
 
+            if fromOntology in prefixToPreferred:
+                fromPrefix = prefixToPreferred[fromOntology]
+
+            # This should always be the correct way to get the OBO ID
+            if fromPrefix and fromPrefix in prefixToBaseUri:
+                baseUris = prefixToBaseUri[fromPrefix]
+                if isinstance(baseUris, list):
+                    for baseUri in baseUris:
+                        if fromIri.startswith(baseUri):
+                            fromId = fromIri.replace(baseUri,"")
+
             if "obo_id" in docs:
                 fromOboId = docs["obo_id"]
-                fromPrefix = OXO.getPrefixFromCui(fromOboId)
-                fromId = OXO.getIdFromCui(fromOboId)
+                if not fromPrefix:
+                    fromPrefix = OXO.getPrefixFromCui(fromOboId)
+                if not fromId:
+                    fromId = OXO.getIdFromCui(fromOboId)
 
-            if not fromPrefix and not fromId:
+            if not fromPrefix:
                 fromPrefix = OXO.getPrefixFromCui(fromShortForm)
+
+            if not fromId:
                 fromId = OXO.getIdFromCui(fromShortForm)
 
             if not fromPrefix:
@@ -204,8 +231,9 @@ def processSolrDocs(url):
                                     "id": toId,
                                     "curie": toCurie,
                                     "uri": None,
-                                    "label":None
+                                    "label": None
                                 }
+
 
                             if fromCurie == toCurie:
                                 continue
@@ -245,16 +273,19 @@ def processSolrDocs(url):
                                 idorgUri = "http://identifiers.org/" + toCurie
                                 terms[toCurie]["uri"] = idorgUri
 
-        print(str(x))
         initUrl = url + "&start=" + str(x) + "&rows=" + str(rows)
-        reply = urllib.request.urlopen(initUrl)
-        anwser = json.load(reply)
+        with urllib.request.urlopen(initUrl) as reply:
+            json_terms = json.loads(reply.read().decode())
 
 
 # do the query to get docs from solr and process
+#print(str(prefixToPreferred))
+#print(str(prefixToBaseUri))
 
-processSolrDocs(efoSolrQueryUrl)
-print("Done processing EFO, starting to query OLS")
+if not skipEfo:
+    processSolrDocs(efoSolrQueryUrl)
+    print("Done processing EFO, starting to query OLS")
+
 processSolrDocs(olsDbxrefSolrQuery)
 print("Done processing OLS")
 
@@ -278,14 +309,13 @@ for key, term in terms.items():
 print("Finished, here are all the unknown sources")
 for key, value in unknownSource.items() :
     # see if we can match prefix to db
-    print(key.encode('utf-8', 'ignore'))
+    print(key)
 
 print("Generating CSV files for neo loading...")
 
 
 import OxoCsvBuilder
 builder = OxoCsvBuilder.Builder()
-
 builder.exportTermsToCsv(exportFileTerms, terms)
 builder.exportMappingsToCsv(exportFileMappings, postMappings, prefixToDatasource)
 

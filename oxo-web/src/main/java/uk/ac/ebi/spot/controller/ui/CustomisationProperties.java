@@ -13,7 +13,7 @@ public class CustomisationProperties {
     @Value("${oxo.customisation.debrand:false}")
     private boolean debrand;
     
-    @Value("${oxo.customisation.logo:/img/OXO_logo_2017_colour_background.png")
+    @Value("${oxo.customisation.logo:/img/OXO_logo_2017_colour_background.png}")
     private String logo;
 
     @Value("${oxo.customisation.title:Ontology Xref Service}")
