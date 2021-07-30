@@ -31,7 +31,7 @@ OXO.oxoUrl=config.get("Basics","oxoUrl")
 OXO.olsurl=config.get("Basics","olsurl")
 
 solrBaseUrl=config.get("Basics","olsSolrBaseUrl")
-skipEfo=config.get("Basics","skipEfo")
+skipEfo=config.getboolean("Basics","skipEfo")
 
 exportFileTerms= config.get("Paths","exportFileTerms")
 if options.terms:
