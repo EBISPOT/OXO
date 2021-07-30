@@ -11,7 +11,7 @@ build:
   only:
     - main
     - stable
-    - snomed-hacks-merged
+    - ihcc-cohorts
   services:
     - docker:18-dind
   script:
