@@ -7,9 +7,9 @@ services:
         ports:
           - 8983:8983
         volumes:
-          - oxo-solr-data:/mnt/solr-data
+          - oxo-solr-data:/var/solr
           - ./solr-config:/mnt/solr-config
-        command: ["solr", "-Dsolr.solr.home=/mnt/solr-config", "-Dsolr.data.dir=/mnt/solr-data", "-Dsolr.log=/mnt/solr-data/logs", "-f"]
+        command: ["-Dsolr.solr.home=/mnt/solr-config", "-Dsolr.data.dir=/var/solr", "-Dsolr.log=/var/solr/logs", "-f"]
     neo4j:
         image: neo4j:3.1.1
         environment:

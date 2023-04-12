@@ -25,12 +25,16 @@ public class CustomisationProperties {
     @Value("${oxo.customisation.org:EMBL-EBI}")
     private String org;
 
+    @Value("${oxo.customisation.olsUrl:https://www.ebi.ac.uk/ols}")
+    private String olsUrl;
+
     public void setCustomisationModelAttributes(Model model) {
         model.addAttribute("debrand", debrand);
         model.addAttribute("logo", logo);
         model.addAttribute("title", title);
         model.addAttribute("shortTitle", shortTitle);
         model.addAttribute("org", org);
+        model.addAttribute("olsUrl", olsUrl);
     }
 
     public boolean getDebrand() {
