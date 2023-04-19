@@ -5,7 +5,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,6 @@ import javax.annotation.Resource;
 @SpringBootApplication
 @EnableNeo4jRepositories(basePackages = "uk.ac.ebi.spot.repository")
 @EnableSolrRepositories(basePackages = "uk.ac.ebi.spot.index", basePackageClasses = {Document.class})
-@EnableAutoConfiguration
 @EnableConfigurationProperties
 @ComponentScan({"uk.ac.ebi"})
 public class SolrIndexer implements CommandLineRunner {
@@ -43,17 +41,18 @@ public class SolrIndexer implements CommandLineRunner {
     SolrClient solrClient() {
         return new HttpSolrClient(environment.getProperty("spring.data.solr.host"));
     }
+
     @Bean
     public SolrTemplate solrTemplate() {
         return new SolrTemplate(solrClient(), "mapping");
     }
-    
+
     @Override
     public void run(String... strings) throws Exception {
         termService.rebuildIndexes();
     }
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(SolrIndexer.class, args);
+        SpringApplication.exit(SpringApplication.run(SolrIndexer.class, args));
     }
 }
