@@ -41,17 +41,18 @@ public class SolrIndexer implements CommandLineRunner {
     SolrClient solrClient() {
         return new HttpSolrClient(environment.getProperty("spring.data.solr.host"));
     }
+
     @Bean
     public SolrTemplate solrTemplate() {
         return new SolrTemplate(solrClient(), "mapping");
     }
-    
+
     @Override
     public void run(String... strings) throws Exception {
         termService.rebuildIndexes();
     }
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(SolrIndexer.class, args);
+        SpringApplication.exit(SpringApplication.run(SolrIndexer.class, args));
     }
 }
