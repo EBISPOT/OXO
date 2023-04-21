@@ -53,6 +53,6 @@ public class SolrIndexer implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.exit(SpringApplication.run(SolrIndexer.class, args));
+        SpringApplication.run(SolrIndexer.class, args);
     }
 }
